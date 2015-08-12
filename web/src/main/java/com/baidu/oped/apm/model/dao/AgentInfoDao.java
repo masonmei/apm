@@ -16,4 +16,6 @@ public interface AgentInfoDao {
     AgentInfoBo findAgentInfoBeforeStartTime(String agentId, long currentTime);
 
     List<AgentInfoBo> getAgentInfo(String agentId, Range range);
+
+    List<AgentInfoBo> findAgentInfoByApplicationName(String application);
 }
