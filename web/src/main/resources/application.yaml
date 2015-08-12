@@ -1,0 +1,32 @@
+spring:
+  application:
+    name: mx-web
+  http:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+  dao:
+    exceptiontranslation:
+      enabled: false
+logging:
+  path: log
+  file: web-mx.log
+  conf: logback.xml
+  level:
+    org.springframework.boot: DEBUG
+    org.springframework: INFO
+    com.baidu.oped.cloudwatch.business.fc: DEBUG
+    com.baidu.oped.cloudwatch.boot: DEBUG
+
+hbase:
+  clientHost: 127.0.0.1
+  clientPort: 2181
+  clientTcpNodelay: true
+  rpcTimeout: 10000
+  operationTimeout: 10000
+  socketReadTimeout: 20000
+  socketWriteTimeout: 60000
+  maxThreadSize: 128
+  poolQueueSize: 5120
+  prestartPool: false

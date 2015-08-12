@@ -1,0 +1,37 @@
+hbase:
+  clientHost: 127.0.0.1
+  clientPort: 2181
+  clientTcpNodelay: true
+  rpcTimeout: 10000
+  operationTimeout: 10000
+  socketReadTimeout: 20000
+  socketWriteTimeout: 60000
+  maxThreadSize: 128
+  poolQueueSize: 5120
+  prestartPool: false
+
+collector:
+  flushPeriod: 1000
+
+  tcpListenIp: 0.0.0.0
+  tcpListenPort: 29994
+
+  udpSpanListenIp: 0.0.0.0
+  udpSpanListenPort: 29996
+
+  udpSpanSocketReceiveBufferSize: 4194304
+  udpSpanWorkerThread: 32
+  udpSpanWorkerQueueSize: 1024
+
+  udpStatListenIp: 0.0.0.0
+  udpStatListenPort: 29995
+  udpStatSocketReceiveBufferSize: 4194304
+  udpStatWorkerThread: 16
+  udpStatWorkerQueueSize: 512
+
+  l4ip:
+
+spring:
+  dao:
+    exceptiontranslation:
+      enabled: false

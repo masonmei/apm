@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="true">
+    <property name="DEBUG_LOG_FILE_PATH" value="log/mx-web.debug.log"/>
+    <property name="MAX_LOG_FILE_SIZE" value="500MB"/>
+    <property name="INFO_LOG_FILE_PATH" value="log/mx-web.info.log"/>
+    <property name="ERROR_LOG_FILE_PATH" value="log/mx-web.error.log"/>
+    <property name="WARN_LOG_FILE_PATH" value="log/mx-web.warn.log"/>
+
+    <include resource="logging/logback-base.xml"/>
+    <logger name="org.springframework" level="INFO"/>
+    <logger name="com.baidu.oped.apm" level="DEBUG">
+        <appender-ref ref="DEBUG_LOG_FILE"/>
+    </logger>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="WebDebugAppender"/>
+        <appender-ref ref="INFO_LOG_FILE"/>
+        <appender-ref ref="ERROR_LOG_FILE"/>
+        <appender-ref ref="WARN_LOG_FILE"/>
+    </root>
+</configuration>

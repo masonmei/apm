@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<included>
+    <statusListener class="ch.qos.logback.core.status.OnConsoleStatusListener"/>
+
+    <property name="MAX_ACCESS_LOG_FILE_SIZE" value="${MAX_ACCESS_LOG_FILE_SIZE:-50MB}"/>
+
+    <property name="ACCESS_DEBUG_URI_PREFIX" value="${ACCESS_DEBUG_FILTER:-/json-api}"/>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>clf</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="CONSOLE_DEBUG" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+            <evaluator name="ApiOnly">
+                <expression>
+                    event.getRequestURI().startsWith("${ACCESS_DEBUG_URI_PREFIX}")
+                </expression>
+            </evaluator>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <encoder>
+            <pattern>%h %l %u [%t] "%r" %s %b "%i{Referer}" "%i{User-Agent}" %n======&gt;%n%fullRequest%n&lt;======%n%fullResponse</pattern>
+        </encoder>
+    </appender>
+
+    <if condition='isDefined("ACCESS_LOG_FILE_PATH")'>
+        <then>
+            <appender name="ACCESS_LOG_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+                <encoder>
+                    <pattern>clf</pattern>
+                </encoder>
+                <file>${ACCESS_LOG_FILE_PATH}</file>
+                <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+                    <fileNamePattern>log/mx-web.access_%i.log</fileNamePattern>
+                    <minIndex>1</minIndex>
+                    <maxIndex>30</maxIndex>
+                </rollingPolicy>
+                <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+                    <maxFileSize>${MAX_LOG_FILE_SIZE}</maxFileSize>
+                </triggeringPolicy>
+            </appender>
+        </then>
+    </if>
+    <if condition='isDefined("ACCESS_DEBUG_LOG_FILE_PATH")'>
+        <then>
+            <appender name="ACCESS_DEBUG_LOG_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+                <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+                    <evaluator name="ApiOnly">
+                        <expression>
+                            event.getRequestURI().startsWith("${ACCESS_DEBUG_URI_PREFIX}")
+                        </expression>
+                    </evaluator>
+                    <onMismatch>DENY</onMismatch>
+                </filter>
+                <encoder>
+                    <pattern>%h %l %u [%t] "%r" %s %b "%i{Referer}" "%i{User-Agent}" %n======&gt;%n%fullRequest%n&lt;======%n%fullResponse</pattern>
+                </encoder>
+                <file>${ACCESS_DEBUG_LOG_FILE_PATH}</file>
+                <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+                    <fileNamePattern>log/mx-web.access.debug_%i.log</fileNamePattern>
+                    <minIndex>1</minIndex>
+                    <maxIndex>30</maxIndex>
+                </rollingPolicy>
+                <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+                    <maxFileSize>${MAX_LOG_FILE_SIZE}</maxFileSize>
+                </triggeringPolicy>
+            </appender>
+        </then>
+    </if>
+</included>
