@@ -1,9 +1,10 @@
 
 package com.baidu.oped.apm.model.dao.hbase;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.baidu.oped.apm.common.hbase.HBaseTables;
+import com.baidu.oped.apm.common.hbase.HbaseOperations2;
+import com.baidu.oped.apm.model.dao.ApplicationIndexDao;
+import com.baidu.oped.apm.mvc.vo.Application;
 import org.apache.hadoop.hbase.client.Delete;
 import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.Scan;
@@ -14,10 +15,8 @@ import org.springframework.data.hadoop.hbase.RowMapper;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
-import com.baidu.oped.apm.Application;
-import com.baidu.oped.apm.common.hbase.HBaseTables;
-import com.baidu.oped.apm.common.hbase.HbaseOperations2;
-import com.baidu.oped.apm.model.dao.ApplicationIndexDao;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * class HbaseApplicationIndexDao 
@@ -30,8 +29,8 @@ public class HbaseApplicationIndexDao implements ApplicationIndexDao {
     @Autowired
     private HbaseOperations2 hbaseOperations2;
 
-//    @Autowired
-//    @Qualifier("applicationNameMapper")
+    @Autowired
+    @Qualifier("applicationNameMapper")
     private RowMapper<List<Application>> applicationNameMapper;
 
 //    @Autowired
@@ -50,7 +49,7 @@ public class HbaseApplicationIndexDao implements ApplicationIndexDao {
         return applications;
     }
 
-    @Override
+//    @Override
     public List<String> selectAgentIds(String applicationName) {
         if (applicationName == null) {
             throw new NullPointerException("applicationName must not be null");
@@ -63,14 +62,14 @@ public class HbaseApplicationIndexDao implements ApplicationIndexDao {
         return hbaseOperations2.get(HBaseTables.APPLICATION_INDEX, get, agentIdMapper);
     }
 
-    @Override
+//    @Override
     public void deleteApplicationName(String applicationName) {
         byte[] rowKey = Bytes.toBytes(applicationName);
         Delete delete = new Delete(rowKey);
         hbaseOperations2.delete(HBaseTables.APPLICATION_INDEX, delete);
     }
 
-    @Override
+//    @Override
     public void deleteAgentId(String applicationName, String agentId) {
         if (StringUtils.isEmpty(applicationName)) {
             throw new IllegalArgumentException("applicationName cannot be empty");

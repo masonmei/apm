@@ -1,16 +1,14 @@
 package com.baidu.oped.apm.mvc.controller;
 
-import java.util.Collections;
-import java.util.List;
-
+import com.baidu.oped.apm.model.service.ApplicationService;
+import com.baidu.oped.apm.mvc.vo.Application;
+import com.baidu.oped.apm.mvc.vo.Instance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.baidu.oped.apm.model.service.ApplicationService;
-import com.baidu.oped.apm.mvc.vo.Application;
-import com.baidu.oped.apm.mvc.vo.Instance;
+import java.util.List;
 
 /**
  * Created by mason on 8/12/15.
@@ -23,7 +21,7 @@ public class ApplicationController {
 
     @RequestMapping(value = {"list"})
     public List<Application> findApplication() {
-        return Collections.emptyList();
+        return applicationService.selectAllApplicationNames();
     }
 
     @RequestMapping(value = {"instance/list"})

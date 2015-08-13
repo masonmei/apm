@@ -1,17 +1,16 @@
 package com.baidu.oped.apm.model.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
+import com.baidu.oped.apm.common.bo.AgentInfoBo;
+import com.baidu.oped.apm.model.dao.AgentInfoDao;
+import com.baidu.oped.apm.model.dao.ApplicationIndexDao;
+import com.baidu.oped.apm.mvc.vo.Application;
+import com.baidu.oped.apm.mvc.vo.Instance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import com.baidu.oped.apm.common.bo.AgentInfoBo;
-import com.baidu.oped.apm.model.dao.AgentInfoDao;
-import com.baidu.oped.apm.mvc.vo.Instance;
-import com.google.common.base.Predicate;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by mason on 8/12/15.
@@ -20,6 +19,13 @@ import com.google.common.base.Predicate;
 public class ApplicationService {
     @Autowired
     private AgentInfoDao agentInfoDao;
+
+    @Autowired
+    private ApplicationIndexDao applicationIndexDao;
+
+    public List<Application> selectAllApplicationNames() {
+        return applicationIndexDao.selectAllApplicationNames();
+    }
 
     public List<Instance> findApplicationInstanceByApplication(String applicationName) {
         Assert.hasLength(applicationName, "ApplicationName cannot be empty when finding Instances.");
