@@ -6,16 +6,12 @@ package com.baidu.oped.apm.mvc.vo;
 public class Metric {
     private String name;
     private String unit;
-    private double value;
 
-    public Metric() {
-    }
-
-    public Metric(String name, String unit, double value) {
-        this.name = name;
-        this.unit = unit;
-        this.value = value;
-    }
+    private double max = 0.0;
+    private double min = 0.0;
+    private double sum = 0.0;
+    private double avg = 0.0;
+    private double count = 0;
 
     public String getName() {
         return name;
@@ -33,12 +29,43 @@ public class Metric {
         this.unit = unit;
     }
 
-    public double getValue() {
-        return value;
+    public double getMax() {
+        return max;
     }
 
-    public void setValue(double value) {
-        this.value = value;
+    public void setMax(double max) {
+        this.max = max;
     }
 
+    public double getMin() {
+        return min;
+    }
+
+    public void setMin(double min) {
+        this.min = min;
+    }
+
+    public double getSum() {
+        return sum;
+    }
+
+    public void setSum(double sum) {
+        this.sum = sum;
+    }
+
+    public double getAvg() {
+        return avg;
+    }
+
+    public void setAvg(double avg) {
+        this.avg = avg;
+    }
+
+    public double getCount() {
+        return count;
+    }
+
+    public void setCount(double count) {
+        this.count = count;
+    }
 }

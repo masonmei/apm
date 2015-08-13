@@ -30,12 +30,12 @@ public class HbaseTraceDao implements TraceDao {
     @Autowired
     private HbaseOperations2 template2;
 
-//    @Autowired
-//    @Qualifier("traceDistributor")
+    @Autowired
+    @Qualifier("traceDistributor")
     private AbstractRowKeyDistributor rowKeyDistributor;
 
-//    @Autowired
-//    @Qualifier("spanMapper")
+    @Autowired
+    @Qualifier("spanMapper")
     private RowMapper<List<SpanBo>> spanMapper;
 
 //    @Autowired

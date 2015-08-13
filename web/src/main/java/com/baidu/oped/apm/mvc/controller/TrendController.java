@@ -34,7 +34,7 @@ public class TrendController {
 
     }
 
-    @RequestMapping(value = {"apdex"})
+    @RequestMapping(value = {"error"})
     public void error() {
 
     }
