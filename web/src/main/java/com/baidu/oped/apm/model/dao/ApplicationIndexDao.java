@@ -3,7 +3,7 @@ package com.baidu.oped.apm.model.dao;
 
 import java.util.List;
 
-import com.baidu.oped.apm.Application;
+import com.baidu.oped.apm.mvc.vo.Application;
 
 /**
  * class ApplicationIndexDao 

@@ -27,7 +27,7 @@ public class ApplicationService {
         return applicationIndexDao.selectAllApplicationNames();
     }
 
-    public List<Instance> findApplicationInstanceByApplication(String applicationName) {
+    public List<Instance> findApplicationInstanceByApplication(String applicationName, boolean simplify) {
         Assert.hasLength(applicationName, "ApplicationName cannot be empty when finding Instances.");
         List<AgentInfoBo> agentInfoBos = agentInfoDao.findAgentInfoByApplicationName(applicationName);
 
@@ -39,7 +39,9 @@ public class ApplicationService {
                     Instance instance = new Instance();
                     instance.setName(agentInfoBo.getApplicationName());
                     instance.setInstanceId(buildInstanceId(agentInfoBo));
-                    buildMetricInfo(instance, agentInfoBo);
+                    if(!simplify){
+                        buildMetricInfo(instance, agentInfoBo);
+                    }
                     return instance;
                 }).collect(Collectors.toList());
         return instanceList;

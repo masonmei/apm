@@ -25,7 +25,11 @@ public class ApplicationController {
     }
 
     @RequestMapping(value = {"instance/list"})
-    public List<Instance> findApplicationInstance(@RequestParam("appName") String applicationName) {
-        return applicationService.findApplicationInstanceByApplication(applicationName);
+    public List<Instance> findApplicationInstance(
+             @RequestParam("appName") String applicationName,
+             @RequestParam(value = "simplify", required = false) boolean simplify) {
+        return applicationService.findApplicationInstanceByApplication(applicationName, simplify);
     }
+
+
 }
