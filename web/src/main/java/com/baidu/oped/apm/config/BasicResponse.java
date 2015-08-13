@@ -27,7 +27,7 @@ public class BasicResponse<T> {
 
     private T result;
 
-    public static <E> Builder<E> builder() {
+    public static <T> Builder<T> builder() {
         return new Builder<>();
     }
 
@@ -102,7 +102,7 @@ public class BasicResponse<T> {
                 basicResponse.setMessage(message);
             }
 
-            basicResponse.setResult(result);
+            basicResponse.<T>setResult(result);
             return basicResponse;
         }
     }

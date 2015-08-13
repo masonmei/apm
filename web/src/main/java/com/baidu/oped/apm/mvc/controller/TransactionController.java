@@ -8,6 +8,7 @@ import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalUnit;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -42,9 +43,15 @@ public class TransactionController {
     public List<TransactionSummary> top(@RequestParam("appName") String applicationName,
                                         @RequestParam(value = "number", required = false, defaultValue = "5")
                                         int number,
-                                        @RequestParam(value = "instanceId", required = false) String instanceId) {
-
-        throw new UnsupportedOperationException("Not implemented yet.");
+                                        @RequestParam(value = "instanceId", required = false) String instanceId,
+                                        @RequestParam(value = "from", required = false)
+                                            @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime from,
+                                        @RequestParam(value = "to", required = false)
+                                            @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime to) {
+        List<TransactionSummary> summaries = list(applicationName, instanceId, from, to);
+        return summaries.stream()
+                .sorted((compare, with) -> Double.compare(compare.getRtMetric().getAvg(), with.getRtMetric().getAvg()))
+                .limit(number).collect(Collectors.toList());
     }
 
     @RequestMapping(value = {"list"})

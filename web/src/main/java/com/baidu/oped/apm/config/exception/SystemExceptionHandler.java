@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import com.baidu.oped.apm.config.BasicResponse;
 import com.baidu.oped.apm.config.SystemConstant;
+import com.baidu.oped.apm.utils.RequestUtils;
 
 /**
  * class SystemExceptionHandler 
@@ -27,14 +28,6 @@ public class SystemExceptionHandler {
 
     Logger log = LoggerFactory.getLogger(getClass());
 
-    private String getRequestId(HttpServletRequest request, HttpServletResponse response) {
-        if (request.getHeader(SystemConstant.X_BCE_REQUEST_ID) != null) {
-            return request.getHeader(SystemConstant.X_BCE_REQUEST_ID);
-        } else if (response.containsHeader(SystemConstant.X_BCE_REQUEST_ID)) {
-            return response.getHeader(SystemConstant.X_BCE_REQUEST_ID);
-        }
-        return null;
-    }
 
     @ExceptionHandler(DataAccessException.class)
     public ResponseEntity<BasicResponse> handleDataAccessException(HttpServletRequest request,
@@ -43,7 +36,7 @@ public class SystemExceptionHandler {
         log.warn("DataAccessException, error : {}", exception.getMessage());
         SystemCode code = SystemCode.INVALID_PARAMETER_VALUE;
         BasicResponse error = new BasicResponse();
-        String requestId = getRequestId(request, response);
+        String requestId = RequestUtils.getRequestId(request, response);
         error.setRequestId(requestId);
         error.setCode(code);
         error.setMessage("Invalid Parameters.");
@@ -58,7 +51,7 @@ public class SystemExceptionHandler {
         log.warn("SystemException handled", exception);
         SystemCode code = exception.getCode();
         BasicResponse error = new BasicResponse();
-        String requestId = getRequestId(request, response);
+        String requestId = RequestUtils.getRequestId(request, response);
         error.setRequestId(requestId);
         error.setCode(code);
         error.setMessage(exception.getMessage());
@@ -82,7 +75,7 @@ public class SystemExceptionHandler {
             HttpServletResponse response, MissingServletRequestParameterException exception) {
         log.warn("MissingServletRequestParameterException handled", exception);
         BasicResponse error = new BasicResponse();
-        String requestId = getRequestId(request, response);
+        String requestId = RequestUtils.getRequestId(request, response);
         error.setRequestId(requestId);
         error.setCode(SystemCode.INVALID_PARAMETER);
         error.setMessage(exception.getMessage());
@@ -95,7 +88,7 @@ public class SystemExceptionHandler {
             HttpServletResponse response, Exception exception) {
         log.error("Exception handled", exception);
         BasicResponse error = new BasicResponse();
-        String requestId = getRequestId(request, response);
+        String requestId = RequestUtils.getRequestId(request, response);
         error.setRequestId(requestId);
         error.setCode(SystemCode.INTERNAL_ERROR);
         error.setMessage(exception.getMessage());

@@ -1,5 +1,7 @@
 package com.baidu.oped.apm.mvc.vo;
 
+import static com.baidu.oped.apm.utils.NumberUtils.format;
+
 import org.springframework.util.Assert;
 
 /**
@@ -22,22 +24,22 @@ public class TransactionSummary {
         this.transactionName = transaction.getRpc();
         this.transactionId = this.transactionName;
         this.unsatisfyCount = transaction.getToleratedCount();
-        this.pv = transaction.getCalls();
-        this.cpm = this.pv * 60 * 1024 / range.getRange();
+        this.pv = format(transaction.getCalls());
+        this.cpm = format(this.pv * 60 * 1024 / range.getRange());
         this.rtMetric = new Metric();
 
         if (this.pv > 0) {
-            this.apdex = (transaction.getSatisfiedCount() + (transaction.getToleratedCount() / 2.0)) / this.pv;
-            this.unsatisfyRate = this.unsatisfyCount / this.pv;
+            this.apdex = format((transaction.getSatisfiedCount() + (transaction.getToleratedCount() / 2.0)) / this.pv);
+            this.unsatisfyRate = format(this.unsatisfyCount / this.pv);
 
-            this.rtMetric.setAvg(transaction.getTotalTime() / this.pv);
-            this.rtMetric.setCount(this.pv);
-            this.rtMetric.setMax(transaction.getMaxTime());
-            this.rtMetric.setMin(transaction.getMinTime());
-            this.rtMetric.setSum(transaction.getTotalTime());
+            this.rtMetric.setAvg(format(transaction.getTotalTime() / this.pv));
+            this.rtMetric.setCount(format(this.pv));
+            this.rtMetric.setMax(format(transaction.getMaxTime()));
+            this.rtMetric.setMin(format(transaction.getMinTime()));
+            this.rtMetric.setSum(format(transaction.getTotalTime()));
         } else {
             this.apdex = 1;
-            this.unsatisfyRate = 0.0;
+            this.unsatisfyRate = format(0.0);
         }
     }
 
