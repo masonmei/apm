@@ -1,31 +1,20 @@
 package com.baidu.oped.apm.mvc.controller;
 
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
-
+import com.baidu.oped.apm.model.service.TraceIndexService;
+import com.baidu.oped.apm.model.service.TransactionService;
+import com.baidu.oped.apm.mvc.vo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.baidu.oped.apm.model.service.TraceIndexService;
-import com.baidu.oped.apm.model.service.TransactionService;
-import com.baidu.oped.apm.mvc.vo.BusinessTransaction;
-import com.baidu.oped.apm.mvc.vo.BusinessTransactions;
-import com.baidu.oped.apm.mvc.vo.Range;
-import com.baidu.oped.apm.mvc.vo.TransactionId;
-import com.baidu.oped.apm.mvc.vo.TransactionSummary;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by mason on 8/13/15.
@@ -74,7 +63,7 @@ public class TransactionController {
         List<TransactionId> transactionIds = traceIndexService.selectTraceIds(applicationName, range);
 
         BusinessTransactions transactions =
-                transactionService.selectTransactions(transactionIds, applicationName, range);
+                transactionService.selectTransactions(transactionIds, applicationName, range, "rpc");
 
         Collection<BusinessTransaction> businessTransaction = transactions.getBusinessTransaction();
         List<TransactionSummary> summaryList =
