@@ -8,10 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by mason on 8/13/15.
@@ -76,6 +73,16 @@ public class TransactionService {
                 dataPoints.add(new DataPoint(ts, items));
             }
 
+            Collections.sort(dataPoints, new Comparator<DataPoint>() {
+                @Override
+                public int compare(DataPoint o1, DataPoint o2) {
+                    if (o1.getTimestamp() < o2.getTimestamp()) {
+                        return -1;
+                    } else {
+                        return 1;
+                    }
+                }
+            });
             LegendTrend legendTrend = new LegendTrend(key, dataPoints);
             legendTrends.add(legendTrend);
         }
