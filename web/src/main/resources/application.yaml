@@ -1,3 +1,5 @@
+server:
+  port: 8888
 spring:
   application:
     name: mx-web
@@ -19,7 +21,7 @@ logging:
     com.baidu.oped: DEBUG
 
 hbase:
-  clientHost: 127.0.0.1
+  clientHost: 180.76.149.15
   clientPort: 2181
   clientTcpNodelay: true
   rpcTimeout: 10000
