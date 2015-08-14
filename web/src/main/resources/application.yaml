@@ -16,12 +16,12 @@ logging:
   file: web-mx.log
   conf: logback.xml
   level:
-    org.springframework.boot: INFO
+    org.springframework.boot: DEBUG
     org.springframework: INFO
     com.baidu.oped: DEBUG
 
 hbase:
-  clientHost: 180.76.149.15
+  clientHost: 127.0.0.1
   clientPort: 2181
   clientTcpNodelay: true
   rpcTimeout: 10000
