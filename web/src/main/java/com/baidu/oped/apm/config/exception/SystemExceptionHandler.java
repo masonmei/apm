@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import com.baidu.oped.apm.config.BasicResponse;
-import com.baidu.oped.apm.config.SystemConstant;
 import com.baidu.oped.apm.utils.RequestUtils;
 
 /**
@@ -34,12 +33,11 @@ public class SystemExceptionHandler {
                                                             HttpServletResponse response,
                                                             DataAccessException exception) {
         log.warn("DataAccessException, error : {}", exception.getMessage());
-        SystemCode code = SystemCode.INVALID_PARAMETER_VALUE;
-        BasicResponse error = new BasicResponse();
-        String requestId = RequestUtils.getRequestId(request, response);
-        error.setRequestId(requestId);
-        error.setCode(code);
-        error.setMessage("Invalid Parameters.");
+        BasicResponse error = BasicResponse.builder()
+                                      .requestId(RequestUtils.getRequestId(request, response))
+                                      .code(SystemCode.INVALID_PARAMETER_VALUE)
+                                      .message("Invalid Parameters.")
+                                      .success(false).build();
         log.info("[exception] {}", error.getCode());
 
         return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -50,12 +48,13 @@ public class SystemExceptionHandler {
             HttpServletResponse response, SystemException exception) {
         log.warn("SystemException handled", exception);
         SystemCode code = exception.getCode();
-        BasicResponse error = new BasicResponse();
-        String requestId = RequestUtils.getRequestId(request, response);
-        error.setRequestId(requestId);
-        error.setCode(code);
-        error.setMessage(exception.getMessage());
-        log.info("[exception] {}", error.getCode());
+
+        BasicResponse error = BasicResponse.builder()
+                                      .requestId(RequestUtils.getRequestId(request, response))
+                                      .message(exception.getMessage())
+                                      .success(false)
+                                      .code(code).build();
+
         if (code == SystemCode.INTERNAL_ERROR) {
             return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -74,11 +73,12 @@ public class SystemExceptionHandler {
     public ResponseEntity<BasicResponse> handleMissingServletRequestParameterException(HttpServletRequest request,
             HttpServletResponse response, MissingServletRequestParameterException exception) {
         log.warn("MissingServletRequestParameterException handled", exception);
-        BasicResponse error = new BasicResponse();
-        String requestId = RequestUtils.getRequestId(request, response);
-        error.setRequestId(requestId);
-        error.setCode(SystemCode.INVALID_PARAMETER);
-        error.setMessage(exception.getMessage());
+        BasicResponse error = BasicResponse.builder()
+                                      .requestId(RequestUtils.getRequestId(request, response))
+                                      .message(exception.getMessage())
+                                      .success(false)
+                                      .code(SystemCode.INVALID_PARAMETER).build();
+
         log.info("[exception] {}", error.getCode());
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
@@ -87,11 +87,11 @@ public class SystemExceptionHandler {
     public ResponseEntity<BasicResponse> handleException(HttpServletRequest request,
             HttpServletResponse response, Exception exception) {
         log.error("Exception handled", exception);
-        BasicResponse error = new BasicResponse();
-        String requestId = RequestUtils.getRequestId(request, response);
-        error.setRequestId(requestId);
-        error.setCode(SystemCode.INTERNAL_ERROR);
-        error.setMessage(exception.getMessage());
+        BasicResponse error = BasicResponse.builder()
+                                      .requestId(RequestUtils.getRequestId(request, response))
+                                      .message(exception.getMessage())
+                                      .success(false)
+                                      .code(SystemCode.INTERNAL_ERROR).build();
         log.info("[exception] {}", error.getCode());
         return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }

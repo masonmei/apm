@@ -1,14 +1,13 @@
 package com.baidu.oped.apm.config;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.baidu.oped.apm.config.exception.SystemCode;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
- * class BasicResponse 
+ * class BasicResponse
  *
  * @author meidongxu@baidu.com
  */
-
 
 /**
  * Basic Response
@@ -21,6 +20,9 @@ public class BasicResponse<T> {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private SystemCode code = SystemCode.OK;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private boolean success = true;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String message = "";
@@ -63,9 +65,18 @@ public class BasicResponse<T> {
         this.result = result;
     }
 
+    public boolean isSuccess() {
+        return success;
+    }
+
+    public void setSuccess(boolean success) {
+        this.success = success;
+    }
+
     public static class Builder<T> {
         private String requestId;
         private SystemCode code;
+        private Boolean success;
         private String message;
         private T result;
 
@@ -81,6 +92,11 @@ public class BasicResponse<T> {
 
         public Builder message(String message) {
             this.message = message;
+            return this;
+        }
+
+        public Builder success(Boolean success) {
+            this.success = success;
             return this;
         }
 
@@ -100,6 +116,10 @@ public class BasicResponse<T> {
 
             if (message != null) {
                 basicResponse.setMessage(message);
+            }
+
+            if (success != null) {
+                basicResponse.setSuccess(success);
             }
 
             basicResponse.<T>setResult(result);
