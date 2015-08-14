@@ -68,13 +68,13 @@
         <profile>
             <id>for-windows</id>
             <properties>
-                <thrift.executable>${basedir}/compiler/windows/thrift-0.9.0.exe</thrift.executable>
+                <thrift.executable>${basedir}/src/compiler/windows/thrift-0.9.0.exe</thrift.executable>
             </properties>
         </profile>
         <profile>
             <id>for-linux</id>
             <properties>
-                <thrift.executable>${basedir}/compiler/linux/thrift-0.9.0</thrift.executable>
+                <thrift.executable>${basedir}/src/compiler/linux/thrift-0.9.0</thrift.executable>
             </properties>
         </profile>
         <profile>
@@ -87,7 +87,7 @@
 
 
     <properties>
-        <thrift.executable>${basedir}/compiler/linux/thrift-0.9.0</thrift.executable>
+        <thrift.executable>${basedir}/src/compiler/linux/thrift-0.9.0</thrift.executable>
     </properties>
 
     <build>
