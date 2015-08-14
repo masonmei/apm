@@ -14,7 +14,7 @@ import java.util.List;
  * Created by mason on 8/12/15.
  */
 @RestController
-@RequestMapping("application")
+@RequestMapping("api/apm")
 public class ApplicationController {
     @Autowired
     private ApplicationService applicationService;

@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
  * Created by mason on 8/13/15.
  */
 @RestController
-@RequestMapping("transaction")
+@RequestMapping("api/apm/transaction")
 public class TransactionController {
     @Autowired
     private TransactionService transactionService;

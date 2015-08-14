@@ -24,7 +24,7 @@ import java.util.List;
  * Created by mason on 8/13/15.
  */
 @RestController
-@RequestMapping("trend")
+@RequestMapping("api/apm/trend")
 public class TrendController {
 
     @Autowired
