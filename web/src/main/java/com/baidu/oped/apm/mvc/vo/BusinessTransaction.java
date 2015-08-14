@@ -1,12 +1,12 @@
 
 package com.baidu.oped.apm.mvc.vo;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.baidu.oped.apm.common.bo.SpanBo;
 import com.baidu.oped.apm.common.util.TransactionIdUtils;
 import com.baidu.oped.apm.utils.ApdexUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * class BusinessTransaction 
@@ -27,6 +27,22 @@ public class BusinessTransaction {
     private int toleratedCount = 0;
     private int frustratedCount = 0;
 
+    @Override
+    public String toString() {
+        return "BusinessTransaction{" +
+                "frustratedCount=" + frustratedCount +
+                ", traces=" + traces +
+                ", rpc='" + rpc + '\'' +
+                ", apdex_t=" + apdex_t +
+                ", calls=" + calls +
+                ", error=" + error +
+                ", totalTime=" + totalTime +
+                ", maxTime=" + maxTime +
+                ", minTime=" + minTime +
+                ", satisfiedCount=" + satisfiedCount +
+                ", toleratedCount=" + toleratedCount +
+                '}';
+    }
 
     public BusinessTransaction(SpanBo span) {
         if (span == null) {

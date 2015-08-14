@@ -1,23 +1,21 @@
 
 package com.baidu.oped.apm.model.dao.hbase;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
+import com.baidu.oped.apm.common.bo.SpanBo;
+import com.baidu.oped.apm.common.hbase.HBaseTables;
+import com.baidu.oped.apm.common.hbase.HbaseOperations2;
+import com.baidu.oped.apm.model.dao.TraceDao;
+import com.baidu.oped.apm.mvc.vo.TransactionId;
+import com.sematext.hbase.wd.AbstractRowKeyDistributor;
 import org.apache.hadoop.hbase.client.Get;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.hadoop.hbase.RowMapper;
 import org.springframework.stereotype.Repository;
 
-import com.baidu.oped.apm.common.bo.SpanBo;
-import com.baidu.oped.apm.common.hbase.HBaseTables;
-import com.baidu.oped.apm.common.hbase.HbaseOperations2;
-
-import com.baidu.oped.apm.model.dao.TraceDao;
-import com.baidu.oped.apm.mvc.vo.TransactionId;
-import com.sematext.hbase.wd.AbstractRowKeyDistributor;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * class HbaseTraceDao 

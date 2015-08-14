@@ -7,12 +7,12 @@ import java.util.List;
  */
 public class DataPoint {
     private long timestamp;
-    private List<Integer> items;
+    private List<Double> items;
 
     public DataPoint() {
     }
 
-    public DataPoint(long timestamp, List<Integer> items) {
+    public DataPoint(long timestamp, List<Double> items) {
         this.timestamp = timestamp;
         this.items = items;
     }
@@ -25,11 +25,11 @@ public class DataPoint {
         this.timestamp = timestamp;
     }
 
-    public List<Integer> getItems() {
+    public List<Double> getItems() {
         return items;
     }
 
-    public void setItems(List<Integer> items) {
+    public void setItems(List<Double> items) {
         this.items = items;
     }
 }

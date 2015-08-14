@@ -13,6 +13,13 @@ public class Metric {
     private double avg = 0.0;
     private double count = 0;
 
+    public Metric() {}
+
+    public Metric(String name, String unit) {
+        this.name = name;
+        this.unit = unit;
+    }
+
     public String getName() {
         return name;
     }

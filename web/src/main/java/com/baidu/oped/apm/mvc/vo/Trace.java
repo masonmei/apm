@@ -24,6 +24,16 @@ public class Trace {
         this.exceptionCode = exceptionCode;
     }
 
+    @Override
+    public String toString() {
+        return "Trace{" +
+                "transactionId='" + transactionId + '\'' +
+                ", executionTime=" + executionTime +
+                ", startTime=" + startTime +
+                ", exceptionCode=" + exceptionCode +
+                '}';
+    }
+
     public String getTransactionId() {
         return transactionId;
     }
