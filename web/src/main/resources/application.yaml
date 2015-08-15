@@ -3,6 +3,11 @@ server:
 spring:
   application:
     name: mx-web
+  datasource:
+    driverClassName: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost/apm
+    username: root
+    password: noah
   http:
     encoding:
       charset: UTF-8
