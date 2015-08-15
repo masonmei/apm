@@ -12,9 +12,6 @@ import org.springframework.stereotype.Component;
  *
  * @author meidongxu@baidu.com
  */
-
-
-
 @Component
 public class AgentInfoBoMapper implements ThriftBoMapper<AgentInfoBo, TAgentInfo> {
 
