@@ -1,40 +1,25 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <organization>
-        <name>Naver Corporation</name>
-        <url>http://www.navercorp.com/</url>
-    </organization>
+
     <groupId>com.baidu.oped.apm</groupId>
     <artifactId>pom</artifactId>
     <version>1.1.0</version>
     <name>apm</name>
     <packaging>pom</packaging>
 
-    <repositories>
-        <repository>
-            <id>cubrid.release.repository</id>
-            <url>http://maven.cubrid.org</url>
-        </repository>
-        <repository>
-            <id>cloudera</id>
-            <url>https://repository.cloudera.com/artifactory/cloudera-repos/</url>
-        </repository>
-    </repositories>
-
-    <pluginRepositories>
-        <pluginRepository>
-            <id>central</id>
-            <name>Maven central plugin repository</name>
-            <url>http://repo1.maven.org/maven2</url>
-        </pluginRepository>
-    </pluginRepositories>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>1.2.5.RELEASE</version>
+        <relativePath/>
+    </parent>
 
     <modules>
         <module>bootstrap-core</module>
         <module>bootstrap</module>
         <module>commons</module>
-        <module>commons-hbase</module>
+        <!--<module>commons-hbase</module>-->
         <module>profiler</module>
         <module>profiler-optional</module>
         <module>rpc</module>
@@ -49,16 +34,16 @@
         <encoding>UTF-8</encoding>
         <jdk.version>1.6</jdk.version>
         <jdk.home>${env.JAVA_HOME}</jdk.home>
-        <slf4j.version>1.7.5</slf4j.version>
+        <slf4j.version>1.7.12</slf4j.version>
         <metrics.version>3.0.1</metrics.version>
-        <spring.version>3.2.3.RELEASE</spring.version>
-        <jetty.version>8.1.12.v20130726</jetty.version>
+        <spring.version>4.1.7.RELEASE</spring.version>
+        <jetty.version>9.3.2.v20150730</jetty.version>
         <codehaus.jackson.version>1.9.13</codehaus.jackson.version>
-        <fastxml.jackson.version>2.3.1</fastxml.jackson.version>
+        <fastxml.jackson.version>2.6.1</fastxml.jackson.version>
         <httpcomponents.version>4.3</httpcomponents.version>
-        <jedis.version>2.4.2</jedis.version>
+        <jedis.version>2.7.3</jedis.version>
         <cloverLicenseLocation>${basedir}/clover.license</cloverLicenseLocation>
-        <spring-batch-version>2.2.7.RELEASE</spring-batch-version>
+        <spring-batch-version>3.0.5.RELEASE</spring-batch-version>
     </properties>
 
     <dependencies>
@@ -124,7 +109,7 @@
             <dependency>
                 <groupId>com.baidu.oped.apm</groupId>
                 <artifactId>collector</artifactId>
-                <type>war</type>
+                <type>jar</type>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -135,85 +120,13 @@
             </dependency>
             <dependency>
                 <groupId>com.baidu.oped.apm</groupId>
-                <artifactId>pinpoint-web</artifactId>
-                <version>${project.version}</version>
-                <type>war</type>
-            </dependency>
-            <dependency>
-                <groupId>com.baidu.oped.apm</groupId>
                 <artifactId>web</artifactId>
                 <classifier>classes</classifier>
                 <version>${project.version}</version>
             </dependency>
-
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-core</artifactId>
-                <version>${spring.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-beans</artifactId>
-                <version>${spring.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-context</artifactId>
-                <version>${spring.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-orm</artifactId>
-                <version>${spring.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-test</artifactId>
-                <version>${spring.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-web</artifactId>
-                <version>${spring.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-webmvc</artifactId>
-                <version>${spring.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-jdbc</artifactId>
-                <version>${spring.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-tx</artifactId>
-                <version>${spring.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-oxm</artifactId>
-                <version>${spring.version}</version>
-            </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-instrument</artifactId>
-                <version>${spring.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-context-support</artifactId>
-                <version>${spring.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-aop</artifactId>
-                <version>${spring.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-aspects</artifactId>
                 <version>${spring.version}</version>
             </dependency>
 
@@ -279,7 +192,7 @@
             <dependency>
                 <groupId>org.apache.hbase</groupId>
                 <artifactId>hbase-client</artifactId>
-                <version>1.0.0-cdh5.4.0</version>
+                <version>1.1.1</version>
                 <exclusions>
                     <exclusion>
                         <groupId>commons-beanutils</groupId>
@@ -297,7 +210,7 @@
             <dependency>
                 <groupId>org.springframework.data</groupId>
                 <artifactId>spring-data-hadoop-hbase</artifactId>
-                <version>2.1.2.RELEASE</version>
+                <version>2.2.0.RELEASE</version>
             </dependency>
 
 
@@ -320,7 +233,7 @@
             <dependency>
                 <groupId>log4j</groupId>
                 <artifactId>log4j</artifactId>
-                <version>1.2.16</version>
+                <version>1.2.17</version>
             </dependency>
 
             <dependency>
@@ -352,11 +265,18 @@
                 <version>5.1.20</version>
             </dependency>
 
+            <!--<dependency>-->
+                <!--<groupId>cubrid</groupId>-->
+                <!--<artifactId>cubrid-jdbc</artifactId>-->
+                <!--<version>8.4.3.1005</version>-->
+            <!--</dependency>-->
+
             <dependency>
-                <groupId>cubrid</groupId>
-                <artifactId>cubrid-jdbc</artifactId>
-                <version>8.4.3.1005</version>
+                <groupId>com.github.jinahya</groupId>
+                <artifactId>cubrid-jdbc-driver-9.3.0.0206</artifactId>
+                <version>1.0</version>
             </dependency>
+
             <dependency>
                 <groupId>net.sourceforge.jtds</groupId>
                 <artifactId>jtds</artifactId>
@@ -410,7 +330,7 @@
             <dependency>
                 <groupId>org.springframework.data</groupId>
                 <artifactId>spring-data-redis</artifactId>
-                <version>1.1.1.RELEASE</version>
+                <version>1.5.2.RELEASE</version>
             </dependency>
 
             <dependency>
@@ -554,7 +474,7 @@
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
-                <version>4.8.2</version>
+                <version>4.12</version>
             </dependency>
             <dependency>
                 <groupId>org.hamcrest</groupId>
@@ -564,20 +484,20 @@
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-all</artifactId>
-                <version>1.8.4</version>
+                <version>1.10.19</version>
             </dependency>
             <dependency>
                 <groupId>org.dbunit</groupId>
                 <artifactId>dbunit</artifactId>
-                <version>2.4.3</version>
+                <version>2.5.1</version>
             </dependency>
 
 
-            <dependency>
-                <groupId>org.apache.zookeeper</groupId>
-                <artifactId>zookeeper</artifactId>
-                <version>3.4.5-cdh5.4.0</version>
-            </dependency>
+            <!--<dependency>-->
+                <!--<groupId>org.apache.zookeeper</groupId>-->
+                <!--<artifactId>zookeeper</artifactId>-->
+                <!--<version>3.4.5-cdh5.4.0</version>-->
+            <!--</dependency>-->
 
             <!-- for zookeeper test -->
             <dependency>
@@ -607,7 +527,7 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>17.0</version>
+                <version>18.0</version>
             </dependency>
 
         </dependencies>
@@ -754,19 +674,6 @@
     <reporting>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jxr-plugin</artifactId>
-                <version>2.3</version>
-                <inherited>false</inherited>
-                <configuration>
-                    <aggregate>true</aggregate>
-                    <inputEncoding>${encoding}</inputEncoding>
-                    <outputEncoding>${encoding}</outputEncoding>
-                    <windowTitle>Pinpoint ${project.version} Cross Reference</windowTitle>
-                    <docTitle>Pinpoint ${project.version} Cross Reference</docTitle>
-                </configuration>
-            </plugin>
-            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>findbugs-maven-plugin</artifactId>
                 <configuration>
@@ -811,29 +718,31 @@
         </plugins>
     </reporting>
 
-    <profiles>
-        <profile>
-            <id>klocwork</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>com.klocwork.ps</groupId>
-                        <artifactId>kwmaven</artifactId>
-                        <version>2.1.1</version>
-                        <configuration>
-                            <buildspec_filename>${KWINJECT_OUT_PATH}</buildspec_filename>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <phase>validate</phase>
-                                <goals>
-                                    <goal>run</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
+    <!--用于配置分发管理，配置相应的产品发布信息,主要用于发布，在执行mvn deploy后表示要发布的位置-->
+    <distributionManagement>
+        <repository>
+            <id>baidu_local</id>
+            <name>Baidu Local Repository</name>
+            <url>http://maven.scm.baidu.com:8081/nexus/content/repositories/Baidu_Local</url>
+        </repository>
+        <snapshotRepository>
+            <id>baidu_local_snapshot</id>
+            <name>Baidu Local Snapshot Repository</name>
+            <url>http://maven.scm.baidu.com:8081/nexus/content/repositories/Baidu_Local_Snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+    <!--设定除中央仓库(repo1.maven.org/maven2/)外的其他仓库,按设定顺序进行查找-->
+    <repositories>
+        <repository>
+            <id>Nexus</id>
+            <name>Nexus Public Repository</name>
+            <url>http://maven.scm.baidu.com:8081/nexus/content/groups/public</url>
+        </repository>
+        <repository>
+            <id>Nexus snapshots</id>
+            <name>Nexus Public Repository</name>
+            <url>http://maven.scm.baidu.com:8081/nexus/content/groups/public-snapshots</url>
+        </repository>
+    </repositories>
 </project>

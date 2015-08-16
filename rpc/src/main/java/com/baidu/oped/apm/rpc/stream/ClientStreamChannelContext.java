@@ -8,9 +8,6 @@ import com.baidu.oped.apm.rpc.util.AssertUtils;
  *
  * @author meidongxu@baidu.com
  */
-
-
-
 public class ClientStreamChannelContext extends StreamChannelContext {
 
     private final ClientStreamChannel clientStreamChannel;

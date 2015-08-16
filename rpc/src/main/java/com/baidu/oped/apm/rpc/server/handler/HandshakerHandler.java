@@ -10,9 +10,6 @@ import com.baidu.oped.apm.rpc.packet.HandshakeResponseCode;
  *
  * @author meidongxu@baidu.com
  */
-
-
-
 public interface HandshakerHandler {
     
     HandshakeResponseCode handleHandshake(Map properties);

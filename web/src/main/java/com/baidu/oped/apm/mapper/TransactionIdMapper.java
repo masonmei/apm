@@ -16,23 +16,22 @@
 
 package com.baidu.oped.apm.mapper;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.hadoop.hbase.Cell;
-import org.apache.hadoop.hbase.client.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.hadoop.hbase.RowMapper;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
 import com.baidu.oped.apm.common.buffer.Buffer;
 import com.baidu.oped.apm.common.buffer.OffsetFixedBuffer;
 import com.baidu.oped.apm.mvc.vo.TransactionId;
-import com.sematext.hbase.wd.AbstractRowKeyDistributor;
 
 /**
  * @author emeroad
@@ -43,28 +42,28 @@ public class TransactionIdMapper implements RowMapper<List<TransactionId>> {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-     @Autowired
-     @Qualifier("applicationTraceIndexDistributor")
-     private AbstractRowKeyDistributor rowKeyDistributor;
+//     @Autowired
+//     @Qualifier("applicationTraceIndexDistributor")
+//     private AbstractRowKeyDistributor rowKeyDistributor;
 
-    @Override
-    public List<TransactionId> mapRow(Result result, int rowNum) throws Exception {
-        if (result.isEmpty()) {
-            return Collections.emptyList();
-        }
-        Cell[] rawCells = result.rawCells();
-        List<TransactionId> traceIdList = new ArrayList<TransactionId>(rawCells.length);
-        for (Cell cell : rawCells) {
-            byte[] qualifierArray = cell.getQualifierArray();
-            int qualifierOffset = cell.getQualifierOffset();
-            // increment by value of key
-            TransactionId traceId = parseVarTransactionId(qualifierArray, qualifierOffset);
-            traceIdList.add(traceId);
-
-            logger.debug("found traceId {}", traceId);
-        }
-        return traceIdList;
-    }
+//    @Override
+//    public List<TransactionId> mapRow(Result result, int rowNum) throws Exception {
+//        if (result.isEmpty()) {
+//            return Collections.emptyList();
+//        }
+//        Cell[] rawCells = result.rawCells();
+//        List<TransactionId> traceIdList = new ArrayList<TransactionId>(rawCells.length);
+//        for (Cell cell : rawCells) {
+//            byte[] qualifierArray = cell.getQualifierArray();
+//            int qualifierOffset = cell.getQualifierOffset();
+//            // increment by value of key
+//            TransactionId traceId = parseVarTransactionId(qualifierArray, qualifierOffset);
+//            traceIdList.add(traceId);
+//
+//            logger.debug("found traceId {}", traceId);
+//        }
+//        return traceIdList;
+//    }
 
     public static TransactionId parseVarTransactionId(byte[] bytes, int offset) {
         if (bytes == null) {
@@ -80,5 +79,10 @@ public class TransactionIdMapper implements RowMapper<List<TransactionId>> {
         long agentStartTime = buffer.readSVarLong();
         long transactionSequence = buffer.readVarLong();
         return new TransactionId(agentId, agentStartTime, transactionSequence);
+    }
+
+    @Override
+    public List<TransactionId> mapRow(ResultSet rs, int rowNum) throws SQLException {
+        return null;
     }
 }

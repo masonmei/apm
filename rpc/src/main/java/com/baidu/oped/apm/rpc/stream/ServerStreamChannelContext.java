@@ -6,9 +6,6 @@ package com.baidu.oped.apm.rpc.stream;
  *
  * @author meidongxu@baidu.com
  */
-
-
-
 public class ServerStreamChannelContext extends StreamChannelContext {
 
     private ServerStreamChannel streamChannel;

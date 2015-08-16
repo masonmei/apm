@@ -11,9 +11,6 @@ import com.baidu.oped.apm.rpc.packet.stream.StreamCreatePacket;
  *
  * @author meidongxu@baidu.com
  */
-
-
-
 public class ClientStreamChannel extends StreamChannel {
 
     public ClientStreamChannel(Channel channel, int streamId, StreamChannelManager streamChannelManager) {

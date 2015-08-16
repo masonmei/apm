@@ -19,13 +19,12 @@ package com.baidu.oped.apm.mapper;
 
 import com.baidu.oped.apm.common.ServiceType;
 import com.baidu.oped.apm.mvc.vo.Application;
-import org.apache.hadoop.hbase.Cell;
-import org.apache.hadoop.hbase.CellUtil;
-import org.apache.hadoop.hbase.client.Result;
-import org.apache.hadoop.hbase.util.Bytes;
-import org.springframework.data.hadoop.hbase.RowMapper;
+
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.*;
 
 /**
@@ -33,29 +32,33 @@ import java.util.*;
  */
 @Component("applicationNameMapper")
 public class ApplicationNameMapper implements RowMapper<List<Application>> {
-    
     @Override
-    public List<Application> mapRow(Result result, int rowNum) throws Exception {
-        if (result.isEmpty()) {
-            return Collections.emptyList();
-        }
-        Set<Short> uniqueTypeCodes = new HashSet<Short>();
-        String applicationName = Bytes.toString(result.getRow());
-        
-        List<Cell> list = result.listCells();
-        if (list == null) {
-            return Collections.emptyList();
-        }
-        
-        for (Cell cell : list) {
-            short serviceTypeCode = Bytes.toShort(CellUtil.cloneValue(cell));
-            uniqueTypeCodes.add(serviceTypeCode);
-        }
-        List<Application> applications = new ArrayList<Application>();
-        for (short serviceTypeCode : uniqueTypeCodes) {
-            applications.add(new Application(applicationName, ServiceType.findServiceType(serviceTypeCode)));
-        }      
-
-        return applications;
+    public List<Application> mapRow(ResultSet rs, int rowNum) throws SQLException {
+        return null;
     }
+
+    //    @Override
+//    public List<Application> mapRow(Result result, int rowNum) throws Exception {
+//        if (result.isEmpty()) {
+//            return Collections.emptyList();
+//        }
+//        Set<Short> uniqueTypeCodes = new HashSet<Short>();
+//        String applicationName = Bytes.toString(result.getRow());
+//
+//        List<Cell> list = result.listCells();
+//        if (list == null) {
+//            return Collections.emptyList();
+//        }
+//
+//        for (Cell cell : list) {
+//            short serviceTypeCode = Bytes.toShort(CellUtil.cloneValue(cell));
+//            uniqueTypeCodes.add(serviceTypeCode);
+//        }
+//        List<Application> applications = new ArrayList<Application>();
+//        for (short serviceTypeCode : uniqueTypeCodes) {
+//            applications.add(new Application(applicationName, ServiceType.findServiceType(serviceTypeCode)));
+//        }
+//
+//        return applications;
+//    }
 }

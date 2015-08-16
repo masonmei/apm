@@ -13,9 +13,6 @@ import com.baidu.oped.apm.rpc.packet.stream.StreamResponsePacket;
  *
  * @author meidongxu@baidu.com
  */
-
-
-
 public class LoggingStreamChannelMessageListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LoggingStreamChannelMessageListener.class);

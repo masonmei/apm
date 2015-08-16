@@ -10,9 +10,6 @@ import java.util.Set;
  *
  * @author meidongxu@baidu.com
  */
-
-
-
 public enum StreamChannelStateCode {
 
     NEW,

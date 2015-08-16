@@ -6,9 +6,6 @@ package com.baidu.oped.apm.rpc.packet.stream;
  *
  * @author meidongxu@baidu.com
  */
-
-
-
 public abstract class BasicStreamPacket implements StreamPacket {
 
     // Status Code

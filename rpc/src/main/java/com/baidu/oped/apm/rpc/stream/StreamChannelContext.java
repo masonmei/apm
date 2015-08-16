@@ -8,9 +8,6 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author meidongxu@baidu.com
  */
-
-
-
 public abstract class StreamChannelContext {
 
     private final ConcurrentHashMap<String, Object> attribute = new ConcurrentHashMap<String, Object>();

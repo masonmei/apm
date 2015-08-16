@@ -9,9 +9,6 @@ import java.util.Set;
  *
  * @author meidongxu@baidu.com
  */
-
-
-
 public enum PinpointServerSocketStateCode {
 
     // NONE : No event

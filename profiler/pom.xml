@@ -107,10 +107,14 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>cubrid</groupId>
-            <artifactId>cubrid-jdbc</artifactId>
-            <scope>provided</scope>
+            <groupId>com.github.jinahya</groupId>
+            <artifactId>cubrid-jdbc-driver-9.3.0.0206</artifactId>
         </dependency>
+        <!--<dependency>-->
+            <!--<groupId>cubrid</groupId>-->
+            <!--<artifactId>cubrid-jdbc</artifactId>-->
+            <!--<scope>provided</scope>-->
+        <!--</dependency>-->
         <!--<dependency>-->
             <!--<groupId>oracle</groupId>-->
             <!--<artifactId>ojdbc6</artifactId>-->

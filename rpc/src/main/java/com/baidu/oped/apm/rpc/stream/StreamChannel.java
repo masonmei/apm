@@ -18,9 +18,6 @@ import java.util.concurrent.TimeUnit;
  *
  * @author meidongxu@baidu.com
  */
-
-
-
 public abstract class StreamChannel {
 
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());

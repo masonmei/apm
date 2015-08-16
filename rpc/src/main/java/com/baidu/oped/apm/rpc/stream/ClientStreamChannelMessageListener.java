@@ -9,9 +9,6 @@ import com.baidu.oped.apm.rpc.packet.stream.StreamResponsePacket;
  *
  * @author meidongxu@baidu.com
  */
-
-
-
 public interface ClientStreamChannelMessageListener {
 
     void handleStreamData(ClientStreamChannelContext streamChannelContext, StreamResponsePacket packet);

@@ -28,9 +28,6 @@ import com.baidu.oped.apm.rpc.util.IDGenerator;
  *
  * @author meidongxu@baidu.com
  */
-
-
-
 public class StreamChannelManager {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());

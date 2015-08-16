@@ -7,9 +7,9 @@ import com.baidu.oped.apm.mvc.vo.BusinessTransactions;
 import com.baidu.oped.apm.mvc.vo.DataTrend;
 import com.baidu.oped.apm.mvc.vo.Range;
 import com.baidu.oped.apm.mvc.vo.TransactionId;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -62,7 +62,7 @@ public class TrendController {
         List<TransactionId> transactionIds = traceIndexService.selectTraceIds(applicationName, range);
 
         List<TransactionId> neededTransactionIds = new ArrayList<TransactionId>();
-        if (StringUtils.isNotEmpty(agentId)) {
+        if (!StringUtils.isEmpty(agentId)) {
             for (TransactionId transactionId : transactionIds) {
                 if (transactionId.getAgentId().equalsIgnoreCase(agentId)) {
                     neededTransactionIds.add(transactionId);

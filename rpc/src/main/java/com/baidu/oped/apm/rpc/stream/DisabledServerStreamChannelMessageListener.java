@@ -13,8 +13,6 @@ import com.baidu.oped.apm.rpc.packet.stream.StreamCreatePacket;
  *
  * @author meidongxu@baidu.com
  */
-
-
 public class DisabledServerStreamChannelMessageListener implements ServerStreamChannelMessageListener {
 
     public static final ServerStreamChannelMessageListener INSTANCE = new DisabledServerStreamChannelMessageListener();

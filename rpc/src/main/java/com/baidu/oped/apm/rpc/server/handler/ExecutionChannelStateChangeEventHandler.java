@@ -14,9 +14,6 @@ import com.baidu.oped.apm.rpc.server.PinpointServerSocketStateCode;
  *
  * @author meidongxu@baidu.com
  */
-
-
-
 public abstract class ExecutionChannelStateChangeEventHandler implements ChannelStateChangeEventHandler {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());

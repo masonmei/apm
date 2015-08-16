@@ -3,7 +3,6 @@ package com.baidu.oped.apm.collector.handler;
 
 import java.util.List;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.thrift.TBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +17,7 @@ import com.baidu.oped.apm.thrift.dto.TSpan;
 import com.baidu.oped.apm.thrift.dto.TSpanEvent;
 
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 /**
  * class SpanHandler 

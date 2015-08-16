@@ -1,24 +1,19 @@
 package com.baidu.oped.apm.collector.config;
 
-import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.codahale.metrics.MetricRegistry;
-import com.baidu.oped.apm.collector.dao.hbase.statistics.RowKeyMerge;
 import com.baidu.oped.apm.collector.receiver.TcpDispatchHandler;
 import com.baidu.oped.apm.collector.receiver.UdpDispatchHandler;
 import com.baidu.oped.apm.collector.receiver.UdpSpanDispatchHandler;
 import com.baidu.oped.apm.collector.receiver.tcp.TCPReceiver;
 import com.baidu.oped.apm.collector.receiver.udp.BaseUDPReceiver;
 import com.baidu.oped.apm.common.Version;
-import com.baidu.oped.apm.common.hbase.HBaseTables;
-import com.baidu.oped.apm.common.util.DefaultTimeSlot;
-import com.baidu.oped.apm.common.util.TimeSlot;
 import com.baidu.oped.apm.thrift.io.CommandHeaderTBaseDeserializerFactory;
 import com.baidu.oped.apm.thrift.io.CommandHeaderTBaseSerializerFactory;
+import com.codahale.metrics.MetricRegistry;
 
 /**
  * Created by mason on 8/5/15.
@@ -29,34 +24,34 @@ public class MxCollectorConfiguration {
     @Autowired
     private MxCollectorProperties collectorProperties;
 
-    @Bean
-    @Qualifier("callerMerge")
-    RowKeyMerge callerMerge() {
-        return new RowKeyMerge(HBaseTables.MAP_STATISTICS_CALLEE_CF_VER2_COUNTER);
-    }
-
-    @Bean
-    @Qualifier("calleeMerge")
-    RowKeyMerge calleeMerge() {
-        return new RowKeyMerge(HBaseTables.MAP_STATISTICS_CALLER_CF_COUNTER);
-    }
-
-    @Bean
-    @Qualifier("selfMerge")
-    RowKeyMerge selfMerge() {
-        return new RowKeyMerge(HBaseTables.MAP_STATISTICS_SELF_CF_COUNTER);
-    }
-
-    @Bean
-    TimeSlot timeSlot() {
-        return new DefaultTimeSlot();
-    }
-
-    @Bean
-    @Qualifier("jsonObjectMapper")
-    ObjectMapper jsonObjectMapper() {
-        return new ObjectMapper();
-    }
+//    @Bean
+//    @Qualifier("callerMerge")
+//    RowKeyMerge callerMerge() {
+//        return new RowKeyMerge(HBaseTables.MAP_STATISTICS_CALLEE_CF_VER2_COUNTER);
+//    }
+//
+//    @Bean
+//    @Qualifier("calleeMerge")
+//    RowKeyMerge calleeMerge() {
+//        return new RowKeyMerge(HBaseTables.MAP_STATISTICS_CALLER_CF_COUNTER);
+//    }
+//
+//    @Bean
+//    @Qualifier("selfMerge")
+//    RowKeyMerge selfMerge() {
+//        return new RowKeyMerge(HBaseTables.MAP_STATISTICS_SELF_CF_COUNTER);
+//    }
+//
+//    @Bean
+//    TimeSlot timeSlot() {
+//        return new DefaultTimeSlot();
+//    }
+//
+//    @Bean
+//    @Qualifier("jsonObjectMapper")
+//    ObjectMapper jsonObjectMapper() {
+//        return new ObjectMapper();
+//    }
     //
     //    @Bean
     //    TcpDispatchHandler tcpDispatchHandler() {

@@ -8,9 +8,6 @@ import java.util.concurrent.atomic.AtomicReference;
  *
  * @author meidongxu@baidu.com
  */
-
-
-
 public class StreamChannelState {
 
     private final AtomicReference<StreamChannelStateCode> currentStateRefernce = new AtomicReference<StreamChannelStateCode>();
