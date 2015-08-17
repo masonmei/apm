@@ -321,17 +321,20 @@ public abstract class BaseDto<T> {
             props.remove("class");
             return props;
         } catch (Exception e) {
-            throw new RuntimeException("Exception when Fetching fields of " + this);
+            throw new RuntimeException("Exception when Fetching fields of " + entityClass.getName(), e);
         }
     }
 
     private long getId(T one) {
         try {
-            long value = Long.valueOf(idField.getLong(one));
-            return value;
+            Object value = idField.get(one);
+            if (value == null) {
+                return 0L;
+            }
+            return Long.valueOf(value.toString());
         } catch (Exception e) {
             String error = String.format("bo class %s get key id value fail", entityClass.getName());
-            throw new RuntimeException(error);
+            throw new RuntimeException(error, e);
         }
     }
 
