@@ -3,9 +3,9 @@ package com.baidu.oped.apm.model.dao;
 import com.google.common.base.CaseFormat;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -16,7 +16,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 和mysql交互基本Dao
+ * 和mysql交互基本Dao <code>
+ *     要求：
+ *      1. 所有的Dto继承于BaseDao
+ *      2. 对应的mysql-bo主键必须为id(Long)
+ * </code>
  *
  * @author yangbolin
  */
@@ -31,12 +35,24 @@ public abstract class BaseDto<T> {
     // 构造方法，根据实例类自动获取实体类类型
     @SuppressWarnings({"rawtypes", "unchecked"})
     public BaseDto() {
-        this.entityClass = null;
-        Class c = getClass();
-        Type t = c.getGenericSuperclass();
-        if (t instanceof ParameterizedType) {
-            Type[] p = ((ParameterizedType) t).getActualTypeArguments();
-            this.entityClass = (Class<T>) p[0];
+        try {
+            this.entityClass = null;
+            Class c = getClass();
+            Type t = c.getGenericSuperclass();
+            if (t instanceof ParameterizedType) {
+                Type[] p = ((ParameterizedType) t).getActualTypeArguments();
+                this.entityClass = (Class<T>) p[0];
+            }
+        }catch (Exception e) {
+            throw new RuntimeException("parse bo class type fail", e);
+        }
+
+        try {
+            idField = entityClass.getDeclaredField("id");
+            idField.setAccessible(true);
+        }catch (Exception e) {
+            String error = String.format("bo class %s missing field id", entityClass.getName());
+            throw new RuntimeException(error, e);
         }
     }
 
@@ -64,7 +80,7 @@ public abstract class BaseDto<T> {
             kvs.add(attrName + " = ?");
             attrVals.add(attrs.get(attrName));
         }
-        sql.append(StringUtils.join(kvs.toArray(), ","));
+        sql.append(StringUtils.arrayToDelimitedString(kvs.toArray(), ","));
         return jdbcTemplate.queryForObject(sql.toString(), attrVals.toArray(), entityClass);
     }
 
@@ -111,20 +127,20 @@ public abstract class BaseDto<T> {
             kvs.add(attrName + " = ?");
             attrVals.add(attrs.get(attrName));
         }
-        sql.append(StringUtils.join(kvs.toArray(), " and "));
+        sql.append(StringUtils.arrayToDelimitedString(kvs.toArray(), " and "));
         return jdbcTemplate.queryForList(sql.toString(), attrVals.toArray(), entityClass);
     }
 
     public List<T> batchGet(String condtionSql, Object... params) {
         StringBuffer sql = new StringBuffer("SELECT * FROM " + tableName());
-        if (StringUtils.isNotEmpty(condtionSql.trim())) {
+        if (!StringUtils.isEmpty(condtionSql.trim())) {
             sql.append(" WHERE " + condtionSql);
         }
         return jdbcTemplate.queryForList(sql.toString(), entityClass, params);
     }
 
     public List<T> batchGet(Collection<String> fields, String condtionSql, Object... params) {
-        String fieldStr = StringUtils.join(fields, ",");
+        String fieldStr = StringUtils.arrayToDelimitedString(fields.toArray(), ",");
         StringBuffer sql = new StringBuffer("SELECT " + fieldStr + " FROM " + tableName() + " WHERE " + condtionSql);
         return jdbcTemplate.queryForList(sql.toString(), entityClass, params);
     }
@@ -167,76 +183,34 @@ public abstract class BaseDto<T> {
             kvs.add(attrName + " = ?");
             attrVals.add(attrs.get(attrName));
         }
-        sql.append(StringUtils.join(kvs.toArray(), "and"));
+        sql.append(StringUtils.arrayToDelimitedString(kvs.toArray(), "and"));
         jdbcTemplate.update(sql.toString(), attrVals.toArray());
     }
 
-    /*public <T extends POJO> boolean update() {
-        if (getId() <= 0) {
+    public boolean update(T one) {
+        long id = this.getId(one);
+        if (id <= 0) {
             return false;
         }
 
-        Map<String, Object> dbMsgs = this.listInsertableFields();
-        dbMsgs.remove("id");
+        Map<String, String> toUpdateMsgs = this.listFieldValues(one);
+        toUpdateMsgs.remove("id");
 
-        return this.updateAttrs(dbMsgs);
+        return this.updateAttrs(toUpdateMsgs, id);
     }
 
-    public <T extends POJO> boolean update(T toUpdateObj) {
-        if (getId() <= 0 || !getClass().equals(toUpdateObj.getClass())) {
+    public boolean updateAttrs(Map<String, String> updateAttrs, long id) {
+        if (id <= 0) {
             return false;
         }
-
-        Map<String, Object> dbMsgs = this.listInsertableFields();
-        Map<String, Object> toUpdateMsgs = toUpdateObj.listInsertableFields();
-        if (toUpdateMsgs.containsKey("id")) { // 去除主键
-            toUpdateMsgs.remove("id");
-        }
-
-        Map<String, Object> attrs = new HashMap<String, Object>();
-        for (String field : toUpdateMsgs.keySet()) {
-            Object dbMsgValue = dbMsgs.get(field);
-            Object toUpdateValue = toUpdateMsgs.get(field);
-            if (ObjectUtil.equals(dbMsgValue, toUpdateValue)) {
-                continue;
-            }
-            attrs.put(field, toUpdateValue);
-        }
-
-        return this.updateAttrs(attrs);
-    }
-
-    public boolean updateAttrs(Map<String, Object> updateAttrs) {
         if (updateAttrs == null || updateAttrs.size() == 0) {
             return true;
         }
-        int len = updateAttrs.size();
-        List<Object> attrValues = new ArrayList<Object>(len);
-        List<String> kvs = new ArrayList<String>(len);
-        for (String attr : updateAttrs.keySet()) {
-            kvs.add(attr + " = ?");
-            attrValues.add(updateAttrs.get(attr));
-        }
 
-        String sql = "update " + tableName() + " set " + StringUtils.join(kvs.toArray(), ",") + " where id = ?";
-        attrValues.add(id);
-
-        int ret = getQueryHelper().update(sql, attrValues.toArray());
-        try {
-            if (ret > 0) {
-                for (String fieldName : updateAttrs.keySet()) {
-                    BeanUtils.setProperty(this, fieldName, updateAttrs.get(fieldName));
-                }
-            } else {
-                return false;
-            }
-        } catch (Exception e) {
-            return false;
-        }
-        return true;
+        return updateAttrs(updateAttrs, "id=?", id);
     }
 
-    public boolean updateAttrs(Map<String, Object> updateAttrs, String conditionSql, Object... conditionParams) {
+    public boolean updateAttrs(Map<String, String> updateAttrs, String conditionSql, Object... conditionParams) {
         int len = updateAttrs.size();
         List<Object> attrValues = new ArrayList<Object>(len);
         List<String> kvs = new ArrayList<String>(len);
@@ -246,61 +220,21 @@ public abstract class BaseDto<T> {
         }
 
         String sql =
-                "update " + tableName() + " set " + StringUtils.join(kvs.toArray(), ",") + " where " + conditionSql;
+                "update " + tableName() + " set " + StringUtils.arrayToDelimitedString(kvs.toArray(), ",") + " where " + conditionSql;
         for (Object param : conditionParams) {
             attrValues.add(param);
         }
 
-        int ret = getQueryHelper().update(sql, attrValues.toArray());
-        try {
-            if (ret > 0) {
-                for (String fieldName : updateAttrs.keySet()) {
-                    BeanUtils.setProperty(this, fieldName, updateAttrs.get(fieldName));
-                }
-            } else {
-                return false;
-            }
-        } catch (Exception e) {
-            return false;
-        }
-        return true;
+        int ret = jdbcTemplate.update(sql, attrValues.toArray());
+        return ret > 0 ? true : false;
     }
-
-    public boolean updateAttrs(Map<String, Object> updateAttrs, String conditionAttrName, Object conditonValue) {
-        int len = updateAttrs.size();
-        List<Object> attrValues = new ArrayList<Object>(len);
-        List<String> kvs = new ArrayList<String>(len);
-        for (String attr : updateAttrs.keySet()) {
-            kvs.add(attr + " = ?");
-            attrValues.add(updateAttrs.get(attr));
-        }
-
-        String sql =
-                "update " + tableName() + " set " + StringUtils.join(kvs.toArray(), ",") + " where "
-                        + conditionAttrName + " = ?";
-        attrValues.add(conditonValue);
-
-        int ret = getQueryHelper().update(sql, attrValues.toArray());
-        try {
-            if (ret > 0) {
-                for (String fieldName : updateAttrs.keySet()) {
-                    BeanUtils.setProperty(this, fieldName, updateAttrs.get(fieldName));
-                }
-            } else {
-                return false;
-            }
-        } catch (Exception e) {
-            return false;
-        }
-        return true;
-    }*/
 
     public void batchSave(List<T> instances) {
         if (CollectionUtils.isEmpty(instances)) {
             return;
         }
 
-        Map<String, String> pojoBean = this.listInsertableFields(instances.get(0));
+        Map<String, String> pojoBean = this.listFieldValues(instances.get(0));
         String[] fields = pojoBean.keySet().toArray(new String[pojoBean.size()]);
         int fieldNum = fields.length;
 
@@ -340,7 +274,7 @@ public abstract class BaseDto<T> {
                     sql.append(",");
                 }
                 sql.append(whereSql);
-                Map<String, String> fieldValues = this.listInsertableFields(instances.get(i + j));
+                Map<String, String> fieldValues = this.listFieldValues(instances.get(i + j));
                 for (int k = 0; k < fieldNum; k++) {
                     params[j * fieldNum + k] = fieldValues.get(fields[k]);
                 }
@@ -351,7 +285,7 @@ public abstract class BaseDto<T> {
     }
 
     public long save(T one) {
-        Map<String, String> pojo_bean = this.listInsertableFields(one);
+        Map<String, String> pojo_bean = this.listFieldValues(one);
         String[] fields = pojo_bean.keySet().toArray(new String[pojo_bean.size()]);
         Object[] params = new Object[pojo_bean.size()];
         StringBuilder sql = new StringBuilder("INSERT INTO ");
@@ -376,10 +310,10 @@ public abstract class BaseDto<T> {
         return jdbcTemplate.queryForObject("select LAST_INSERT_ID() as id", Long.class);
     }
 
-    private Map<String, String> listInsertableFields(T one) {
+    private Map<String, String> listFieldValues(T one) {
         try {
             Map<String, String> props = BeanUtils.describe(one);
-            if (getId(one) <= 0) {
+            if (getId(one) <= 0L) {
                 props.remove("id");
             }
             props.remove("class");
@@ -390,7 +324,13 @@ public abstract class BaseDto<T> {
     }
 
     private long getId(T one) {
-        return 0L;
+        try {
+            long value = Long.valueOf(idField.getLong(one));
+            return value;
+        }catch (Exception e) {
+            String error = String.format("bo class %s get key id value fail", entityClass.getName());
+            throw new RuntimeException(error);
+        }
     }
 
 }

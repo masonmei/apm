@@ -1,15 +1,15 @@
 package com.baidu.oped.apm.collector.dao.jdbc.mock;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.List;
-
-import com.baidu.oped.apm.common.util.BytesUtils;
+import com.baidu.oped.apm.common.util.TransactionIdUtils;
 import com.baidu.oped.apm.thrift.dto.TAnnotation;
 import com.baidu.oped.apm.thrift.dto.TAnnotationValue;
 import com.baidu.oped.apm.thrift.dto.TSpan;
 import com.baidu.oped.apm.thrift.dto.TSpanEvent;
+
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by mason on 8/17/15.
@@ -23,7 +23,7 @@ public abstract class ModelProviders {
             LocalDateTime.of(2015, 8, 10, 10, 10, 15, 10).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 
     public static final String APPLICATION_NAME = "TESTAPP";
-    public static final byte[] TRANSACTION_ID = BytesUtils.toBytes("0001A5DEAC9EEF2904");
+    public static final byte[] TRANSACTION_ID = TransactionIdUtils.formatBytes(null, AGENT_START_TIME, 1);
     public static final long SPAN_ID = 3044242050217653448l;
     public static final int ELAPSED = 2339;
     public static final String RPC = "/callSelf/getCurrentTimestamp.pinpoint";

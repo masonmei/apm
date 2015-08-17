@@ -1,7 +1,13 @@
 package com.baidu.oped.apm;
 
-import static java.lang.String.format;
-import static java.lang.String.join;
+import com.google.common.base.CaseFormat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.JdbcUtils;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
@@ -13,19 +19,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.BeanWrapper;
-import org.springframework.beans.NotWritablePropertyException;
-import org.springframework.beans.PropertyAccessorFactory;
-import org.springframework.beans.TypeMismatchException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.support.JdbcUtils;
-
-import com.google.common.base.CaseFormat;
+import static java.lang.String.format;
+import static java.lang.String.join;
 
 /**
  * Created by mason on 8/15/15.
@@ -41,11 +36,12 @@ public abstract class BaseRepository<T> implements RowMapper<T> {
     private static final String WIlDCARD = "*";
     private static final String EMPTY_CONDITION = "";
     private static final String ID_CONDITION = "id = ?";
-    private static final String ATTR_CONDITION = "%s = ?";
+    private static final String ATTR_CONDITION = "`%s` = ?";
     public static final String CLASS_FIELD_NAME = "class";
     public static final String DEFAULT_FIELD_NAME = "id";
     public static final String CONDITIN_HEADER = "WHERE ";
     public static final String AND_DELIMITER = " AND ";
+    public static final String COLUMN_FORMAT = "`%s`";
 
     private final Class<T> objectClass;
     private final String tableName;
@@ -158,7 +154,7 @@ public abstract class BaseRepository<T> implements RowMapper<T> {
                     continue;
                 }
                 Object value = descriptor.getReadMethod().invoke(entity);
-                columns.add(entry.getKey());
+                columns.add(String.format(COLUMN_FORMAT, entry.getKey()));
                 wildcards.add("?");
                 params.add(value);
             } catch (IllegalAccessException | InvocationTargetException e) {
