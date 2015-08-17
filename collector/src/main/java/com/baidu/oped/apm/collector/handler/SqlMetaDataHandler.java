@@ -22,7 +22,7 @@ public class SqlMetaDataHandler implements RequestResponseHandler {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
-    @Qualifier("hbaseSqlMetaDataCompatibility")
+//    @Qualifier("hbaseSqlMetaDataCompatibility")
     private SqlMetaDataDao sqlMetaDataDao;
 
     @Override
