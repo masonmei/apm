@@ -74,7 +74,7 @@
             </dependency>
             <dependency>
                 <groupId>com.baidu.oped.apm</groupId>
-                <artifactId>commons-hbase</artifactId>
+                <artifactId>commons-jdbc</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
