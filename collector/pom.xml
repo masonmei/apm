@@ -13,6 +13,7 @@
     <artifactId>collector</artifactId>
 
     <properties>
+        <jdk.version>1.8</jdk.version>
         <metrics.version>3.0.1</metrics.version>
     </properties>
 
@@ -61,10 +62,10 @@
             <groupId>com.baidu.oped.apm</groupId>
             <artifactId>commons</artifactId>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>com.baidu.oped.apm</groupId>-->
-            <!--<artifactId>commons-hbase</artifactId>-->
-        <!--</dependency>-->
+        <dependency>
+            <groupId>com.baidu.oped.apm</groupId>
+            <artifactId>commons-jdbc</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.baidu.oped.apm</groupId>
             <artifactId>rpc</artifactId>
