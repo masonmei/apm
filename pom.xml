@@ -28,6 +28,7 @@
         <module>web</module>
         <module>collector</module>
         <module>agent</module>
+        <module>commons-jdbc</module>
     </modules>
 
     <properties>
