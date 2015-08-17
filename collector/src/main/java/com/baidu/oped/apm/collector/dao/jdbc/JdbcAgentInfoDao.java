@@ -1,28 +1,31 @@
 package com.baidu.oped.apm.collector.dao.jdbc;
 
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Repository;
-
+import com.baidu.oped.apm.BaseDto;
+import com.baidu.oped.apm.JdbcTables;
 import com.baidu.oped.apm.collector.dao.AgentInfoDao;
 import com.baidu.oped.apm.collector.mapper.thrift.AgentInfoBoMapper;
 import com.baidu.oped.apm.collector.mapper.thrift.ServerMetaDataBoMapper;
-import com.baidu.oped.apm.common.bo.AgentInfoBo;
-import com.baidu.oped.apm.common.bo.ServerMetaDataBo;
-import com.baidu.oped.apm.common.bo.ServiceInfoBo;
+import com.baidu.oped.apm.common.entity.AgentInfo;
+import com.baidu.oped.apm.common.entity.ServerMetaData;
+import com.baidu.oped.apm.common.entity.ServiceInfo;
 import com.baidu.oped.apm.thrift.dto.TAgentInfo;
+import com.baidu.oped.apm.thrift.dto.TServerMetaData;
+import com.baidu.oped.apm.thrift.dto.TServiceInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
+
+import java.util.List;
 
 /**
  * Created by mason on 8/15/15.
  */
 @Repository
-public class JdbcAgentInfoDao extends BaseRepository<AgentInfoBo> implements AgentInfoDao {
-    private static final Logger LOG = LoggerFactory.getLogger(JdbcAgentInfoDao.class);
-    private static final String TABLE_NAME = "apm_agent_info";
+public class JdbcAgentInfoDao extends BaseDto<AgentInfo> implements AgentInfoDao {
+
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     private AgentInfoBoMapper agentInfoBoMapper;
@@ -31,10 +34,14 @@ public class JdbcAgentInfoDao extends BaseRepository<AgentInfoBo> implements Age
     private ServerMetaDataBoMapper serverMetaDataBoMapper;
 
     @Autowired
-    private JdbcServerMetaDataDao serverMetaDataDao;
+    private JdbcServerMetaDataDao jdbcServerMetaDataDao;
 
-    public JdbcAgentInfoDao() {
-        super(AgentInfoBo.class, TABLE_NAME);
+    @Autowired
+    private JdbcServiceInfoDao jdbcServiceInfoDao;
+
+    @Override
+    protected String tableName() {
+        return JdbcTables.AGENT_INFO;
     }
 
     @Override
@@ -43,26 +50,37 @@ public class JdbcAgentInfoDao extends BaseRepository<AgentInfoBo> implements Age
             throw new NullPointerException("agentInfo must not be null");
         }
 
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("insert agent info. {}", agentInfo);
+        if (logger.isDebugEnabled()) {
+            logger.debug("insert agent info. {}", agentInfo);
         }
 
-        // should add additional agent informations. for now added only starttime for sqlMetaData
-        AgentInfoBo agentInfoBo = this.agentInfoBoMapper.map(agentInfo);
+        AgentInfo aInfo = new AgentInfo(agentInfo);
+        long agentInfoId = this.save(aInfo);
 
         if (agentInfo.isSetServerMetaData()) {
-            ServerMetaDataBo serverMetaDataBo = this.serverMetaDataBoMapper.map(agentInfo.getServerMetaData());
+            ServerMetaData serverMetaData = new ServerMetaData();
+            TServerMetaData thriftObject = agentInfo.getServerMetaData();
+            final String serverInfo = thriftObject.getServerInfo();
+            final List<String> vmArgs = thriftObject.getVmArgs();
+            serverMetaData.setServerInfo(serverInfo);
+            serverMetaData.setVmArgs(StringUtils.arrayToDelimitedString(vmArgs.toArray(), ","));
+            serverMetaData.setAgentId(aInfo.getAgentId());
+            serverMetaData.setAgentInfoId(agentInfoId);
+            long serverMetaDataId = jdbcServerMetaDataDao.save(serverMetaData);
 
-            // todo save to database
+            if (thriftObject.isSetServiceInfos()) {
+                for (TServiceInfo tServiceInfo : thriftObject.getServiceInfos()) {
+                    String serviceName = tServiceInfo.getServiceName();
+                    String serviceLibs =
+                            StringUtils.arrayToCommaDelimitedString(tServiceInfo.getServiceLibs().toArray());
 
-            List<ServiceInfoBo> serviceInfos = serverMetaDataBo.getServiceInfos();
-            if(serviceInfos != null){
-                for (ServiceInfoBo serviceInfo : serviceInfos) {
-
+                    ServiceInfo serviceInfo = new ServiceInfo(serverMetaDataId,
+                                                                aInfo.getAgentId(), serviceName, serviceLibs);
+                    jdbcServiceInfoDao.save(serviceInfo);
                 }
             }
+
         }
 
-        // TODO save to database;
     }
 }

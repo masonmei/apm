@@ -1,17 +1,19 @@
 package com.baidu.oped.apm.collector.dao.jdbc;
 
+import com.baidu.oped.apm.BaseDto;
+import com.baidu.oped.apm.JdbcTables;
+import com.baidu.oped.apm.common.entity.ServiceInfo;
 import org.springframework.stereotype.Repository;
 
-import com.baidu.oped.apm.common.bo.ServiceInfoBo;
-
 /**
- * Created by mason on 8/15/15.
+ * Created by yangbolin on 8/15/15.
  */
 @Repository
-public class JdbcServiceInfoDao extends BaseRepository<ServiceInfoBo> {
-    private static final String TABLE_NAME = "apm_service_info";
+public class JdbcServiceInfoDao extends BaseDto<ServiceInfo> {
 
-    public JdbcServiceInfoDao() {
-        super(ServiceInfoBo.class, TABLE_NAME);
+    @Override
+    protected String tableName() {
+        return JdbcTables.SERVER_INFO;
     }
+
 }

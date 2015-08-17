@@ -1,17 +1,19 @@
 package com.baidu.oped.apm.collector.dao.jdbc;
 
+import com.baidu.oped.apm.BaseDto;
+import com.baidu.oped.apm.JdbcTables;
+import com.baidu.oped.apm.common.entity.ServerMetaData;
 import org.springframework.stereotype.Repository;
-
-import com.baidu.oped.apm.common.bo.ServerMetaDataBo;
 
 /**
  * Created by mason on 8/15/15.
  */
 @Repository
-public class JdbcServerMetaDataDao  extends BaseRepository<ServerMetaDataBo> {
-    private static final String TABLE_NAME = "apm_server_meta_data";
+public class JdbcServerMetaDataDao extends BaseDto<ServerMetaData> {
 
-    public JdbcServerMetaDataDao() {
-        super(ServerMetaDataBo.class, TABLE_NAME);
+    @Override
+    protected String tableName() {
+        return JdbcTables.SERVER_META_DATA;
     }
+
 }
