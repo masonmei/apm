@@ -3,7 +3,7 @@ package com.baidu.oped.apm;
 
 import com.baidu.oped.apm.common.util.ClassUtils;
 import com.google.common.base.CaseFormat;
-import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.PropertyUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.CollectionUtils;
@@ -26,7 +26,7 @@ import java.util.Map;
  *
  * @author yangbolin
  */
-public abstract class BaseDto<T> {
+public abstract class BaseDto<T, K> {
 
     @Autowired
     JdbcTemplate jdbcTemplate;
@@ -195,13 +195,13 @@ public abstract class BaseDto<T> {
             return false;
         }
 
-        Map<String, String> toUpdateMsgs = this.listFieldValues(one);
+        Map<String, Object> toUpdateMsgs = this.listFieldValues(one);
         toUpdateMsgs.remove("id");
 
         return this.updateAttrs(toUpdateMsgs, id);
     }
 
-    public boolean updateAttrs(Map<String, String> updateAttrs, long id) {
+    public boolean updateAttrs(Map<String, Object> updateAttrs, long id) {
         if (id <= 0) {
             return false;
         }
@@ -212,7 +212,7 @@ public abstract class BaseDto<T> {
         return updateAttrs(updateAttrs, "id=?", id);
     }
 
-    public boolean updateAttrs(Map<String, String> updateAttrs, String conditionSql, Object... conditionParams) {
+    public boolean updateAttrs(Map<String, Object> updateAttrs, String conditionSql, Object... conditionParams) {
         int len = updateAttrs.size();
         List<Object> attrValues = new ArrayList<Object>(len);
         List<String> kvs = new ArrayList<String>(len);
@@ -236,7 +236,7 @@ public abstract class BaseDto<T> {
             return;
         }
 
-        Map<String, String> pojoBean = this.listFieldValues(instances.get(0));
+        Map<String, Object> pojoBean = this.listFieldValues(instances.get(0));
         String[] fields = pojoBean.keySet().toArray(new String[pojoBean.size()]);
         int fieldNum = fields.length;
 
@@ -276,7 +276,7 @@ public abstract class BaseDto<T> {
                     sql.append(",");
                 }
                 sql.append(whereSql);
-                Map<String, String> fieldValues = this.listFieldValues(instances.get(i + j));
+                Map<String, Object> fieldValues = this.listFieldValues(instances.get(i + j));
                 for (int k = 0; k < fieldNum; k++) {
                     params[j * fieldNum + k] = fieldValues.get(fields[k]);
                 }
@@ -287,7 +287,7 @@ public abstract class BaseDto<T> {
     }
 
     public long save(T one) {
-        Map<String, String> pojo_bean = this.listFieldValues(one);
+        Map<String, Object> pojo_bean = this.listFieldValues(one);
         String[] fields = pojo_bean.keySet().toArray(new String[pojo_bean.size()]);
         Object[] params = new Object[pojo_bean.size()];
         StringBuilder sql = new StringBuilder("INSERT INTO ");
@@ -312,9 +312,9 @@ public abstract class BaseDto<T> {
         return jdbcTemplate.queryForObject("select LAST_INSERT_ID() as id", Long.class);
     }
 
-    private Map<String, String> listFieldValues(T one) {
+    private Map<String, Object> listFieldValues(T one) {
         try {
-            Map<String, String> props = BeanUtils.describe(one);
+            Map<String, Object> props = PropertyUtils.describe(one);
             if (getId(one) <= 0L) {
                 props.remove("id");
             }

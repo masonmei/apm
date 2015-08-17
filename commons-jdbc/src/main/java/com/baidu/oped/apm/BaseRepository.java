@@ -8,9 +8,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.JdbcUtils;
+import org.springframework.util.StringUtils;
 
 import java.beans.PropertyDescriptor;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -52,11 +56,33 @@ public abstract class BaseRepository<T> implements RowMapper<T> {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    public BaseRepository(Class<T> objectClass, String tableName) {
-        this.objectClass = objectClass;
-        this.tableName = tableName;
-        this.idFieldName = DEFAULT_FIELD_NAME;
+    public BaseRepository() {
+        try {
+            Class c = getClass();
+            Type t = c.getGenericSuperclass();
+            if (!(t instanceof ParameterizedType)) {
+                throw new Exception("generic class type error");
+            }
+            Type[] p = ((ParameterizedType) t).getActualTypeArguments();
+            this.objectClass = (Class<T>) p[0];
+        } catch (Exception e) {
+            throw new RuntimeException("parse generic class type fail", e);
+        }
 
+        Annotation annotation = objectClass.getAnnotation(Table.class);
+        if (annotation == null) {
+            throw new RuntimeException(String.format("class %s missing @interface Table, is not a pojo",
+                    objectClass.getName()));
+        }
+        Table table = (Table) annotation;
+        String name = table.name();
+        if (StringUtils.isEmpty(name)) {
+            this.tableName = name;
+        } else {
+            this.tableName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, objectClass.getName());
+        }
+
+        this.idFieldName = DEFAULT_FIELD_NAME;
         PropertyDescriptor[] pds = BeanUtils.getPropertyDescriptors(objectClass);
         for (PropertyDescriptor pd : pds) {
             if (pd.getName().equals(CLASS_FIELD_NAME)) {
@@ -80,7 +106,7 @@ public abstract class BaseRepository<T> implements RowMapper<T> {
 
     public T findOneById(long id) {
         String sql = format(QUERY_PATTERN, WIlDCARD, tableName, conditionBuilder().append(ID_CONDITION));
-        return jdbcTemplate.queryForObject(sql, new Object[] {id}, this);
+        return jdbcTemplate.queryForObject(sql, new Object[]{id}, this);
     }
 
     public T findOneByAttr(String attrName, Object attrValue) {
@@ -105,7 +131,7 @@ public abstract class BaseRepository<T> implements RowMapper<T> {
         }
 
         String sql = format(QUERY_PATTERN, WIlDCARD, tableName,
-                                   conditionBuilder.append(join(AND_DELIMITER, conditions)).toString());
+                conditionBuilder.append(join(AND_DELIMITER, conditions)).toString());
 
         return jdbcTemplate.queryForObject(sql, this, params.toArray(new Object[params.size()]));
     }
@@ -132,7 +158,7 @@ public abstract class BaseRepository<T> implements RowMapper<T> {
         }
 
         String sql = format(QUERY_PATTERN, WIlDCARD, tableName,
-                                   conditionBuilder.append(join(AND_DELIMITER, conditions)).toString());
+                conditionBuilder.append(join(AND_DELIMITER, conditions)).toString());
 
         return jdbcTemplate.query(sql, this, params.toArray(new Object[params.size()]));
     }
