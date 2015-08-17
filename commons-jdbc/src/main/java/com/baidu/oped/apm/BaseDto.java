@@ -1,6 +1,7 @@
 package com.baidu.oped.apm;
 
 
+import com.baidu.oped.apm.common.util.ClassUtils;
 import com.google.common.base.CaseFormat;
 import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +50,7 @@ public abstract class BaseDto<T> {
         }
 
         try {
-            idField = entityClass.getDeclaredField("id");
+            idField = ClassUtils.getClassFields(entityClass, true).get("id");
             idField.setAccessible(true);
         } catch (Exception e) {
             String error = String.format("bo class %s missing field id", entityClass.getName());
