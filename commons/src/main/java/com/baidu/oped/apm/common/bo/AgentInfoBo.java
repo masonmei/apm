@@ -28,19 +28,19 @@ public class AgentInfoBo {
         }
     };
 
-    private final String hostName;
-    private final String ip;
-    private final String ports;
-    private final String agentId;
-    private final String applicationName;
-    private final ServiceType serviceType;
-    private final int pid;
-    private final String version;
+    private String hostName;
+    private String ip;
+    private String ports;
+    private String agentId;
+    private String applicationName;
+    private ServiceType serviceType;
+    private int pid;
+    private String version;
 
-    private final long startTime;
+    private long startTime;
 
-    private final long endTimeStamp;
-    private final int endStatus;
+    private long endTimeStamp;
+    private int endStatus;
 
     // Should be serialized separately
     private final ServerMetaDataBo serverMetaData;
