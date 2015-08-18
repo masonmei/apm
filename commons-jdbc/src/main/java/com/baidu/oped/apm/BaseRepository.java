@@ -79,7 +79,9 @@ public abstract class BaseRepository<T> implements RowMapper<T> {
         if (StringUtils.isEmpty(name)) {
             this.tableName = name;
         } else {
-            this.tableName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, objectClass.getName());
+            String className = objectClass.getName();
+            this.tableName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE,
+                    className.substring(className.lastIndexOf(".") + 1));
         }
 
         this.idFieldName = DEFAULT_FIELD_NAME;
