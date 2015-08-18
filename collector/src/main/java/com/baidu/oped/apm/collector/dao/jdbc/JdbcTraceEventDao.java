@@ -1,7 +1,7 @@
 package com.baidu.oped.apm.collector.dao.jdbc;
 
 import com.baidu.oped.apm.BaseRepository;
-import com.baidu.oped.apm.JdbcTables;
+import com.baidu.oped.apm.common.annotation.JdbcTables;
 import com.baidu.oped.apm.common.entity.TraceEvent;
 import org.springframework.stereotype.Repository;
 

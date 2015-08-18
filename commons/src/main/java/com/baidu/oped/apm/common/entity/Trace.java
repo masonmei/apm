@@ -1,8 +1,12 @@
 package com.baidu.oped.apm.common.entity;
 
+import com.baidu.oped.apm.common.annotation.JdbcTables;
+import com.baidu.oped.apm.common.annotation.Table;
+
 /**
  * Created by mason on 8/17/15.
  */
+@Table(name = JdbcTables.TRACE)
 public class Trace extends BaseEntity {
     private byte version = 0;
 

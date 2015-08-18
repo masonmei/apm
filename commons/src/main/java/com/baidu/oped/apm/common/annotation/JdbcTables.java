@@ -1,4 +1,4 @@
-package com.baidu.oped.apm;
+package com.baidu.oped.apm.common.annotation;
 
 /**
  * Created by mason on 8/17/15.

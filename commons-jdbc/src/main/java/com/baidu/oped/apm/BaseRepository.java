@@ -1,5 +1,6 @@
 package com.baidu.oped.apm;
 
+import com.baidu.oped.apm.common.annotation.Table;
 import com.google.common.base.CaseFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
