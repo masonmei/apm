@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.JdbcUtils;
@@ -45,6 +44,7 @@ public abstract class BaseRepository<T> implements RowMapper<T> {
     public static final String CLASS_FIELD_NAME = "class";
     public static final String DEFAULT_FIELD_NAME = "id";
     public static final String CONDITION_HEADER = "WHERE ";
+    public static final String UPDATE_HEADER = "UPDATE ";
     public static final String AND_DELIMITER = " AND ";
     public static final String COLUMN_FORMAT = "`%s`";
 
@@ -103,8 +103,8 @@ public abstract class BaseRepository<T> implements RowMapper<T> {
         }
     }
 
-    private static StringBuilder conditionBuilder() {
-        return new StringBuilder(CONDITION_HEADER);
+    private static StringBuilder updateBuilder() {
+        return new StringBuilder(UPDATE_HEADER);
     }
 
     public T findOneById(long id) {
@@ -118,25 +118,19 @@ public abstract class BaseRepository<T> implements RowMapper<T> {
     }
 
     public T findOneByAttrs(Map<String, Object> attrs) {
-        if (attrs == null || attrs.size() == 0) {
-            return null;
-        }
-        StringBuilder conditionBuilder = conditionBuilder();
-        List<String> conditions = new ArrayList<>(attrs.size());
-        List<Object> params = new ArrayList<>(attrs.size());
+        StringBuilder conditionBuilder = new StringBuilder();
+        List<Object> params = new ArrayList<>();
+        if (attrs != null) {
+            List<String> conditions = new ArrayList<>(attrs.size());
 
-        for (Map.Entry<String, Object> entry : attrs.entrySet()) {
-            processConditions(conditions, params, entry);
+            for (Map.Entry<String, Object> entry : attrs.entrySet()) {
+                processConditions(conditions, params, entry);
+            }
+            conditionBuilder.append(CONDITION_HEADER);
+            conditionBuilder.append(join(AND_DELIMITER, conditions));
         }
-
-        String sql = format(QUERY_PATTERN, WIlDCARD, tableName,
-                conditionBuilder.append(join(AND_DELIMITER, conditions)).toString());
-
-        try {
-            return jdbcTemplate.queryForObject(sql, this, params.toArray(new Object[params.size()]));
-        } catch (EmptyResultDataAccessException e) {
-            return null;
-        }
+        String sql = format(QUERY_PATTERN, WIlDCARD, tableName, conditionBuilder.toString());
+        return jdbcTemplate.queryForObject(sql, this, params.toArray(new Object[params.size()]));
     }
 
     private void processConditions(List<String> conditions, List<Object> params, Map.Entry<String, Object> entry) {
@@ -157,28 +151,26 @@ public abstract class BaseRepository<T> implements RowMapper<T> {
         return findByAttrs(WIlDCARD, attrs);
     }
 
-    public List<T> findByAttrs(String select, Map<String, Object> attrs){
-        if (attrs == null || attrs.size() == 0) {
-            return null;
-        }
-        StringBuilder conditionBuilder = conditionBuilder();
-        List<String> conditions = new ArrayList<>(attrs.size());
-        List<Object> params = new ArrayList<>(attrs.size());
+    public List<T> findByAttrs(String select, Map<String, Object> attrs) {
+        List<Object> params = new ArrayList<>();
 
-        for (Map.Entry<String, Object> entry : attrs.entrySet()) {
-            String key = entry.getKey();
-            if (mappedFields.containsKey(key)) {
-                conditions.add(format(ATTR_CONDITION, toDatabaseName(key)));
-                params.add(entry.getValue());
+        StringBuilder conditionBuilder = new StringBuilder();
+        if (attrs != null) {
+            List<String> conditions = new ArrayList<>();
+            for (Map.Entry<String, Object> entry : attrs.entrySet()) {
+                String key = entry.getKey();
+                if (mappedFields.containsKey(key)) {
+                    conditions.add(format(ATTR_CONDITION, toDatabaseName(key)));
+                    params.add(entry.getValue());
+                }
             }
+            conditionBuilder.append(CONDITION_HEADER);
+            conditionBuilder.append(join(AND_DELIMITER, conditions)).toString();
         }
+        String sql = format(QUERY_PATTERN, select, tableName, conditionBuilder.toString());
 
-        String sql = format(QUERY_PATTERN, select, tableName,
-                                   conditionBuilder.append(join(AND_DELIMITER, conditions)).toString());
-
-        return jdbcTemplate.query(sql, this, params.toArray(new Object[params.size()]));
+        return jdbcTemplate.query(sql, this, params.toArray());
     }
-
 
 
     public List<T> findAll() {
@@ -223,10 +215,12 @@ public abstract class BaseRepository<T> implements RowMapper<T> {
     }
 
     public int deleteByAttrs(Map<String, Object> attrs) {
-        StringBuilder conditionBuilder = conditionBuilder();
+        if (attrs == null || attrs.isEmpty()) {
+            throw new UnsupportedOperationException("delete operation must match some conditions");
+        }
+        StringBuilder conditionBuilder = new StringBuilder(CONDITION_HEADER);
         List<String> conditions = new ArrayList<>(attrs.size());
         List<Object> params = new ArrayList<>(attrs.size());
-
         for (Map.Entry<String, Object> entry : attrs.entrySet()) {
             processConditions(conditions, params, entry);
         }
@@ -259,6 +253,9 @@ public abstract class BaseRepository<T> implements RowMapper<T> {
     }
 
     public boolean updateAttrs(Map<String, Object> updateAttrs, Map<String, Object> conditionAttrs) {
+        if (updateAttrs == null || updateAttrs.isEmpty()) {
+            throw new UnsupportedOperationException("the needed update params must not be empty ");
+        }
         int len = updateAttrs.size();
         List<Object> attrValues = new ArrayList<>(len);
         List<String> kvs = new ArrayList<>(len);
@@ -267,24 +264,24 @@ public abstract class BaseRepository<T> implements RowMapper<T> {
             attrValues.add(updateAttrs.get(attr));
         }
 
-        List<Object> params = new ArrayList<>(conditionAttrs.size());
-
-        StringBuilder updatesBuilder = conditionBuilder();
+        List<Object> params = new ArrayList<>();
+        StringBuilder updatesBuilder = updateBuilder();
         List<String> updates = new ArrayList<>(updateAttrs.size());
         for (Map.Entry<String, Object> entry : updateAttrs.entrySet()) {
             processConditions(updates, params, entry);
         }
         updatesBuilder.append(join(AND_DELIMITER, updates));
 
-        StringBuilder conditionBuilder = conditionBuilder();
-        List<String> conditions = new ArrayList<>(conditionAttrs.size());
-        for (Map.Entry<String, Object> entry : conditionAttrs.entrySet()) {
-            processConditions(conditions, params, entry);
+        StringBuilder conditionBuilder = new StringBuilder();
+        if (conditionAttrs != null) {
+            List<String> conditions = new ArrayList<>(conditionAttrs.size());
+            for (Map.Entry<String, Object> entry : conditionAttrs.entrySet()) {
+                processConditions(conditions, params, entry);
+            }
+            conditionBuilder.append(UPDATE_HEADER);
+            conditionBuilder.append(join(AND_DELIMITER, conditions));
         }
-        conditionBuilder.append(join(AND_DELIMITER, conditions));
-
         String sql = format(UPDATE_PATTERN, tableName, updatesBuilder.toString(), conditionBuilder.toString());
-
         int ret = jdbcTemplate.update(sql, attrValues.toArray(new Object[params.size()]));
         return ret > 0;
     }
