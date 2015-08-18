@@ -1,6 +1,7 @@
 package com.baidu.oped.apm;
 
 
+import com.baidu.oped.apm.common.annotation.Table;
 import com.baidu.oped.apm.common.util.ClassUtils;
 import com.google.common.base.CaseFormat;
 import org.apache.commons.beanutils.PropertyUtils;
@@ -9,6 +10,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -26,47 +28,71 @@ import java.util.Map;
  *
  * @author yangbolin
  */
-public abstract class BaseDto<T, K> {
+public abstract class BaseDto<T> {
+
+    private static final String KEY = "id";
 
     @Autowired
     JdbcTemplate jdbcTemplate;
 
     private Class<T> entityClass;
     private Field idField;
+    private String tableName;
 
     // 构造方法，根据实例类自动获取实体类类型
     @SuppressWarnings({"rawtypes", "unchecked"})
     public BaseDto() {
+        // 获取泛型类型
         try {
-            this.entityClass = null;
             Class c = getClass();
             Type t = c.getGenericSuperclass();
-            if (t instanceof ParameterizedType) {
-                Type[] p = ((ParameterizedType) t).getActualTypeArguments();
-                this.entityClass = (Class<T>) p[0];
+            if (!(t instanceof ParameterizedType)) {
+                throw new Exception("generic class type error");
             }
+            Type[] p = ((ParameterizedType) t).getActualTypeArguments();
+            this.entityClass = (Class<T>) p[0];
         } catch (Exception e) {
             throw new RuntimeException("parse bo class type fail", e);
         }
 
+        // 注解
+        Annotation annotation = entityClass.getAnnotation(Table.class);
+        if (annotation == null) {
+            throw new RuntimeException(String.format("class %s missing @interface Table, is not a pojo",
+                    entityClass.getName()));
+        }
+        Table table = (Table) annotation;
+        String name = table.name();
+        if (StringUtils.isEmpty(name)) {
+            this.tableName = name;
+        } else {
+            String className = entityClass.getName();
+            this.tableName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE,
+                    className.substring(className.lastIndexOf(".") + 1));
+        }
+
+        // 主键标识
         try {
-            idField = ClassUtils.getClassFields(entityClass, true).get("id");
+            idField = ClassUtils.getClassFields(entityClass, true).get(KEY);
             idField.setAccessible(true);
         } catch (Exception e) {
-            String error = String.format("bo class %s missing field id", entityClass.getName());
+            String error = String.format("bo class %s missing field %s", entityClass.getName(), KEY);
             throw new RuntimeException(error, e);
         }
+
     }
 
-    protected abstract String tableName();
+    private String tableName() {
+        return String.format("`%s`", tableName);
+    }
 
     public T get(long id) {
-        String sql = "SELECT * FROM " + tableName() + " WHERE id = ?";
+        String sql = "SELECT * FROM " + tableName() + " WHERE `" + KEY + "` = ?";
         return jdbcTemplate.queryForObject(sql, entityClass, id);
     }
 
     public T get(String attrName, Object attrValue) {
-        String sql = "SELECT * FROM " + tableName() + " WHERE " + attrName + " = ?";
+        String sql = "SELECT * FROM " + tableName() + " WHERE `" + attrName + "` = ?";
         return jdbcTemplate.queryForObject(sql, entityClass, attrValue);
     }
 
@@ -79,10 +105,10 @@ public abstract class BaseDto<T, K> {
         List<String> kvs = new ArrayList<String>(size);
         List<Object> attrVals = new ArrayList<Object>(size);
         for (String attrName : attrs.keySet()) {
-            kvs.add(attrName + " = ?");
+            kvs.add("`" + attrName + "` = ?");
             attrVals.add(attrs.get(attrName));
         }
-        sql.append(StringUtils.arrayToDelimitedString(kvs.toArray(), ","));
+        sql.append(StringUtils.arrayToDelimitedString(kvs.toArray(), " and "));
         return jdbcTemplate.queryForObject(sql.toString(), attrVals.toArray(), entityClass);
     }
 
@@ -105,7 +131,7 @@ public abstract class BaseDto<T, K> {
                 endkey = values.size();
             }
             List subValues = values.subList(i, endkey);
-            StringBuilder sql = new StringBuilder("SELECT * FROM " + tableName() + " WHERE " + attrName + " IN (");
+            StringBuilder sql = new StringBuilder("SELECT * FROM " + tableName() + " WHERE `" + attrName + "` IN (");
             for (int j = 1; j <= subValues.size(); j++) {
                 sql.append('?');
                 if (j < subValues.size())
@@ -126,7 +152,7 @@ public abstract class BaseDto<T, K> {
         List<String> kvs = new ArrayList<String>(size);
         List<Object> attrVals = new ArrayList<Object>(size);
         for (String attrName : attrs.keySet()) {
-            kvs.add(attrName + " = ?");
+            kvs.add("`" + attrName + "` = ?");
             attrVals.add(attrs.get(attrName));
         }
         sql.append(StringUtils.arrayToDelimitedString(kvs.toArray(), " and "));
@@ -142,17 +168,21 @@ public abstract class BaseDto<T, K> {
     }
 
     public List<T> batchGet(Collection<String> fields, String condtionSql, Object... params) {
-        String fieldStr = StringUtils.arrayToDelimitedString(fields.toArray(), ",");
+        List<String> sqlFields = new ArrayList<String>(fields.size());
+        for (String field : fields) {
+            sqlFields.add(String.format("`%s`", field));
+        }
+        String fieldStr = StringUtils.arrayToDelimitedString(sqlFields.toArray(), ",");
         StringBuffer sql = new StringBuffer("SELECT " + fieldStr + " FROM " + tableName() + " WHERE " + condtionSql);
         return jdbcTemplate.queryForList(sql.toString(), entityClass, params);
     }
 
     public void delete(long id) {
-        jdbcTemplate.update("DELETE FROM " + tableName() + " WHERE id = ?", id);
+        jdbcTemplate.update("DELETE FROM " + tableName() + " WHERE `" + KEY + "` = ?", id);
     }
 
     public void delete(String attrName, Object attrValue) {
-        jdbcTemplate.update("DELETE FROM " + tableName() + " WHERE " + attrName + " = ?", attrValue);
+        jdbcTemplate.update("DELETE FROM " + tableName() + " WHERE `" + attrName + "` = ?", attrValue);
     }
 
     public void delete(String condtionSql, Object... params) {
@@ -163,7 +193,7 @@ public abstract class BaseDto<T, K> {
         if (inValues == null || inValues.size() == 0) {
             return;
         }
-        StringBuffer sql = new StringBuffer("DELETE FROM " + tableName() + " WHERE " + attrName + " IN (");
+        StringBuffer sql = new StringBuffer("DELETE FROM " + tableName() + " WHERE `" + attrName + "` IN (");
         for (int i = 1; i <= inValues.size(); i++) {
             sql.append('?');
             if (i < inValues.size())
@@ -182,10 +212,10 @@ public abstract class BaseDto<T, K> {
         List<Object> attrVals = new ArrayList<Object>(size);
         List<String> kvs = new ArrayList<String>(size);
         for (String attrName : attrs.keySet()) {
-            kvs.add(attrName + " = ?");
+            kvs.add("`" + attrName + "` = ?");
             attrVals.add(attrs.get(attrName));
         }
-        sql.append(StringUtils.arrayToDelimitedString(kvs.toArray(), "and"));
+        sql.append(StringUtils.arrayToDelimitedString(kvs.toArray(), " and "));
         jdbcTemplate.update(sql.toString(), attrVals.toArray());
     }
 
@@ -196,7 +226,7 @@ public abstract class BaseDto<T, K> {
         }
 
         Map<String, Object> toUpdateMsgs = this.listFieldValues(one);
-        toUpdateMsgs.remove("id");
+        toUpdateMsgs.remove(KEY);
 
         return this.updateAttrs(toUpdateMsgs, id);
     }
@@ -209,7 +239,7 @@ public abstract class BaseDto<T, K> {
             return true;
         }
 
-        return updateAttrs(updateAttrs, "id=?", id);
+        return updateAttrs(updateAttrs, "`" + KEY + "`=?", id);
     }
 
     public boolean updateAttrs(Map<String, Object> updateAttrs, String conditionSql, Object... conditionParams) {
@@ -217,7 +247,7 @@ public abstract class BaseDto<T, K> {
         List<Object> attrValues = new ArrayList<Object>(len);
         List<String> kvs = new ArrayList<String>(len);
         for (String attr : updateAttrs.keySet()) {
-            kvs.add(attr + " = ?");
+            kvs.add("`" + attr + "` = ?");
             attrValues.add(updateAttrs.get(attr));
         }
 
@@ -247,7 +277,7 @@ public abstract class BaseDto<T, K> {
             if (i > 0) {
                 fieldsSql.append(',');
             }
-            fieldsSql.append(CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, fields[i]));
+            fieldsSql.append(String.format("`%s`", CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, fields[i])));
         }
         fieldsSql.append(") VALUES ");
 
@@ -287,9 +317,9 @@ public abstract class BaseDto<T, K> {
     }
 
     public long save(T one) {
-        Map<String, Object> pojo_bean = this.listFieldValues(one);
-        String[] fields = pojo_bean.keySet().toArray(new String[pojo_bean.size()]);
-        Object[] params = new Object[pojo_bean.size()];
+        Map<String, Object> pojoBean = this.listFieldValues(one);
+        String[] fields = pojoBean.keySet().toArray(new String[pojoBean.size()]);
+        Object[] params = new Object[pojoBean.size()];
         StringBuilder sql = new StringBuilder("INSERT INTO ");
         sql.append(this.tableName());
         sql.append('(');
@@ -297,8 +327,8 @@ public abstract class BaseDto<T, K> {
             if (i > 0) {
                 sql.append(',');
             }
-            sql.append(CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, fields[i]));
-            params[i] = pojo_bean.get(fields[i]);
+            sql.append(String.format("`%s`", CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, fields[i])));
+            params[i] = pojoBean.get(fields[i]);
         }
         sql.append(") VALUES (");
         for (int j = 0; j < fields.length; j++) {
@@ -316,7 +346,7 @@ public abstract class BaseDto<T, K> {
         try {
             Map<String, Object> props = PropertyUtils.describe(one);
             if (getId(one) <= 0L) {
-                props.remove("id");
+                props.remove(KEY);
             }
             props.remove("class");
             return props;
@@ -333,7 +363,7 @@ public abstract class BaseDto<T, K> {
             }
             return Long.valueOf(value.toString());
         } catch (Exception e) {
-            String error = String.format("bo class %s get key id value fail", entityClass.getName());
+            String error = String.format("bo class %s get key %s value fail", entityClass.getName(), KEY);
             throw new RuntimeException(error, e);
         }
     }

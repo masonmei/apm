@@ -77,7 +77,7 @@ public abstract class BaseRepository<T> implements RowMapper<T> {
         }
         Table table = (Table) annotation;
         String name = table.name();
-        if (StringUtils.isEmpty(name)) {
+        if (!StringUtils.isEmpty(name)) {
             this.tableName = name;
         } else {
             String className = objectClass.getName();

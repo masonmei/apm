@@ -1,11 +1,15 @@
 
 package com.baidu.oped.apm.common.entity;
 
+import com.baidu.oped.apm.common.annotation.JdbcTables;
+import com.baidu.oped.apm.common.annotation.Table;
+
 /**
  * class ServiceInfo
  *
  * @author yangbolin@baidu.com
  */
+@Table(name = JdbcTables.SERVER_INFO)
 public class ServiceInfo extends BaseEntity {
 
     private long serverMetaDataId;

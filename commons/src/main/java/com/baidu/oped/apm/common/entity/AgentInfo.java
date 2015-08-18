@@ -1,12 +1,15 @@
 package com.baidu.oped.apm.common.entity;
 
+import com.baidu.oped.apm.common.annotation.JdbcTables;
+import com.baidu.oped.apm.common.annotation.Table;
 import com.baidu.oped.apm.thrift.dto.TAgentInfo;
 
 /**
- * class AgentInfoBo
+ * class AgentInfo
  *
  * @author yangbolin@baidu.com
  */
+@Table(name = JdbcTables.AGENT_INFO)
 public class AgentInfo extends BaseEntity {
 
     private String hostName;

@@ -1,10 +1,7 @@
 package com.baidu.oped.apm.collector.dao.jdbc;
 
-import com.baidu.oped.apm.BaseDto;
-import com.baidu.oped.apm.JdbcTables;
+import com.baidu.oped.apm.BaseRepository;
 import com.baidu.oped.apm.collector.dao.AgentInfoDao;
-import com.baidu.oped.apm.collector.mapper.thrift.AgentInfoBoMapper;
-import com.baidu.oped.apm.collector.mapper.thrift.ServerMetaDataBoMapper;
 import com.baidu.oped.apm.common.entity.AgentInfo;
 import com.baidu.oped.apm.common.entity.ServerMetaData;
 import com.baidu.oped.apm.common.entity.ServiceInfo;
@@ -23,26 +20,15 @@ import java.util.List;
  * Created by mason on 8/15/15.
  */
 @Repository
-public class JdbcAgentInfoDao extends BaseDto<AgentInfo> implements AgentInfoDao {
+public class JdbcAgentInfoDao extends BaseRepository<AgentInfo> implements AgentInfoDao {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
-
-    @Autowired
-    private AgentInfoBoMapper agentInfoBoMapper;
-
-    @Autowired
-    private ServerMetaDataBoMapper serverMetaDataBoMapper;
 
     @Autowired
     private JdbcServerMetaDataDao jdbcServerMetaDataDao;
 
     @Autowired
     private JdbcServiceInfoDao jdbcServiceInfoDao;
-
-    @Override
-    protected String tableName() {
-        return JdbcTables.AGENT_INFO;
-    }
 
     @Override
     public void insert(TAgentInfo agentInfo) {
