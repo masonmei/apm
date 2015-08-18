@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.JdbcUtils;
@@ -40,19 +41,18 @@ public abstract class BaseRepository<T> implements RowMapper<T> {
 
     private static final String WIlDCARD = "*";
     private static final String EMPTY_CONDITION = "";
-    private static final String ID_CONDITION = "id = ?";
     private static final String ATTR_CONDITION = "`%s` = ?";
     public static final String CLASS_FIELD_NAME = "class";
     public static final String DEFAULT_FIELD_NAME = "id";
-    public static final String CONDITIN_HEADER = "WHERE ";
+    public static final String CONDITION_HEADER = "WHERE ";
     public static final String AND_DELIMITER = " AND ";
     public static final String COLUMN_FORMAT = "`%s`";
 
     private final Class<T> objectClass;
     private final String tableName;
     private final String idFieldName;
-    private final Map<String, String> fieldColumnMapper = new HashMap<String, String>();
-    private final Map<String, PropertyDescriptor> mappedFields = new HashMap<String, PropertyDescriptor>();
+    private final Map<String, String> fieldColumnMapper = new HashMap<>();
+    private final Map<String, PropertyDescriptor> mappedFields = new HashMap<>();
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -104,18 +104,17 @@ public abstract class BaseRepository<T> implements RowMapper<T> {
     }
 
     private static StringBuilder conditionBuilder() {
-        return new StringBuilder(CONDITIN_HEADER);
+        return new StringBuilder(CONDITION_HEADER);
     }
 
     public T findOneById(long id) {
-        String sql = format(QUERY_PATTERN, WIlDCARD, tableName, conditionBuilder().append(ID_CONDITION));
-        return jdbcTemplate.queryForObject(sql, new Object[]{id}, this);
+        return findOneByAttr(idFieldName, id);
     }
 
     public T findOneByAttr(String attrName, Object attrValue) {
-        String sql =
-                format(QUERY_PATTERN, WIlDCARD, tableName, conditionBuilder().append(format(ATTR_CONDITION, attrName)));
-        return jdbcTemplate.queryForObject(sql, this, attrValue);
+        Map<String, Object> attrs = new HashMap<>();
+        attrs.put(attrName, attrValue);
+        return findOneByAttrs(attrs);
     }
 
     public T findOneByAttrs(Map<String, Object> attrs) {
@@ -123,26 +122,35 @@ public abstract class BaseRepository<T> implements RowMapper<T> {
             return null;
         }
         StringBuilder conditionBuilder = conditionBuilder();
-        List<String> conditions = new ArrayList<String>(attrs.size());
-        List<Object> params = new ArrayList<Object>(attrs.size());
+        List<String> conditions = new ArrayList<>(attrs.size());
+        List<Object> params = new ArrayList<>(attrs.size());
 
         for (Map.Entry<String, Object> entry : attrs.entrySet()) {
-            if (mappedFields.containsKey(entry.getKey())) {
-                conditions.add(format(ATTR_CONDITION, entry.getKey()));
-                params.add(entry.getValue());
-            }
+            processConditions(conditions, params, entry);
         }
 
         String sql = format(QUERY_PATTERN, WIlDCARD, tableName,
                 conditionBuilder.append(join(AND_DELIMITER, conditions)).toString());
 
-        return jdbcTemplate.queryForObject(sql, this, params.toArray(new Object[params.size()]));
+        try {
+            return jdbcTemplate.queryForObject(sql, this, params.toArray(new Object[params.size()]));
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
+    }
+
+    private void processConditions(List<String> conditions, List<Object> params, Map.Entry<String, Object> entry) {
+        String key = entry.getKey();
+        if (mappedFields.containsKey(key)) {
+            conditions.add(format(ATTR_CONDITION, toDatabaseName(key)));
+            params.add(entry.getValue());
+        }
     }
 
     public List<T> findByAttr(String attrName, Object attrValue) {
-        String sql =
-                format(QUERY_PATTERN, WIlDCARD, tableName, conditionBuilder().append(format(ATTR_CONDITION, attrName)));
-        return jdbcTemplate.query(sql, this, attrValue);
+        Map<String, Object> attrs = new HashMap<>();
+        attrs.put(attrName, attrValue);
+        return findByAttrs(attrs);
     }
 
     public List<T> findByAttrs(Map<String, Object> attrs) {
@@ -150,12 +158,13 @@ public abstract class BaseRepository<T> implements RowMapper<T> {
             return null;
         }
         StringBuilder conditionBuilder = conditionBuilder();
-        List<String> conditions = new ArrayList<String>(attrs.size());
-        List<Object> params = new ArrayList<Object>(attrs.size());
+        List<String> conditions = new ArrayList<>(attrs.size());
+        List<Object> params = new ArrayList<>(attrs.size());
 
         for (Map.Entry<String, Object> entry : attrs.entrySet()) {
-            if (mappedFields.containsKey(entry.getKey())) {
-                conditions.add(format(ATTR_CONDITION, entry.getKey()));
+            String key = entry.getKey();
+            if (mappedFields.containsKey(key)) {
+                conditions.add(format(ATTR_CONDITION, toDatabaseName(key)));
                 params.add(entry.getValue());
             }
         }
@@ -172,9 +181,9 @@ public abstract class BaseRepository<T> implements RowMapper<T> {
     }
 
     public int save(T entity) {
-        List<String> columns = new ArrayList<String>(fieldColumnMapper.size());
-        List<String> wildcards = new ArrayList<String>(fieldColumnMapper.size());
-        List<Object> params = new ArrayList<Object>(fieldColumnMapper.size());
+        List<String> columns = new ArrayList<>(fieldColumnMapper.size());
+        List<String> wildcards = new ArrayList<>(fieldColumnMapper.size());
+        List<Object> params = new ArrayList<>(fieldColumnMapper.size());
 
         for (Map.Entry<String, String> entry : fieldColumnMapper.entrySet()) {
             try {
@@ -198,26 +207,22 @@ public abstract class BaseRepository<T> implements RowMapper<T> {
     }
 
     public int deleteById(long id) {
-        String sql = format(DELETE_PATTERN, tableName, conditionBuilder().append(" ").append(ID_CONDITION));
-        int update = jdbcTemplate.update(sql, id);
-        return update;
+        return deleteByAttr(idFieldName, id);
     }
 
     public int deleteByAttr(String attrName, Object attrValue) {
-        String sql = format(DELETE_PATTERN, tableName, conditionBuilder().append(format(ATTR_CONDITION, attrName)));
-        return jdbcTemplate.update(sql, attrValue);
+        Map<String, Object> attrs = new HashMap<>();
+        attrs.put(attrName, attrValue);
+        return deleteByAttrs(attrs);
     }
 
     public int deleteByAttrs(Map<String, Object> attrs) {
         StringBuilder conditionBuilder = conditionBuilder();
-        List<String> conditions = new ArrayList<String>(attrs.size());
-        List<Object> params = new ArrayList<Object>(attrs.size());
+        List<String> conditions = new ArrayList<>(attrs.size());
+        List<Object> params = new ArrayList<>(attrs.size());
 
         for (Map.Entry<String, Object> entry : attrs.entrySet()) {
-            if (mappedFields.containsKey(entry.getKey())) {
-                conditions.add(format(ATTR_CONDITION, entry.getKey()));
-                params.add(entry.getValue());
-            }
+            processConditions(conditions, params, entry);
         }
 
         String sql = format(DELETE_PATTERN, tableName, conditionBuilder.append(join(AND_DELIMITER, conditions)).toString());
@@ -249,32 +254,26 @@ public abstract class BaseRepository<T> implements RowMapper<T> {
 
     public boolean updateAttrs(Map<String, Object> updateAttrs, Map<String, Object> conditionAttrs) {
         int len = updateAttrs.size();
-        List<Object> attrValues = new ArrayList<Object>(len);
-        List<String> kvs = new ArrayList<String>(len);
+        List<Object> attrValues = new ArrayList<>(len);
+        List<String> kvs = new ArrayList<>(len);
         for (String attr : updateAttrs.keySet()) {
             kvs.add(attr + " = ?");
             attrValues.add(updateAttrs.get(attr));
         }
 
-        List<Object> params = new ArrayList<Object>(conditionAttrs.size());
+        List<Object> params = new ArrayList<>(conditionAttrs.size());
 
         StringBuilder updatesBuilder = conditionBuilder();
-        List<String> updates = new ArrayList<String>(updateAttrs.size());
+        List<String> updates = new ArrayList<>(updateAttrs.size());
         for (Map.Entry<String, Object> entry : updateAttrs.entrySet()) {
-            if (mappedFields.containsKey(entry.getKey())) {
-                updates.add(format(ATTR_CONDITION, entry.getKey()));
-                params.add(entry.getValue());
-            }
+            processConditions(updates, params, entry);
         }
         updatesBuilder.append(join(AND_DELIMITER, updates));
 
         StringBuilder conditionBuilder = conditionBuilder();
-        List<String> conditions = new ArrayList<String>(conditionAttrs.size());
+        List<String> conditions = new ArrayList<>(conditionAttrs.size());
         for (Map.Entry<String, Object> entry : conditionAttrs.entrySet()) {
-            if (mappedFields.containsKey(entry.getKey())) {
-                conditions.add(format(ATTR_CONDITION, entry.getKey()));
-                params.add(entry.getValue());
-            }
+            processConditions(conditions, params, entry);
         }
         conditionBuilder.append(join(AND_DELIMITER, conditions));
 
@@ -323,5 +322,9 @@ public abstract class BaseRepository<T> implements RowMapper<T> {
             String error = String.format("get bo id of class %s failed", objectClass.getName());
             throw new RuntimeException(error);
         }
+    }
+
+    private String toDatabaseName(String fieldName) {
+        return CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, fieldName);
     }
 }

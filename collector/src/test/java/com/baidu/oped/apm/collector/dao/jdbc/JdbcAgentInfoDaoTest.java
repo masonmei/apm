@@ -21,7 +21,6 @@ import static org.junit.Assert.assertTrue;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = {Application.class})
-@ActiveProfiles("for-mac")
 public class JdbcAgentInfoDaoTest {
 
     @Autowired

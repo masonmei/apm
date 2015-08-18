@@ -1,5 +1,7 @@
 package com.baidu.oped.apm.collector.config;
 
+import com.baidu.oped.apm.common.util.DefaultTimeSlot;
+import com.baidu.oped.apm.common.util.TimeSlot;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -41,11 +43,11 @@ public class MxCollectorConfiguration {
 //    RowKeyMerge selfMerge() {
 //        return new RowKeyMerge(HBaseTables.MAP_STATISTICS_SELF_CF_COUNTER);
 //    }
-//
-//    @Bean
-//    TimeSlot timeSlot() {
-//        return new DefaultTimeSlot();
-//    }
+
+    @Bean
+    TimeSlot timeSlot() {
+        return new DefaultTimeSlot();
+    }
 //
 //    @Bean
 //    @Qualifier("jsonObjectMapper")

@@ -1,10 +1,7 @@
 package com.baidu.oped.apm.collector.dao.jdbc.mock;
 
 import com.baidu.oped.apm.common.util.TransactionIdUtils;
-import com.baidu.oped.apm.thrift.dto.TAnnotation;
-import com.baidu.oped.apm.thrift.dto.TAnnotationValue;
-import com.baidu.oped.apm.thrift.dto.TSpan;
-import com.baidu.oped.apm.thrift.dto.TSpanEvent;
+import com.baidu.oped.apm.thrift.dto.*;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -32,6 +29,9 @@ public abstract class ModelProviders {
     public static final String REMOTE_ADDR = "0:0:0:0:0:0:0:1";
     public static final short FLAG = 0;
     public static final int API_ID = -1;
+    public static final int STRING_ID = 100;
+    public static final int SQL_ID = 1000;
+    public static final String SQL = "SELECT * from table";
 
     public static TSpan tSpan() {
         TSpan span = new TSpan();
@@ -85,5 +85,23 @@ public abstract class ModelProviders {
         spanEventList.add(spanEvent3);
 
         return span;
+    }
+
+    public static TStringMetaData stringMetaData(){
+        TStringMetaData metaData = new TStringMetaData();
+        metaData.setAgentId(AGENT_ID);
+        metaData.setAgentStartTime(AGENT_START_TIME);
+        metaData.setStringId(STRING_ID);
+        metaData.setStringValue("THis is a test string value");
+        return metaData;
+    }
+
+    public static TSqlMetaData sqlMetaData() {
+        TSqlMetaData metaData = new TSqlMetaData();
+        metaData.setAgentStartTime(AGENT_START_TIME);
+        metaData.setAgentId(AGENT_ID);
+        metaData.setSqlId(SQL_ID);
+        metaData.setSql(SQL);
+        return metaData;
     }
 }

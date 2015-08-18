@@ -35,8 +35,8 @@ public class JdbcStringMetaDataDao extends BaseRepository<StringMetaData> implem
         metaData.setStringValue(stringMetaData.getStringValue());
 
         Map<String, Object> conditionMap = new HashMap<>();
-        conditionMap.put("agent_id", stringMetaData.getAgentId());
-        conditionMap.put("start_time", stringMetaData.getAgentStartTime());
+        conditionMap.put("agentId", stringMetaData.getAgentId());
+        conditionMap.put("startTime", stringMetaData.getAgentStartTime());
         StringMetaData result = findOneByAttrs(conditionMap);
         if (result == null) {
             save(metaData);
