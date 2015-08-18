@@ -154,6 +154,10 @@ public abstract class BaseRepository<T> implements RowMapper<T> {
     }
 
     public List<T> findByAttrs(Map<String, Object> attrs) {
+        return findByAttrs(WIlDCARD, attrs);
+    }
+
+    public List<T> findByAttrs(String select, Map<String, Object> attrs){
         if (attrs == null || attrs.size() == 0) {
             return null;
         }
@@ -169,11 +173,13 @@ public abstract class BaseRepository<T> implements RowMapper<T> {
             }
         }
 
-        String sql = format(QUERY_PATTERN, WIlDCARD, tableName,
-                conditionBuilder.append(join(AND_DELIMITER, conditions)).toString());
+        String sql = format(QUERY_PATTERN, select, tableName,
+                                   conditionBuilder.append(join(AND_DELIMITER, conditions)).toString());
 
         return jdbcTemplate.query(sql, this, params.toArray(new Object[params.size()]));
     }
+
+
 
     public List<T> findAll() {
         String sql = format(QUERY_PATTERN, WIlDCARD, tableName, EMPTY_CONDITION);

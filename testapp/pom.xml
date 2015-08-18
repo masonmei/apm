@@ -81,6 +81,13 @@
                         <version>1.2.3.RELEASE</version>
                     </dependency>
                 </dependencies>
+                <configuration>
+                    <jvmArguments>
+                        -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8123
+                        -javaagent:${project.basedir}/../agent/java-agent/target/pinpoint-agent/bootstrap-1.1.0.jar
+                        -Dpinpoint.agentId=${pom.build.finalName} -Dpinpoint.applicationName=TESTAPP
+                    </jvmArguments>
+                </configuration>
             </plugin>
 
         </plugins>
