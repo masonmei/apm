@@ -10,12 +10,5 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public class JdbcTraceEventDao extends BaseRepository<TraceEvent> {
-    public JdbcTraceEventDao() {
-        super(TraceEvent.class, JdbcTables.TRACE_EVENT);
-    }
 
-//    @Override
-    protected String tableName() {
-        return JdbcTables.TRACE_EVENT;
-    }
 }

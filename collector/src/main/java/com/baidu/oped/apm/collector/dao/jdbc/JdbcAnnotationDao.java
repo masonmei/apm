@@ -9,7 +9,5 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public class JdbcAnnotationDao extends BaseRepository<Annotation> {
-    public JdbcAnnotationDao() {
 
-    }
 }

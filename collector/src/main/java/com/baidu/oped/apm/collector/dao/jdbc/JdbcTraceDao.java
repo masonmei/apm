@@ -43,15 +43,6 @@ public class JdbcTraceDao extends BaseRepository<Trace> implements TracesDao {
     @Autowired
     private JdbcTraceEventDao traceEventDao;
 
-    public JdbcTraceDao() {
-        super(Trace.class, JdbcTables.TRACE);
-    }
-
-    //    @Override
-    protected String tableName() {
-        return JdbcTables.TRACE;
-    }
-
     @Override
     public void insert(TSpan span) {
         if (span == null) {
