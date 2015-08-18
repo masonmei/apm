@@ -6,7 +6,7 @@ package com.baidu.oped.apm.common.annotation;
 public interface JdbcTables {
     String TRACE = "apm_span";
     String TRACE_EVENT = "apm_span_event";
-    String AGENT_CPU_LOAD = "apm_agent_cpu_load";
+    String AGENT_CPU_LOAD = "apm_agent_stat_cpu_load";
     String AGENT_INFO = "apm_agent_info";
     String AGENT_STAT_MEMORY_GC = "apm_agent_stat_memory_gc";
     String ANNOTATION = "apm_annotation";
