@@ -1,30 +1,31 @@
 package com.baidu.oped.apm.model.dao.jdbc;
 
-import java.util.List;
-
+import com.baidu.oped.apm.BaseRepository;
+import com.baidu.oped.apm.common.entity.AgentInfo;
 import org.springframework.stereotype.Repository;
 
-import com.baidu.oped.apm.common.bo.AgentInfoBo;
-import com.baidu.oped.apm.model.dao.AgentInfoDao;
-import com.baidu.oped.apm.mvc.vo.Range;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by mason on 8/16/15.
  */
 @Repository
-public class JdbcAgentInfoDao implements AgentInfoDao {
-    @Override
-    public AgentInfoBo findAgentInfoBeforeStartTime(String agentId, long currentTime) {
-        return null;
+public class JdbcAgentInfoDao extends BaseRepository<AgentInfo> {
+
+    public List<String> selectAllApplicationNames() {
+        List<String> applicationNames = new ArrayList<>();
+        List<AgentInfo> agentInfos = this.findByAttrs("distinct(application_name)", null);
+        for (AgentInfo agentInfo : agentInfos) {
+            applicationNames.add(agentInfo.getApplicationName());
+        }
+        return applicationNames;
     }
 
-    @Override
-    public List<AgentInfoBo> getAgentInfo(String agentId, Range range) {
-        return null;
+
+    public List<AgentInfo> findAgentInfoByApplicationName(String applicationName) {
+        List<AgentInfo> agentInfos = this.findByAttr("applicationName", applicationName);
+        return agentInfos;
     }
 
-    @Override
-    public List<AgentInfoBo> findAgentInfoByApplicationName(String application) {
-        return null;
-    }
 }
