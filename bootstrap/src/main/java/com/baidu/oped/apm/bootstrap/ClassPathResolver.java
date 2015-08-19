@@ -23,9 +23,9 @@ import java.util.regex.Pattern;
 public class ClassPathResolver {
 
     private static final Pattern DEFAULT_AGENT_PATTERN =
-            Pattern.compile("pinpoint-bootstrap(-[0-9]+\\.[0-9]+\\.[0-9]+(\\-SNAPSHOT)?)?\\.jar");
+            Pattern.compile("bootstrap(-[0-9]+\\.[0-9]+\\.[0-9]+(\\-SNAPSHOT)?)?\\.jar");
     private static final Pattern DEFAULT_AGENT_CORE_PATTERN =
-            Pattern.compile("pinpoint-bootstrap-core(-[0-9]+\\.[0-9]+\\.[0-9]+(\\-SNAPSHOT)?)?\\.jar");
+            Pattern.compile("bootstrap-core(-[0-9]+\\.[0-9]+\\.[0-9]+(\\-SNAPSHOT)?)?\\.jar");
     private final Logger logger = Logger.getLogger(this.getClass().getName());
     private String classPath;
 
