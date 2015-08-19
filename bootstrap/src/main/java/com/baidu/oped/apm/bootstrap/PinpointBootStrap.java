@@ -34,45 +34,45 @@ public class PinpointBootStrap {
         }
         final boolean duplicated = checkDuplicateLoadState();
         if (duplicated) {
-            logPinpointAgentLoadFail();
+            logAgentLoadFail();
             return;
         }
         // 1st find boot-strap.jar
         final ClassPathResolver classPathResolver = new ClassPathResolver();
         boolean agentJarNotFound = classPathResolver.findAgentJar();
         if (!agentJarNotFound) {
-            logger.severe("pinpoint-bootstrap-x.x.x(-SNAPSHOT).jar not found.");
-            logPinpointAgentLoadFail();
+            logger.severe("bootstrap-x.x.x(-SNAPSHOT).jar not found.");
+            logAgentLoadFail();
             return;
         }
-        // 2st find boot-strap-core.jar
+        // 2st find bootstrap-core.jar
         final String bootStrapCoreJar = classPathResolver.getBootStrapCoreJar();
         if (bootStrapCoreJar == null) {
-            logger.severe("pinpoint-bootstrap-core-x.x.x(-SNAPSHOT).jar not found");
-            logPinpointAgentLoadFail();
+            logger.severe("bootstrap-core-x.x.x(-SNAPSHOT).jar not found");
+            logAgentLoadFail();
             return;
         }
         JarFile bootStrapCoreJarFile = getBootStrapJarFile(bootStrapCoreJar);
         if (bootStrapCoreJarFile == null) {
-            logger.severe("pinpoint-bootstrap-core-x.x.x(-SNAPSHOT).jar not found");
-            logPinpointAgentLoadFail();
+            logger.severe("bootstrap-core-x.x.x(-SNAPSHOT).jar not found");
+            logAgentLoadFail();
             return;
         }
-        logger.info("load pinpoint-bootstrap-core-x.x.x(-SNAPSHOT).jar :" + bootStrapCoreJar);
+        logger.info("load bootstrap-core-x.x.x(-SNAPSHOT).jar :" + bootStrapCoreJar);
         instrumentation.appendToBootstrapClassLoaderSearch(bootStrapCoreJarFile);
 
         if (!isValidId("pinpoint.agentId", PinpointConstants.AGENT_NAME_MAX_LEN)) {
-            logPinpointAgentLoadFail();
+            logAgentLoadFail();
             return;
         }
         if (!isValidId("pinpoint.applicationName", PinpointConstants.APPLICATION_NAME_MAX_LEN)) {
-            logPinpointAgentLoadFail();
+            logAgentLoadFail();
             return;
         }
 
         String configPath = getConfigPath(classPathResolver);
         if (configPath == null) {
-            logPinpointAgentLoadFail();
+            logAgentLoadFail();
             return;
         }
 
@@ -87,13 +87,13 @@ public class PinpointBootStrap {
             List<URL> libUrlList = resolveLib(classPathResolver);
             AgentClassLoader agentClassLoader = new AgentClassLoader(libUrlList.toArray(new URL[libUrlList.size()]));
             agentClassLoader.setBootClass(BOOT_CLASS);
-            logger.info("pinpoint agent starting...");
+            logger.info("agent starting...");
             agentClassLoader.boot(classPathResolver.getAgentDirPath(), agentArgs, instrumentation, profilerConfig);
-            logger.info("pinpoint agent started normally.");
+            logger.info("agent started normally.");
         } catch (Exception e) {
             // unexpected exception that did not be checked above
             logger.log(Level.SEVERE, ProductInfo.CAMEL_NAME + " start failed. Error:" + e.getMessage(), e);
-            logPinpointAgentLoadFail();
+            logAgentLoadFail();
         }
 
     }
@@ -107,9 +107,9 @@ public class PinpointBootStrap {
         }
     }
 
-    private static void logPinpointAgentLoadFail() {
+    private static void logAgentLoadFail() {
         final String errorLog = "*****************************************************************************\n" +
-                                        "* Pinpoint Agent load failure\n" +
+                                        "* Agent load failure\n" +
                                         "*****************************************************************************";
         System.err.println(errorLog);
     }
@@ -125,7 +125,7 @@ public class PinpointBootStrap {
             return false;
         } else {
             if (logger.isLoggable(Level.SEVERE)) {
-                logger.severe("pinpoint-bootstrap already started. skipping agent loading.");
+                logger.severe("bootstrap already started. skipping agent loading.");
             }
             return true;
         }
@@ -174,10 +174,10 @@ public class PinpointBootStrap {
 
     private static String getConfigPath(ClassPathResolver classPathResolver) {
         final String configName = ProductInfo.NAME + ".config";
-        String pinpointConfigFormSystemProperty = System.getProperty(configName);
-        if (pinpointConfigFormSystemProperty != null) {
-            logger.info(configName + " systemProperty found. " + pinpointConfigFormSystemProperty);
-            return pinpointConfigFormSystemProperty;
+        String configFormSystemProperty = System.getProperty(configName);
+        if (configFormSystemProperty != null) {
+            logger.info(configName + " systemProperty found. " + configFormSystemProperty);
+            return configFormSystemProperty;
         }
 
         String classPathAgentConfigPath = classPathResolver.getAgentConfigPath();
