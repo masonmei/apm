@@ -43,6 +43,7 @@ public class JdbcApiMetaDataDao extends BaseRepository<ApiMetaData> implements A
         Map<String, Object> conditionMap = new HashMap<>();
         conditionMap.put("agentId", apiMetaData.getAgentId());
         conditionMap.put("startTime", apiMetaData.getAgentStartTime());
+        conditionMap.put("apiId", apiMetaData.getApiId());
         ApiMetaData result = findOneByAttrs(conditionMap);
         if (result == null) {
             save(metaData);

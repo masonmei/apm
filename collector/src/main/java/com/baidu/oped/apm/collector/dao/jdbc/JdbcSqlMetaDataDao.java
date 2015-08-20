@@ -37,6 +37,7 @@ public class JdbcSqlMetaDataDao extends BaseRepository<SqlMetaData> implements S
         Map<String, Object> conditionMap = new HashMap<>();
         conditionMap.put("agentId", sqlMetaData.getAgentId());
         conditionMap.put("startTime", sqlMetaData.getAgentStartTime());
+        conditionMap.put("apiId", sqlMetaData.getSqlId());
         SqlMetaData result = findOneByAttrs(conditionMap);
         if (result == null) {
             save(metaData);

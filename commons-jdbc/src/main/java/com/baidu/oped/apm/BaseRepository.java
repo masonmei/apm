@@ -1,16 +1,7 @@
 package com.baidu.oped.apm;
 
-import com.baidu.oped.apm.common.annotation.Table;
-import com.google.common.base.CaseFormat;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.support.JdbcUtils;
-import org.springframework.util.StringUtils;
+import static java.lang.String.format;
+import static java.lang.String.join;
 
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
@@ -25,30 +16,41 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static java.lang.String.format;
-import static java.lang.String.join;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.BeanWrapper;
+import org.springframework.beans.NotWritablePropertyException;
+import org.springframework.beans.PropertyAccessorFactory;
+import org.springframework.beans.TypeMismatchException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.JdbcUtils;
+import org.springframework.util.StringUtils;
+
+import com.baidu.oped.apm.common.annotation.Table;
+import com.google.common.base.CaseFormat;
 
 /**
  * Created by mason on 8/15/15.
  */
 public abstract class BaseRepository<T> implements RowMapper<T> {
-    private static final Logger LOG = LoggerFactory.getLogger(BaseRepository.class);
-
-    private static final String INSERT_PATTERN = "INSERT into %s (%s ) values (%s );";
-    private static final String DELETE_PATTERN = "DELETE FROM %s %s";
-    private static final String UPDATE_PATTERN = "UPDATE %s SET %s %s";
-    private static final String QUERY_PATTERN = "SELECT %s FROM %s %s";
-
-    private static final String WIlDCARD = "*";
-    private static final String EMPTY_CONDITION = "";
-    private static final String ATTR_CONDITION = "`%s` = ?";
+    public static final String INSERT_PATTERN = "INSERT into %s (%s ) values (%s );";
+    public static final String DELETE_PATTERN = "DELETE FROM %s %s";
+    public static final String UPDATE_PATTERN = "UPDATE %s SET %s %s";
+    public static final String QUERY_PATTERN = "SELECT %s FROM %s %s";
+    public static final String WIlDCARD = "*";
+    public static final String EMPTY_CONDITION = "";
+    public static final String ATTR_CONDITION = "`%s` = ?";
     public static final String CLASS_FIELD_NAME = "class";
     public static final String DEFAULT_FIELD_NAME = "id";
     public static final String CONDITION_HEADER = "WHERE ";
     public static final String UPDATE_HEADER = "UPDATE ";
     public static final String AND_DELIMITER = " AND ";
     public static final String COLUMN_FORMAT = "`%s`";
-
+    private static final Logger LOG = LoggerFactory.getLogger(BaseRepository.class);
     private final Class<T> objectClass;
     private final String tableName;
     private final String idFieldName;
@@ -56,7 +58,7 @@ public abstract class BaseRepository<T> implements RowMapper<T> {
     private final Map<String, PropertyDescriptor> mappedFields = new HashMap<>();
 
     @Autowired
-    private JdbcTemplate jdbcTemplate;
+    protected JdbcTemplate jdbcTemplate;
 
     public BaseRepository() {
         try {
@@ -74,7 +76,7 @@ public abstract class BaseRepository<T> implements RowMapper<T> {
         Annotation annotation = objectClass.getAnnotation(Table.class);
         if (annotation == null) {
             throw new RuntimeException(String.format("class %s missing @interface Table, is not a pojo",
-                    objectClass.getName()));
+                                                            objectClass.getName()));
         }
         Table table = (Table) annotation;
         String name = table.name();
@@ -83,7 +85,7 @@ public abstract class BaseRepository<T> implements RowMapper<T> {
         } else {
             String className = objectClass.getName();
             this.tableName = CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE,
-                    className.substring(className.lastIndexOf(".") + 1));
+                                                              className.substring(className.lastIndexOf(".") + 1));
         }
 
         this.idFieldName = DEFAULT_FIELD_NAME;
@@ -177,7 +179,6 @@ public abstract class BaseRepository<T> implements RowMapper<T> {
         return jdbcTemplate.query(sql, this, params.toArray());
     }
 
-
     public List<T> findAll() {
         String sql = format(QUERY_PATTERN, WIlDCARD, tableName, EMPTY_CONDITION);
         return jdbcTemplate.query(sql, this);
@@ -230,7 +231,8 @@ public abstract class BaseRepository<T> implements RowMapper<T> {
             processConditions(conditions, params, entry);
         }
 
-        String sql = format(DELETE_PATTERN, tableName, conditionBuilder.append(join(AND_DELIMITER, conditions)).toString());
+        String sql =
+                format(DELETE_PATTERN, tableName, conditionBuilder.append(join(AND_DELIMITER, conditions)).toString());
         return jdbcTemplate.update(sql, params.toArray(new Object[params.size()]));
     }
 

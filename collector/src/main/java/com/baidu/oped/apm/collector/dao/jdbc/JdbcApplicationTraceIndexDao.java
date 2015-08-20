@@ -7,6 +7,9 @@ import com.baidu.oped.apm.BaseRepository;
 import com.baidu.oped.apm.collector.dao.ApplicationTraceIndexDao;
 import com.baidu.oped.apm.collector.util.AcceptedTimeService;
 import com.baidu.oped.apm.common.entity.ApplicationTraceIndex;
+import com.baidu.oped.apm.common.util.SpanUtils;
+import com.baidu.oped.apm.common.util.TransactionId;
+import com.baidu.oped.apm.common.util.TransactionIdUtils;
 import com.baidu.oped.apm.thrift.dto.TSpan;
 
 /**
@@ -24,19 +27,24 @@ public class JdbcApplicationTraceIndexDao extends BaseRepository<ApplicationTrac
             throw new NullPointerException("span must not be null");
         }
 
-//        final Buffer buffer = new AutomaticBuffer(10 + AGENT_NAME_MAX_LEN);
-//        buffer.putVar(span.getElapsed());
-//        buffer.putSVar(span.getErr());
-//        buffer.putPrefixedString(span.getAgentId());
-//        final byte[] value = buffer.getBuffer();
-//
-//        long acceptedTime = acceptedTimeService.getAcceptedTime();
-//        final byte[] distributedKey = crateRowKey(span, acceptedTime);
-//        Put put = new Put(distributedKey);
-//
-//        put.addColumn(APPLICATION_TRACE_INDEX_CF_TRACE, makeQualifier(span), acceptedTime, value);
-//
-//        hbaseTemplate.put(APPLICATION_TRACE_INDEX, put);
+        ApplicationTraceIndex traceIndex = new ApplicationTraceIndex();
+        traceIndex.setApplicationName(span.getApplicationName());
+        traceIndex.setElapsed(span.getElapsed());
+        traceIndex.setErr(span.getErr());
+        traceIndex.setAcceptedTime(acceptedTimeService.getAcceptedTime());
+
+        byte[] transactionIdBytes = span.getTransactionId();
+        TransactionId transactionId = TransactionIdUtils.parseTransactionId(transactionIdBytes);
+        String agentId = transactionId.getAgentId();
+        if (agentId == null) {
+            agentId = span.getAgentId();
+        }
+
+        traceIndex.setTransactionSequence(transactionId.getTransactionSequence());
+        traceIndex.setAgentId(agentId);
+        traceIndex.setAgentStartTime(transactionId.getAgentStartTime());
+
+        save(traceIndex);
     }
 }
 
