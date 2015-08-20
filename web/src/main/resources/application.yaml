@@ -4,10 +4,15 @@ spring:
   application:
     name: mx-web
   datasource:
-    driverClassName: com.mysql.jdbc.Driver
-    url: jdbc:mysql://localhost/apm
+    url: jdbc:mysql://127.0.0.1:3306/apm?autoReconnect=true&useUnicode=true&characterEncoding=utf-8
     username: root
-    password: root
+    password: noah
+    driverClassName: com.mysql.jdbc.Driver
+    max-active: 100
+    min-idle: 8
+    max-idle: 8
+    validation-query: select 1
+    test-on-borrow: true
   http:
     encoding:
       charset: UTF-8

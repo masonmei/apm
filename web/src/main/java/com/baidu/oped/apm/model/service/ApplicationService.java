@@ -1,9 +1,7 @@
 package com.baidu.oped.apm.model.service;
 
-import com.baidu.oped.apm.common.bo.AgentInfoBo;
-import com.baidu.oped.apm.model.dao.AgentInfoDao;
-import com.baidu.oped.apm.model.dao.ApplicationIndexDao;
-import com.baidu.oped.apm.mvc.vo.Application;
+import com.baidu.oped.apm.common.entity.AgentInfo;
+import com.baidu.oped.apm.model.dao.jdbc.JdbcAgentInfoDao;
 import com.baidu.oped.apm.mvc.vo.Instance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,18 +16,15 @@ import java.util.stream.Collectors;
 @Service
 public class ApplicationService {
     @Autowired
-    private AgentInfoDao agentInfoDao;
+    private JdbcAgentInfoDao jdbcAgentInfoDao;
 
-    @Autowired
-    private ApplicationIndexDao applicationIndexDao;
-
-    public List<Application> selectAllApplicationNames() {
-        return applicationIndexDao.selectAllApplicationNames();
+    public List<String> selectAllApplicationNames() {
+        return jdbcAgentInfoDao.selectAllApplicationNames();
     }
 
     public List<Instance> findApplicationInstanceByApplication(String applicationName, boolean simplify) {
         Assert.hasLength(applicationName, "ApplicationName cannot be empty when finding Instances.");
-        List<AgentInfoBo> agentInfoBos = agentInfoDao.findAgentInfoByApplicationName(applicationName);
+        List<AgentInfo> agentInfoBos = jdbcAgentInfoDao.findAgentInfoByApplicationName(applicationName);
 
         List<Instance> instanceList = agentInfoBos.stream()
                 .filter(agentInfoBo ->
@@ -47,7 +42,7 @@ public class ApplicationService {
         return instanceList;
     }
 
-    private void buildMetricInfo(final Instance instance, final AgentInfoBo agentInfoBo) {
+    private void buildMetricInfo(final Instance instance, final AgentInfo agentInfoBo) {
         Assert.notNull(instance, "Instance cannot be null while building metric for.");
         Assert.notNull(agentInfoBo, "AgentInfoBo cannot be null while building metric for.");
 
@@ -59,7 +54,7 @@ public class ApplicationService {
         instance.setResponseTime(231);
     }
 
-    private String buildInstanceId(AgentInfoBo agentInfoBo) {
+    private String buildInstanceId(AgentInfo agentInfoBo) {
         StringBuilder builder = new StringBuilder();
         builder.append("java")
                 .append(":")
