@@ -3,6 +3,8 @@ package com.baidu.oped.apm.model.dao.jdbc;
 import java.util.Collection;
 import java.util.List;
 
+import org.springframework.stereotype.Repository;
+
 import com.baidu.oped.apm.common.bo.SpanBo;
 import com.baidu.oped.apm.model.dao.TraceDao;
 import com.baidu.oped.apm.mvc.vo.TransactionId;
@@ -10,6 +12,7 @@ import com.baidu.oped.apm.mvc.vo.TransactionId;
 /**
  * Created by mason on 8/16/15.
  */
+@Repository
 public class JdbcTraceDao implements TraceDao {
     @Override
     public List<SpanBo> selectSpan(TransactionId transactionId) {

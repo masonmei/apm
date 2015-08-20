@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.JdbcUtils;
@@ -130,7 +131,11 @@ public abstract class BaseRepository<T> implements RowMapper<T> {
             conditionBuilder.append(join(AND_DELIMITER, conditions));
         }
         String sql = format(QUERY_PATTERN, WIlDCARD, tableName, conditionBuilder.toString());
-        return jdbcTemplate.queryForObject(sql, this, params.toArray(new Object[params.size()]));
+        try {
+            return jdbcTemplate.queryForObject(sql, this, params.toArray(new Object[params.size()]));
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
     }
 
     private void processConditions(List<String> conditions, List<Object> params, Map.Entry<String, Object> entry) {

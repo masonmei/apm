@@ -17,4 +17,5 @@ public interface JdbcTables {
     String STRING_META_DATA = "apm_string_meta_data";
     String HOST_APPLICATION_MAP = "apm_host_application_map";
     String APPLICATION_TRACE_INDEX = "apm_application_trace_index";
+    String APPLICATION_INDEX = "apm_application_index";
 }

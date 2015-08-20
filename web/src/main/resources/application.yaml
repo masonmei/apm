@@ -7,7 +7,7 @@ spring:
     driverClassName: com.mysql.jdbc.Driver
     url: jdbc:mysql://localhost/apm
     username: root
-    password: noah
+    password: root
   http:
     encoding:
       charset: UTF-8
@@ -21,7 +21,7 @@ logging:
   file: web-mx.log
   conf: logback.xml
   level:
-    org.springframework.boot: DEBUG
+    org.springframework.boot: INFO
     org.springframework: INFO
     com.baidu.oped: DEBUG
 
