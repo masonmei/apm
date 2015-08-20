@@ -1,0 +1,5 @@
+*.iml
+target/
+.idea
+thrift/src/main/java
+logs/
