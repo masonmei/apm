@@ -179,6 +179,18 @@ public abstract class BaseRepository<T> implements RowMapper<T> {
         return jdbcTemplate.query(sql, this, params.toArray());
     }
 
+    public List<T> findBy(String select, String condition, List<Object> params){
+        if(StringUtils.isEmpty(select)){
+            select = WIlDCARD;
+        }
+        if(!StringUtils.isEmpty(condition) && !StringUtils.startsWithIgnoreCase(condition, CONDITION_HEADER)){
+            condition = format(CONDITION_HEADER.concat("%s"), condition);
+        }
+
+        String sql = format(QUERY_PATTERN, select, tableName, condition);
+        return jdbcTemplate.query(sql, this, params.toArray());
+    }
+
     public List<T> findAll() {
         String sql = format(QUERY_PATTERN, WIlDCARD, tableName, EMPTY_CONDITION);
         return jdbcTemplate.query(sql, this);
