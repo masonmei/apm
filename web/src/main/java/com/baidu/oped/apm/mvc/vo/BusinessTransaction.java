@@ -1,7 +1,6 @@
 
 package com.baidu.oped.apm.mvc.vo;
 
-import com.baidu.oped.apm.common.bo.SpanBo;
 import com.baidu.oped.apm.common.util.TransactionIdUtils;
 import com.baidu.oped.apm.utils.ApdexUtils;
 
@@ -44,7 +43,8 @@ public class BusinessTransaction {
                 '}';
     }
 
-    public BusinessTransaction(SpanBo span) {
+
+    public BusinessTransaction(com.baidu.oped.apm.common.entity.Trace span) {
         if (span == null) {
             throw new NullPointerException("span must not be null");
         }
@@ -64,7 +64,7 @@ public class BusinessTransaction {
         calculateApdex(elapsed);
     }
 
-    public void add(SpanBo span) {
+    public void add(com.baidu.oped.apm.common.entity.Trace span) {
         if (span == null) {
             throw new NullPointerException("span must not be null");
         }

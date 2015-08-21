@@ -1,7 +1,7 @@
 
 package com.baidu.oped.apm.mvc.vo;
 
-import com.baidu.oped.apm.common.bo.SpanBo;
+import com.baidu.oped.apm.common.entity.Trace;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
@@ -19,17 +19,17 @@ public class BusinessTransactions {
 
     private int totalCallCount;
 
-    public void add(SpanBo span) {
+    public void add(Trace span) {
         this.add(span, "rpc");
     }
 
-    public void add(SpanBo span, String fieldName) {
+    public void add(Trace span, String fieldName) {
         if (span == null) {
             throw new NullPointerException("span must not be null");
         }
         totalCallCount++;
         try {
-            Field field = SpanBo.class.getDeclaredField(fieldName);
+            Field field = Trace.class.getDeclaredField(fieldName);
             field.setAccessible(true);
             String key = field.get(span).toString();
             if (transactions.containsKey(key)) {

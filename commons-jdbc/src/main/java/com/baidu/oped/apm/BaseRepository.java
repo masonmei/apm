@@ -1,7 +1,16 @@
 package com.baidu.oped.apm;
 
-import static java.lang.String.format;
-import static java.lang.String.join;
+import com.baidu.oped.apm.common.annotation.Table;
+import com.google.common.base.CaseFormat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.JdbcUtils;
+import org.springframework.util.StringUtils;
 
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
@@ -16,22 +25,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.BeanWrapper;
-import org.springframework.beans.NotWritablePropertyException;
-import org.springframework.beans.PropertyAccessorFactory;
-import org.springframework.beans.TypeMismatchException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.support.JdbcUtils;
-import org.springframework.util.StringUtils;
-
-import com.baidu.oped.apm.common.annotation.Table;
-import com.google.common.base.CaseFormat;
+import static java.lang.String.format;
+import static java.lang.String.join;
 
 /**
  * Created by mason on 8/15/15.
@@ -152,6 +147,19 @@ public abstract class BaseRepository<T> implements RowMapper<T> {
         Map<String, Object> attrs = new HashMap<>();
         attrs.put(attrName, attrValue);
         return findByAttrs(attrs);
+    }
+
+    public List<T> find(String conditionSql, Object... values) {
+        if (StringUtils.isEmpty(conditionSql)) {
+            throw new UnsupportedOperationException("conditionSql can't be empty");
+        }
+
+        List<Object> params = new ArrayList<>();
+
+        StringBuilder conditionBuilder = new StringBuilder(CONDITION_HEADER).append(conditionSql);
+
+        String sql = format(QUERY_PATTERN, WIlDCARD, tableName, conditionBuilder.toString());
+        return jdbcTemplate.query(sql, this, params.toArray());
     }
 
     public List<T> findByAttrs(Map<String, Object> attrs) {

@@ -1,41 +1,30 @@
-//package com.baidu.oped.apm.model.dao.jdbc;
-//
-//import java.util.Collection;
-//import java.util.List;
-//
-//import org.springframework.stereotype.Repository;
-//
-//import com.baidu.oped.apm.common.bo.SpanBo;
-//import com.baidu.oped.apm.model.dao.TraceDao;
-//import com.baidu.oped.apm.mvc.vo.TransactionId;
-//
-///**
-// * Created by mason on 8/16/15.
-// */
-//@Repository
-//public class JdbcTraceDao implements TraceDao {
-//    @Override
-//    public List<SpanBo> selectSpan(TransactionId transactionId) {
-//        return null;
-//    }
-//
-//    @Override
-//    public List<SpanBo> selectSpanAndAnnotation(TransactionId transactionId) {
-//        return null;
-//    }
-//
-//    @Override
-//    public List<List<SpanBo>> selectSpans(List<TransactionId> transactionIdList) {
-//        return null;
-//    }
-//
-//    @Override
-//    public List<List<SpanBo>> selectAllSpans(Collection<TransactionId> transactionIdList) {
-//        return null;
-//    }
-//
-//    @Override
-//    public List<SpanBo> selectSpans(TransactionId transactionId) {
-//        return null;
-//    }
-//}
+package com.baidu.oped.apm.model.dao.jdbc;
+
+import com.baidu.oped.apm.BaseRepository;
+import com.baidu.oped.apm.common.entity.Trace;
+import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Created by mason on 8/16/15.
+ */
+@Repository
+public class JdbcTraceDao extends BaseRepository<Trace> {
+
+    public List<Trace> queryTraceList(String applicationName, String agentId, long from, long to) {
+        List<Trace> ret = new ArrayList<Trace>();
+
+        String sql = "application_id=? and start_time>? and start_time<?";
+        if (StringUtils.isEmpty(agentId)) {
+            return this.find(sql, applicationName, from, to);
+        }
+
+        sql = "agent_id=? " + sql;
+        return this.find(sql, agentId, applicationName, from, to);
+    }
+
+
+}
