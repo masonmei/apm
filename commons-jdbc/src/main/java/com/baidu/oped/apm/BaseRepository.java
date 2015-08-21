@@ -154,12 +154,16 @@ public abstract class BaseRepository<T> implements RowMapper<T> {
             throw new UnsupportedOperationException("conditionSql can't be empty");
         }
 
-        List<Object> params = new ArrayList<>();
-
         StringBuilder conditionBuilder = new StringBuilder(CONDITION_HEADER).append(conditionSql);
 
         String sql = format(QUERY_PATTERN, WIlDCARD, tableName, conditionBuilder.toString());
-        return jdbcTemplate.query(sql, this, params.toArray());
+
+        System.out.println("sql = " + sql);
+        System.out.println("values:");
+        for (Object one :  values) {
+            System.out.println("one : " + one.toString());
+        }
+        return jdbcTemplate.query(sql, this, values);
     }
 
     public List<T> findByAttrs(Map<String, Object> attrs) {
