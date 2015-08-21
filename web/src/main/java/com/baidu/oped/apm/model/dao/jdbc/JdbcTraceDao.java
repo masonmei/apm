@@ -5,7 +5,6 @@ import com.baidu.oped.apm.common.entity.Trace;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -15,13 +14,10 @@ import java.util.List;
 public class JdbcTraceDao extends BaseRepository<Trace> {
 
     public List<Trace> queryTraceList(String applicationName, String agentId, long from, long to) {
-        List<Trace> ret = new ArrayList<Trace>();
-
         String sql = "application_id=? and start_time>? and start_time<?";
         if (StringUtils.isEmpty(agentId)) {
             return this.find(sql, applicationName, from, to);
         }
-
         sql = "agent_id=? " + sql;
         return this.find(sql, agentId, applicationName, from, to);
     }
