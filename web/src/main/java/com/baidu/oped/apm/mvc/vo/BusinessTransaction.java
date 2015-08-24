@@ -44,7 +44,7 @@ public class BusinessTransaction {
     }
 
 
-    public BusinessTransaction(com.baidu.oped.apm.common.entity.Trace span) {
+    public BusinessTransaction(com.baidu.oped.apm.common.jpa.entity.Trace span) {
         if (span == null) {
             throw new NullPointerException("span must not be null");
         }
@@ -64,7 +64,7 @@ public class BusinessTransaction {
         calculateApdex(elapsed);
     }
 
-    public void add(com.baidu.oped.apm.common.entity.Trace span) {
+    public void add(com.baidu.oped.apm.common.jpa.entity.Trace span) {
         if (span == null) {
             throw new NullPointerException("span must not be null");
         }

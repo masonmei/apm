@@ -29,6 +29,7 @@
         <module>collector</module>
         <module>agent</module>
         <module>commons-jdbc</module>
+        <module>commons-jpa</module>
     </modules>
 
     <properties>
@@ -75,6 +76,11 @@
             <dependency>
                 <groupId>com.baidu.oped.apm</groupId>
                 <artifactId>commons-jdbc</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.baidu.oped.apm</groupId>
+                <artifactId>commons-jpa</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

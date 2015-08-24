@@ -1,12 +1,24 @@
 package com.baidu.oped.apm.collector.dao.jdbc;
 
-import com.baidu.oped.apm.BaseRepository;
-import com.baidu.oped.apm.common.annotation.JdbcTables;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
+
 import com.baidu.oped.apm.collector.dao.TracesDao;
 import com.baidu.oped.apm.collector.util.AcceptedTimeService;
-import com.baidu.oped.apm.common.entity.Annotation;
-import com.baidu.oped.apm.common.entity.Trace;
-import com.baidu.oped.apm.common.entity.TraceEvent;
+import com.baidu.oped.apm.common.jpa.entity.Annotation;
+import com.baidu.oped.apm.common.jpa.entity.Trace;
+import com.baidu.oped.apm.common.jpa.entity.TraceEvent;
+import com.baidu.oped.apm.common.jpa.repository.AnnotationRepository;
+import com.baidu.oped.apm.common.jpa.repository.TraceEventRepository;
+import com.baidu.oped.apm.common.jpa.repository.TraceRepository;
 import com.baidu.oped.apm.common.util.AnnotationTranscoder;
 import com.baidu.oped.apm.common.util.TransactionId;
 import com.baidu.oped.apm.common.util.TransactionIdUtils;
@@ -14,22 +26,12 @@ import com.baidu.oped.apm.thrift.dto.TIntStringValue;
 import com.baidu.oped.apm.thrift.dto.TSpan;
 import com.baidu.oped.apm.thrift.dto.TSpanChunk;
 import com.baidu.oped.apm.thrift.dto.TSpanEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
-import org.springframework.util.CollectionUtils;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Created by mason on 8/17/15.
  */
-@Repository
-public class JdbcTraceDao extends BaseRepository<Trace> implements TracesDao {
+@Component
+public class JdbcTraceDao implements TracesDao {
     private static final Logger LOG = LoggerFactory.getLogger(JdbcTraceDao.class);
 
     private static final AnnotationTranscoder transcoder = new AnnotationTranscoder();
@@ -38,10 +40,13 @@ public class JdbcTraceDao extends BaseRepository<Trace> implements TracesDao {
     private AcceptedTimeService acceptedTimeService;
 
     @Autowired
-    private JdbcAnnotationDao annotationDao;
+    private TraceRepository traceRepository;
 
     @Autowired
-    private JdbcTraceEventDao traceEventDao;
+    private AnnotationRepository annotationRepository;
+
+    @Autowired
+    private TraceEventRepository traceEventRepository;
 
     @Override
     public void insert(TSpan span) {
@@ -88,107 +93,107 @@ public class JdbcTraceDao extends BaseRepository<Trace> implements TracesDao {
 
         long acceptedTime = acceptedTimeService.getAcceptedTime();
         trace.setCollectorAcceptTime(acceptedTime);
-        long traceId = save(trace);
 
         if (span.getAnnotations() != null) {
-            List<Annotation> annotationList =
-                    span.getAnnotations().stream().filter(tAnnotation1 -> tAnnotation1 != null).map(tAnnotation -> {
+            span.getAnnotations().stream()
+                    .filter(tAnnotation -> tAnnotation != null)
+                    .forEach(tAnnotation -> {
                         Annotation annotation = new Annotation();
                         annotation.setKey(tAnnotation.getKey());
                         Object value = transcoder.getMappingValue(tAnnotation);
                         annotation.setValueType(transcoder.getTypeCode(value));
                         annotation.setByteValue(transcoder.encode(value, annotation.getValueType()));
-                        annotation.setTraceId(traceId);
-                        return annotation;
-                    }).collect(Collectors.toList());
-            annotationList.forEach(annotation -> annotationDao.save(annotation));
+                        trace.addAnnotation(annotation);
+                    });
         }
 
-        addNestedSpanEvent(span, traceId);
+        addNestedSpanEvent(span, trace);
+
+        traceRepository.save(trace);
+
+
     }
 
     @Override
     public void insertSpanChunk(TSpanChunk spanChunk) {
         final byte[] transactionIdBytes = spanChunk.getTransactionId();
         final TransactionId transactionId = TransactionIdUtils.parseTransactionId(transactionIdBytes);
-//
-//        byte[] transactionId = SpanUtils.getTransactionId(spanChunk);
-//        rowKeyDistributor.getDistributedKey(transactionId);
-//            byte[] rowKey = getDistributeRowKey();
-//                Put put = new Put(rowKey);
-//
+
         Map<String, Object> conditionAttrs = new HashMap<>();
         conditionAttrs.put("agentId", transactionId.getAgentId());
         conditionAttrs.put("agentStartTime", transactionId.getAgentStartTime());
 
-        Trace trace = findOneByAttrs(conditionAttrs);
-        Long traceId = trace.getId();
+        Trace trace = traceRepository.findOneByAgentIdAndAgentStartTimeAndSpanId(transactionId.getAgentId(),
+                                                                                        transactionId
+                                                                                                .getAgentStartTime(),
+                                                                                        spanChunk.getSpanId());
 
         long acceptedTime = acceptedTimeService.getAcceptedTime();
-        spanChunk.getSpanEventList().stream().forEach(spanEvent -> {
-            TraceEvent event = new TraceEvent();
-            event.setAgentId(trace.getAgentId());
-            event.setApplicationId(trace.getApplicationId());
-            event.setAgentStartTime(trace.getAgentStartTime());
+        spanChunk.getSpanEventList().stream()
+                .forEach(spanEvent -> {
+                    TraceEvent event = new TraceEvent();
+                    event.setAgentId(trace.getAgentId());
+                    event.setApplicationId(trace.getApplicationId());
+                    event.setAgentStartTime(trace.getAgentStartTime());
 
-            event.setTraceAgentId(transactionId.getAgentId());
+                    event.setTraceAgentId(transactionId.getAgentId());
 
-            if (event.getTraceAgentId() == null) {
-                event.setTraceAgentId(event.getAgentId());
-            }
-            event.setTraceAgentStartTime(transactionId.getAgentStartTime());
-            event.setTraceTransactionSequence(transactionId.getTransactionSequence());
+                    if (event.getTraceAgentId() == null) {
+                        event.setTraceAgentId(event.getAgentId());
+                    }
+                    event.setTraceAgentStartTime(transactionId.getAgentStartTime());
+                    event.setTraceTransactionSequence(transactionId.getTransactionSequence());
 
-            event.setSpanId(trace.getSpanId());
-            event.setSequence(spanEvent.getSequence());
+                    event.setSpanId(trace.getSpanId());
+                    event.setSequence(spanEvent.getSequence());
 
-            event.setStartElapsed(spanEvent.getStartElapsed());
-            event.setEndElapsed(spanEvent.getEndElapsed());
+                    event.setStartElapsed(spanEvent.getStartElapsed());
+                    event.setEndElapsed(spanEvent.getEndElapsed());
 
-            event.setRpc(spanEvent.getRpc());
-            event.setServiceType(spanEvent.getServiceType());
+                    event.setRpc(spanEvent.getRpc());
+                    event.setServiceType(spanEvent.getServiceType());
 
-            event.setDestinationId(spanEvent.getDestinationId());
+                    event.setDestinationId(spanEvent.getDestinationId());
 
-            event.setEndPoint(spanEvent.getEndPoint());
-            event.setApiId(spanEvent.getApiId());
+                    event.setEndPoint(spanEvent.getEndPoint());
+                    event.setApiId(spanEvent.getApiId());
 
-            if (spanEvent.isSetDepth()) {
-                event.setDepth(spanEvent.getDepth());
-            }
+                    if (spanEvent.isSetDepth()) {
+                        event.setDepth(spanEvent.getDepth());
+                    }
 
-            if (spanEvent.isSetNextSpanId()) {
-                event.setNextSpanId(spanEvent.getNextSpanId());
-            }
+                    if (spanEvent.isSetNextSpanId()) {
+                        event.setNextSpanId(spanEvent.getNextSpanId());
+                    }
 
-            final TIntStringValue exceptionInfo = spanEvent.getExceptionInfo();
-            if (exceptionInfo != null) {
-                event.setHasException(true);
-                event.setExceptionId(exceptionInfo.getIntValue());
-                event.setExceptionMessage(exceptionInfo.getStringValue());
-            }
+                    final TIntStringValue exceptionInfo = spanEvent.getExceptionInfo();
+                    if (exceptionInfo != null) {
+                        event.setHasException(true);
+                        event.setExceptionId(exceptionInfo.getIntValue());
+                        event.setExceptionMessage(exceptionInfo.getStringValue());
+                    }
 
-            event.setCollectorAcceptTime(acceptedTime);
+                    event.setCollectorAcceptTime(acceptedTime);
 
-            if (traceId != null) {
-                event.setTraceId(traceId);
-            }
+                    trace.addSpanEvent(event);
 
-            long eventId = traceEventDao.save(event);
-
-            spanEvent.getAnnotations().stream().filter(tAnnotation -> tAnnotation != null).map(tAnnotation -> {
-                Annotation annotation = new Annotation();
-                annotation.setKey(tAnnotation.getKey());
-                Object value = transcoder.getMappingValue(tAnnotation);
-                annotation.setValueType(transcoder.getTypeCode(value));
-                annotation.setByteValue(transcoder.encode(value, annotation.getValueType()));
-                annotation.setTraceEventId(eventId);
-                return annotation;
-            }).collect(Collectors.toList()).forEach(annotation -> annotationDao.save(annotation));
+                    spanEvent.getAnnotations().stream()
+                            .filter(tAnnotation -> tAnnotation != null)
+                            .forEach(tAnnotation -> {
+                                Annotation annotation = new Annotation();
+                                annotation.setKey(tAnnotation.getKey());
+                                Object value = transcoder.getMappingValue(tAnnotation);
+                                annotation.setValueType(transcoder.getTypeCode(value));
+                                annotation.setByteValue(transcoder.encode(value, annotation.getValueType()));
+                                event.addAnnotation(annotation);
+                            });
         });
+        traceRepository.save(trace);
     }
 
-    private void addNestedSpanEvent(TSpan span, Long traceId) {
+    private void addNestedSpanEvent(TSpan span, Trace trace) {
+        Assert.notNull(trace, "trace must not be null while add span event.");
+
         List<TSpanEvent> spanEventBoList = span.getSpanEventList();
         if (CollectionUtils.isEmpty(spanEventBoList)) {
             return;
@@ -196,70 +201,69 @@ public class JdbcTraceDao extends BaseRepository<Trace> implements TracesDao {
 
         long acceptedTime0 = acceptedTimeService.getAcceptedTime();
         if (spanEventBoList != null) {
-            spanEventBoList.stream().filter(spanEvent -> spanEvent != null).forEach(spanEvent -> {
-                TraceEvent event = new TraceEvent();
-                event.setAgentId(span.getAgentId());
-                event.setApplicationId(span.getApplicationName());
-                event.setAgentStartTime(span.getAgentStartTime());
+            spanEventBoList.stream()
+                    .filter(spanEvent -> spanEvent != null)
+                    .forEach(spanEvent -> {
+                        TraceEvent event = new TraceEvent();
+                        event.setAgentId(span.getAgentId());
+                        event.setApplicationId(span.getApplicationName());
+                        event.setAgentStartTime(span.getAgentStartTime());
 
-                final TransactionId transactionId = TransactionIdUtils.parseTransactionId(span.getTransactionId());
-                event.setTraceAgentId(transactionId.getAgentId());
+                        final TransactionId transactionId =
+                                TransactionIdUtils.parseTransactionId(span.getTransactionId());
+                        event.setTraceAgentId(transactionId.getAgentId());
 
-                if (event.getTraceAgentId() == null) {
-                    event.setTraceAgentId(event.getAgentId());
-                }
-                event.setTraceAgentStartTime(transactionId.getAgentStartTime());
-                event.setTraceTransactionSequence(transactionId.getTransactionSequence());
+                        if (event.getTraceAgentId() == null) {
+                            event.setTraceAgentId(event.getAgentId());
+                        }
+                        event.setTraceAgentStartTime(transactionId.getAgentStartTime());
+                        event.setTraceTransactionSequence(transactionId.getTransactionSequence());
 
-                event.setSpanId(span.getSpanId());
-                event.setSequence(spanEvent.getSequence());
+                        event.setSpanId(span.getSpanId());
+                        event.setSequence(spanEvent.getSequence());
 
-                event.setStartElapsed(spanEvent.getStartElapsed());
-                event.setEndElapsed(spanEvent.getEndElapsed());
+                        event.setStartElapsed(spanEvent.getStartElapsed());
+                        event.setEndElapsed(spanEvent.getEndElapsed());
 
-                event.setRpc(spanEvent.getRpc());
-                event.setServiceType(spanEvent.getServiceType());
+                        event.setRpc(spanEvent.getRpc());
+                        event.setServiceType(spanEvent.getServiceType());
 
-                event.setDestinationId(spanEvent.getDestinationId());
+                        event.setDestinationId(spanEvent.getDestinationId());
 
-                event.setEndPoint(spanEvent.getEndPoint());
-                event.setApiId(spanEvent.getApiId());
+                        event.setEndPoint(spanEvent.getEndPoint());
+                        event.setApiId(spanEvent.getApiId());
 
-                if (spanEvent.isSetDepth()) {
-                    event.setDepth(spanEvent.getDepth());
-                }
+                        if (spanEvent.isSetDepth()) {
+                            event.setDepth(spanEvent.getDepth());
+                        }
 
-                if (spanEvent.isSetNextSpanId()) {
-                    event.setNextSpanId(spanEvent.getNextSpanId());
-                }
+                        if (spanEvent.isSetNextSpanId()) {
+                            event.setNextSpanId(spanEvent.getNextSpanId());
+                        }
 
-                final TIntStringValue exceptionInfo = spanEvent.getExceptionInfo();
-                if (exceptionInfo != null) {
-                    event.setHasException(true);
-                    event.setExceptionId(exceptionInfo.getIntValue());
-                    event.setExceptionMessage(exceptionInfo.getStringValue());
-                }
+                        final TIntStringValue exceptionInfo = spanEvent.getExceptionInfo();
+                        if (exceptionInfo != null) {
+                            event.setHasException(true);
+                            event.setExceptionId(exceptionInfo.getIntValue());
+                            event.setExceptionMessage(exceptionInfo.getStringValue());
+                        }
 
-                event.setCollectorAcceptTime(acceptedTime0);
+                        event.setCollectorAcceptTime(acceptedTime0);
 
-                if (traceId != null) {
-                    event.setTraceId(traceId);
-                }
+                        trace.addSpanEvent(event);
 
-                long eventId = traceEventDao.save(event);
-
-                if (spanEvent.getAnnotations() != null) {
-                    spanEvent.getAnnotations().stream().filter(tAnnotation -> tAnnotation != null).map(tAnnotation -> {
-                        Annotation annotation = new Annotation();
-                        annotation.setKey(tAnnotation.getKey());
-                        Object value = transcoder.getMappingValue(tAnnotation);
-                        annotation.setValueType(transcoder.getTypeCode(value));
-                        annotation.setByteValue(transcoder.encode(value, annotation.getValueType()));
-                        annotation.setTraceEventId(eventId);
-                        return annotation;
-                    }).collect(Collectors.toList()).forEach(annotation -> annotationDao.save(annotation));
-                }
-            });
+                        if (spanEvent.getAnnotations() != null) {
+                            spanEvent.getAnnotations().stream().filter(tAnnotation -> tAnnotation != null)
+                                    .forEach(tAnnotation -> {
+                                        Annotation annotation = new Annotation();
+                                        annotation.setKey(tAnnotation.getKey());
+                                        Object value = transcoder.getMappingValue(tAnnotation);
+                                        annotation.setValueType(transcoder.getTypeCode(value));
+                                        annotation.setByteValue(transcoder.encode(value, annotation.getValueType()));
+                                        event.addAnnotation(annotation);
+                                    });
+                        }
+                    });
         }
     }
 

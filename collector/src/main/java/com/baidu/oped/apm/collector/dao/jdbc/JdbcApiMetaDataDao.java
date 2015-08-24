@@ -1,23 +1,24 @@
 package com.baidu.oped.apm.collector.dao.jdbc;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Repository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-import com.baidu.oped.apm.BaseRepository;
 import com.baidu.oped.apm.collector.dao.ApiMetaDataDao;
-import com.baidu.oped.apm.common.entity.ApiMetaData;
+import com.baidu.oped.apm.common.jpa.entity.ApiMetaData;
+import com.baidu.oped.apm.common.jpa.repository.ApiMetaDataRepository;
 import com.baidu.oped.apm.thrift.dto.TApiMetaData;
 
 /**
  * Created by mason on 8/17/15.
  */
-@Repository
-public class JdbcApiMetaDataDao extends BaseRepository<ApiMetaData> implements ApiMetaDataDao {
+@Component
+public class JdbcApiMetaDataDao implements ApiMetaDataDao {
     private static final Logger LOG = LoggerFactory.getLogger(JdbcApiMetaDataDao.class);
+
+    @Autowired
+    private ApiMetaDataRepository apiMetaDataRepository;
 
     @Override
     public void insert(TApiMetaData apiMetaData) {
@@ -40,13 +41,10 @@ public class JdbcApiMetaDataDao extends BaseRepository<ApiMetaData> implements A
         }
         metaData.setApiInfo(apiMetaData.getApiInfo());
 
-        Map<String, Object> conditionMap = new HashMap<>();
-        conditionMap.put("agentId", apiMetaData.getAgentId());
-        conditionMap.put("startTime", apiMetaData.getAgentStartTime());
-        conditionMap.put("apiId", apiMetaData.getApiId());
-        ApiMetaData result = findOneByAttrs(conditionMap);
+        ApiMetaData result = apiMetaDataRepository.findOneByAgentIdAndApiIdAndStartTime(
+                                    apiMetaData.getAgentId(), apiMetaData.getApiId(), apiMetaData.getAgentStartTime());
         if (result == null) {
-            save(metaData);
+            apiMetaDataRepository.save(metaData);
         }
     }
 }

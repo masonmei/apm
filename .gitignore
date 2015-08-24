@@ -1,5 +1,6 @@
 *.iml
-target/
-.idea
+*/target/
+.idea/
 thrift/src/main/java
 logs/
+*/logs/

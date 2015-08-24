@@ -1,23 +1,24 @@
 package com.baidu.oped.apm.collector.dao.jdbc;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Repository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-import com.baidu.oped.apm.BaseRepository;
 import com.baidu.oped.apm.collector.dao.SqlMetaDataDao;
-import com.baidu.oped.apm.common.entity.SqlMetaData;
+import com.baidu.oped.apm.common.jpa.entity.SqlMetaData;
+import com.baidu.oped.apm.common.jpa.repository.SqlMetaDataRepository;
 import com.baidu.oped.apm.thrift.dto.TSqlMetaData;
 
 /**
  * Created by mason on 8/17/15.
  */
-@Repository
-public class JdbcSqlMetaDataDao extends BaseRepository<SqlMetaData> implements SqlMetaDataDao {
+@Component
+public class JdbcSqlMetaDataDao  implements SqlMetaDataDao {
     private static final Logger LOG = LoggerFactory.getLogger(JdbcSqlMetaDataDao.class);
+
+    @Autowired
+    private SqlMetaDataRepository sqlMetaDataRepository;
 
     @Override
     public void insert(TSqlMetaData sqlMetaData) {
@@ -34,13 +35,13 @@ public class JdbcSqlMetaDataDao extends BaseRepository<SqlMetaData> implements S
         metaData.setHashCode(sqlMetaData.getSqlId());
         metaData.setSql(sqlMetaData.getSql());
 
-        Map<String, Object> conditionMap = new HashMap<>();
-        conditionMap.put("agentId", sqlMetaData.getAgentId());
-        conditionMap.put("startTime", sqlMetaData.getAgentStartTime());
-        conditionMap.put("apiId", sqlMetaData.getSqlId());
-        SqlMetaData result = findOneByAttrs(conditionMap);
+        SqlMetaData result = sqlMetaDataRepository.findOneByAgentIdAndHashCodeAndStartTime(sqlMetaData.getAgentId(),
+                                                                                                  sqlMetaData
+                                                                                                          .getSqlId(),
+                                                                                                  sqlMetaData
+                                                                                                          .getAgentStartTime());
         if (result == null) {
-            save(metaData);
+            sqlMetaDataRepository.save(metaData);
         }
     }
 }

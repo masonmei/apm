@@ -2,11 +2,11 @@ server:
   port: 8888
 spring:
   application:
-    name: mx-web
+    name: web
   datasource:
     url: jdbc:mysql://127.0.0.1:3306/apm?autoReconnect=true&useUnicode=true&characterEncoding=utf-8
     username: root
-    password: noah
+    password: root
     driverClassName: com.mysql.jdbc.Driver
     max-active: 100
     min-idle: 8
@@ -18,9 +18,12 @@ spring:
       charset: UTF-8
       enabled: true
       force: true
-  dao:
-    exceptiontranslation:
-      enabled: false
+  jpa:
+    generate-ddl: true
+    show-sql: true
+    data:
+      repositories:
+        enabled: true
 logging:
   path: log
   file: web-mx.log

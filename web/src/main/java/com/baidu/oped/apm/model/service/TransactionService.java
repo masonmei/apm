@@ -1,12 +1,29 @@
 package com.baidu.oped.apm.model.service;
 
-import com.baidu.oped.apm.model.dao.jdbc.JdbcTraceDao;
-import com.baidu.oped.apm.mvc.vo.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.StreamSupport;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
-import java.text.DecimalFormat;
-import java.util.*;
+import com.baidu.oped.apm.common.jpa.entity.QTrace;
+import com.baidu.oped.apm.common.jpa.repository.TraceRepository;
+import com.baidu.oped.apm.mvc.vo.BusinessTransaction;
+import com.baidu.oped.apm.mvc.vo.BusinessTransactions;
+import com.baidu.oped.apm.mvc.vo.DataPoint;
+import com.baidu.oped.apm.mvc.vo.DataTrend;
+import com.baidu.oped.apm.mvc.vo.LegendTrend;
+import com.baidu.oped.apm.mvc.vo.Metric;
+import com.baidu.oped.apm.mvc.vo.Range;
+import com.baidu.oped.apm.mvc.vo.Trace;
+import com.baidu.oped.apm.utils.NumberUtils;
+import com.mysema.query.types.expr.BooleanExpression;
 
 /**
  * Created by mason on 8/13/15.
@@ -15,17 +32,21 @@ import java.util.*;
 public class TransactionService {
 
     @Autowired
-    private JdbcTraceDao traceDao;
+    private TraceRepository traceRepository;
 
     public BusinessTransactions selectTransactions(String applicationName, String agentId, Range range,
                                                    String field) {
+        Assert.hasLength(applicationName, "Application Name must not be null while select transactions");
 
-        List<com.baidu.oped.apm.common.entity.Trace> selectedSpansList = traceDao.queryTraceList(applicationName, agentId, range.getFrom(), range.getTo());
+        QTrace qTrace = QTrace.trace;
+        BooleanExpression appNameExp = qTrace.applicationId.eq(applicationName);
+        BooleanExpression agentIdExp = qTrace.agentId.eq(agentId);;
+        BooleanExpression startTimeExp = qTrace.startTime.between(range.getFrom(), range.getTo());
+        BooleanExpression conditions = appNameExp.and(agentIdExp).and(startTimeExp);
 
         BusinessTransactions transactions = new BusinessTransactions();
-        selectedSpansList.stream()
-                .forEach(trace -> transactions.add(trace, field));
-
+        Iterable<com.baidu.oped.apm.common.jpa.entity.Trace> selectedTrans = traceRepository.findAll(conditions);
+        StreamSupport.stream(selectedTrans.spliterator(), false).forEach(trace -> transactions.add(trace, field));
 
         return transactions;
     }
@@ -62,8 +83,8 @@ public class TransactionService {
                 List<Double> items = new ArrayList<>();
                 Double allRt = Double.valueOf(rtMap.get(ts));
                 Double pv = Double.valueOf(pvMap.get(ts));
-                items.add(formatDouble(allRt / pv));
-                items.add(formatDouble(pv / period));
+                items.add(NumberUtils.format(allRt / pv));
+                items.add(NumberUtils.format(pv / period));
                 items.add(allRt);
                 items.add(pv);
                 dataPoints.add(new DataPoint(ts, items));
@@ -85,9 +106,4 @@ public class TransactionService {
         DataTrend dataTrend = new DataTrend(metrics, legendTrends);
         return dataTrend;
     }
-
-    private double formatDouble(double d) {
-        return Double.parseDouble(new DecimalFormat("#.00").format(d));
-    }
-
 }

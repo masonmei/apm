@@ -1,15 +1,17 @@
 package com.baidu.oped.apm.collector.dao.jdbc;
 
-import com.baidu.oped.apm.BaseRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import com.baidu.oped.apm.collector.dao.AgentStatDao;
-import com.baidu.oped.apm.common.entity.AgentStatCpuLoad;
-import com.baidu.oped.apm.common.entity.AgentStatMemoryGc;
+import com.baidu.oped.apm.common.jpa.entity.AgentStatCpuLoad;
+import com.baidu.oped.apm.common.jpa.entity.AgentStatMemoryGc;
+import com.baidu.oped.apm.common.jpa.repository.AgentStatCpuLoadRepository;
+import com.baidu.oped.apm.common.jpa.repository.AgentStatMemoryGcRepository;
 import com.baidu.oped.apm.thrift.dto.TAgentStat;
 import com.baidu.oped.apm.thrift.dto.TCpuLoad;
 import com.baidu.oped.apm.thrift.dto.TJvmGc;
 import com.baidu.oped.apm.thrift.dto.TJvmGcType;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
 
 /**
  * ***** description *****
@@ -19,11 +21,14 @@ import org.springframework.stereotype.Repository;
  * Time: 11:31
  * To change this template use File | Settings | File Templates.
  */
-@Repository
-public class AgentStatMemoryGcDao extends BaseRepository<AgentStatMemoryGc> implements AgentStatDao {
+@Component
+public class AgentStatMemoryGcDao implements AgentStatDao {
 
     @Autowired
-    AgentStatCpuLoadDao agentStatCpuLoadDao;
+    AgentStatCpuLoadRepository cpuLoadRepository;
+
+    @Autowired
+    AgentStatMemoryGcRepository memoryGcRepository;
 
     @Override
     public void insert(TAgentStat agentStat) {
@@ -33,8 +38,8 @@ public class AgentStatMemoryGcDao extends BaseRepository<AgentStatMemoryGc> impl
 
         AgentStatMemoryGc memoryGc = this.parseMemoryGc(agentStat);
         AgentStatCpuLoad cpuLoad = this.parseCpuLoad(agentStat);
-        this.save(memoryGc);
-        agentStatCpuLoadDao.save(cpuLoad);
+        memoryGcRepository.save(memoryGc);
+        cpuLoadRepository.save(cpuLoad);
     }
 
     private AgentStatMemoryGc parseMemoryGc(TAgentStat thriftObject) {

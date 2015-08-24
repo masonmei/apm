@@ -1,20 +1,23 @@
 package com.baidu.oped.apm.mvc.controller;
 
-import com.baidu.oped.apm.model.service.TraceIndexService;
-import com.baidu.oped.apm.model.service.TransactionService;
-import com.baidu.oped.apm.mvc.vo.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.baidu.oped.apm.model.service.TransactionService;
+import com.baidu.oped.apm.mvc.vo.BusinessTransaction;
+import com.baidu.oped.apm.mvc.vo.BusinessTransactions;
+import com.baidu.oped.apm.mvc.vo.Range;
+import com.baidu.oped.apm.mvc.vo.TransactionSummary;
 
 /**
  * Created by mason on 8/13/15.
@@ -25,8 +28,8 @@ public class TransactionController {
     @Autowired
     private TransactionService transactionService;
 
-    @Autowired
-    private TraceIndexService traceIndexService;
+//    @Autowired
+//    private TraceIndexService traceIndexService;
 
     public List<TransactionSummary> itemTops() {
         return null;

@@ -7,17 +7,15 @@ import org.apache.thrift.TBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
-import com.baidu.oped.apm.collector.dao.ApplicationTraceIndexDao;
 import com.baidu.oped.apm.collector.dao.HostApplicationMapDao;
 import com.baidu.oped.apm.collector.dao.TracesDao;
 import com.baidu.oped.apm.common.ServiceType;
 import com.baidu.oped.apm.common.util.SpanEventUtils;
 import com.baidu.oped.apm.thrift.dto.TSpan;
 import com.baidu.oped.apm.thrift.dto.TSpanEvent;
-
-import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 /**
  * class SpanHandler 
@@ -31,9 +29,6 @@ public class SpanHandler implements SimpleHandler {
 
     @Autowired
     private TracesDao traceDao;
-
-    @Autowired
-    private ApplicationTraceIndexDao applicationTraceIndexDao;
 
     @Autowired
     private StatisticsHandler statisticsHandler;
@@ -54,7 +49,6 @@ public class SpanHandler implements SimpleHandler {
             }
 
             traceDao.insert(span);
-            applicationTraceIndexDao.insert(span);
 
             // insert statistics info for server map
             insertAcceptorHost(span);

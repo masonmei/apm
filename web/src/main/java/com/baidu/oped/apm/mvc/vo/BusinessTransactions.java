@@ -1,7 +1,7 @@
 
 package com.baidu.oped.apm.mvc.vo;
 
-import com.baidu.oped.apm.common.entity.Trace;
+import com.baidu.oped.apm.common.jpa.entity.Trace;
 
 import java.lang.reflect.Field;
 import java.util.Collection;

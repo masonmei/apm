@@ -1,12 +1,10 @@
 package com.baidu.oped.apm.collector.dao.jdbc;
 
-import java.util.Map;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Component;
 
 import com.baidu.oped.apm.collector.dao.MapStatisticsCallerDao;
 import com.baidu.oped.apm.collector.dao.hbase.statistics.CallRowKey;
@@ -24,7 +22,7 @@ import com.baidu.oped.apm.common.util.TimeSlot;
 /**
  * Created by mason on 8/17/15.
  */
-@Repository
+@Component
 public class JdbcMapStatisticsCallerDao implements MapStatisticsCallerDao {
     public static final Logger LOG = LoggerFactory.getLogger(JdbcMapStatisticsCallerDao.class);
     private final boolean useBulk;

@@ -1,34 +1,40 @@
 package com.baidu.oped.apm.collector.dao.jdbc;
 
-import com.baidu.oped.apm.BaseRepository;
-import com.baidu.oped.apm.collector.dao.AgentInfoDao;
-import com.baidu.oped.apm.common.entity.AgentInfo;
-import com.baidu.oped.apm.common.entity.ServerMetaData;
-import com.baidu.oped.apm.common.entity.ServiceInfo;
-import com.baidu.oped.apm.thrift.dto.TAgentInfo;
-import com.baidu.oped.apm.thrift.dto.TServerMetaData;
-import com.baidu.oped.apm.thrift.dto.TServiceInfo;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import java.util.List;
+import com.baidu.oped.apm.collector.dao.AgentInfoDao;
+import com.baidu.oped.apm.common.jpa.entity.AgentInfo;
+import com.baidu.oped.apm.common.jpa.entity.ServerMetaData;
+import com.baidu.oped.apm.common.jpa.entity.ServiceInfo;
+import com.baidu.oped.apm.common.jpa.repository.AgentInfoRepository;
+import com.baidu.oped.apm.common.jpa.repository.ServerMetaDataRepository;
+import com.baidu.oped.apm.common.jpa.repository.ServiceInfoRepository;
+import com.baidu.oped.apm.thrift.dto.TAgentInfo;
+import com.baidu.oped.apm.thrift.dto.TServerMetaData;
+import com.baidu.oped.apm.thrift.dto.TServiceInfo;
 
 /**
  * Created by mason on 8/15/15.
  */
-@Repository
-public class JdbcAgentInfoDao extends BaseRepository<AgentInfo> implements AgentInfoDao {
+@Component
+public class JdbcAgentInfoDao implements AgentInfoDao {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
-    private JdbcServerMetaDataDao jdbcServerMetaDataDao;
+    private AgentInfoRepository agentInfoRepository;
 
     @Autowired
-    private JdbcServiceInfoDao jdbcServiceInfoDao;
+    private ServerMetaDataRepository serverMetaDataRepository;
+
+    @Autowired
+    private ServiceInfoRepository serviceInfoRepository;
 
     @Override
     public void insert(TAgentInfo agentInfo) {
@@ -40,33 +46,46 @@ public class JdbcAgentInfoDao extends BaseRepository<AgentInfo> implements Agent
             logger.debug("insert agent info. {}", agentInfo);
         }
 
-        AgentInfo aInfo = new AgentInfo(agentInfo);
-        long agentInfoId = this.save(aInfo);
+        AgentInfo info = convertToAgentInfoEntity(agentInfo);
+
 
         if (agentInfo.isSetServerMetaData()) {
             ServerMetaData serverMetaData = new ServerMetaData();
             TServerMetaData thriftObject = agentInfo.getServerMetaData();
-            final String serverInfo = thriftObject.getServerInfo();
             final List<String> vmArgs = thriftObject.getVmArgs();
-            serverMetaData.setServerInfo(serverInfo);
             serverMetaData.setVmArgs(StringUtils.arrayToDelimitedString(vmArgs.toArray(), ","));
-            serverMetaData.setAgentId(aInfo.getAgentId());
-            serverMetaData.setAgentInfoId(agentInfoId);
-            long serverMetaDataId = jdbcServerMetaDataDao.save(serverMetaData);
 
             if (thriftObject.isSetServiceInfos()) {
                 for (TServiceInfo tServiceInfo : thriftObject.getServiceInfos()) {
                     String serviceName = tServiceInfo.getServiceName();
-                    String serviceLibs =
-                            StringUtils.arrayToCommaDelimitedString(tServiceInfo.getServiceLibs().toArray());
+                    String serviceLibs = StringUtils.arrayToCommaDelimitedString(tServiceInfo.getServiceLibs().toArray());
 
-                    ServiceInfo serviceInfo = new ServiceInfo(serverMetaDataId,
-                                                                aInfo.getAgentId(), serviceName, serviceLibs);
-                    jdbcServiceInfoDao.save(serviceInfo);
+                    ServiceInfo serviceInfo = new ServiceInfo();
+                    serviceInfo.setServiceName(serviceName);
+                    serviceInfo.setServiceLibs(serviceLibs);
+
+                    serverMetaData.addServiceInfo(serviceInfo);
+                    serviceInfoRepository.save(serviceInfo);
                 }
             }
 
         }
+        agentInfoRepository.save(info);
+    }
 
+    private AgentInfo convertToAgentInfoEntity(TAgentInfo agentInfo) {
+        AgentInfo info = new AgentInfo();
+        info.setHostName(agentInfo.getHostname());
+        info.setIp(agentInfo.getIp());
+        info.setPorts(agentInfo.getPorts());
+        info.setAgentId(agentInfo.getAgentId());
+        info.setApplicationName(agentInfo.getApplicationName());
+        info.setServiceType(agentInfo.getServiceType());
+        info.setPid(agentInfo.getPid());
+        info.setVersion(agentInfo.getVersion());
+        info.setStartTime(agentInfo.getStartTimestamp());
+        info.setEndTimeStamp(agentInfo.getEndTimestamp());
+        info.setEndStatus(agentInfo.getEndStatus());
+        return info;
     }
 }

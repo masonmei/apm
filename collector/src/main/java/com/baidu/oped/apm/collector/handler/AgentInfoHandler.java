@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.baidu.oped.apm.collector.dao.AgentInfoDao;
-import com.baidu.oped.apm.collector.dao.ApplicationIndexDao;
 import com.baidu.oped.apm.thrift.dto.TAgentInfo;
 import com.baidu.oped.apm.thrift.dto.TResult;
 
@@ -24,9 +23,6 @@ public class AgentInfoHandler implements SimpleHandler, RequestResponseHandler {
 
     @Autowired
     private AgentInfoDao agentInfoDao;
-
-    @Autowired
-    private ApplicationIndexDao applicationIndexDao;
 
     public void handleSimple(TBase<?, ?> tbase) {
         handleRequest(tbase);
@@ -48,9 +44,6 @@ public class AgentInfoHandler implements SimpleHandler, RequestResponseHandler {
 
             // agent info
             agentInfoDao.insert(agentInfo);
-
-            // for querying agentid using applicationname
-            applicationIndexDao.insert(agentInfo);
 
             return new TResult(true);
 

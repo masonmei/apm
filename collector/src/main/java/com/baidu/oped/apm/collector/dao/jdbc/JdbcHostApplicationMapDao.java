@@ -3,25 +3,30 @@ package com.baidu.oped.apm.collector.dao.jdbc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Component;
 
-import com.baidu.oped.apm.BaseRepository;
 import com.baidu.oped.apm.collector.dao.HostApplicationMapDao;
 import com.baidu.oped.apm.collector.util.AcceptedTimeService;
 import com.baidu.oped.apm.collector.util.AtomicLongUpdateMap;
-import com.baidu.oped.apm.common.entity.HostApplicationMap;
+import com.baidu.oped.apm.common.jpa.entity.HostApplicationMap;
+import com.baidu.oped.apm.common.jpa.repository.HostApplicationMapRepository;
 import com.baidu.oped.apm.common.util.TimeSlot;
 
 /**
  * Created by mason on 8/17/15.
  */
-@Repository
-public class JdbcHostApplicationMapDao extends BaseRepository<HostApplicationMap> implements HostApplicationMapDao {
+@Component
+public class JdbcHostApplicationMapDao implements HostApplicationMapDao {
 
     private static final Logger LOG = LoggerFactory.getLogger(JdbcHostApplicationMapDao.class);
     private final AtomicLongUpdateMap<CacheKey> updater = new AtomicLongUpdateMap<CacheKey>();
+
+    @Autowired
+    private HostApplicationMapRepository hostApplicationMapRepository;
+
     @Autowired
     private AcceptedTimeService acceptedTimeService;
+
     @Autowired
     private TimeSlot timeSlot;
 
@@ -74,7 +79,7 @@ public class JdbcHostApplicationMapDao extends BaseRepository<HostApplicationMap
         applicationMap.setBindServiceType(bindServiceType);
 
         try {
-            save(applicationMap);
+            hostApplicationMapRepository.save(applicationMap);
         } catch (Exception ex) {
             LOG.warn("retry one. Caused:{}", ex.getCause(), ex);
         }
