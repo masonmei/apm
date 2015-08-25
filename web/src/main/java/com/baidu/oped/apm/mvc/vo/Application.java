@@ -9,83 +9,49 @@ import com.baidu.oped.apm.common.ServiceType;
  * @author meidongxu@baidu.com
  */
 public final class Application {
-    private final String name;
-    private final ServiceType serviceType;
-    // store separately to track undefined cases more easily
-    private final short code;
+    private Long appId;
+    private String appName;
+    private Double responseTime;
+    private Double cpm;
+    private Double errorRate;
 
-    public Application(String name, ServiceType serviceType) {
-        if (name == null) {
-            throw new NullPointerException("name must not be null");
-        }
-        if (serviceType == null) {
-            throw new NullPointerException("serviceType must not be null");
-        }
-        this.name = name;
-        this.serviceType = serviceType;
-        this.code = serviceType.getCode();
+    public Long getAppId() {
+        return appId;
     }
 
-    public Application(String name, short serviceType) {
-        if (name == null) {
-            throw new NullPointerException("name must not be null");
-        }
-        this.name = name;
-        this.serviceType = ServiceType.findServiceType(serviceType);
-        this.code = serviceType;
+    public void setAppId(Long appId) {
+        this.appId = appId;
     }
 
-    public String getName() {
-        return name;
+    public String getAppName() {
+        return appName;
     }
 
-    public ServiceType getServiceType() {
-        return serviceType;
+    public void setAppName(String appName) {
+        this.appName = appName;
     }
 
-    public short getServiceTypeCode() {
-        return serviceType.getCode();
+    public Double getResponseTime() {
+        return responseTime;
     }
 
-    public short getCode() {
-        return code;
+    public void setResponseTime(Double responseTime) {
+        this.responseTime = responseTime;
     }
 
-    public boolean equals(String thatName, ServiceType thatServiceType) {
-        if (thatName == null) {
-            throw new NullPointerException("thatName must not be null");
-        }
-        if (thatServiceType == null) {
-            throw new NullPointerException("thatServiceType must not be null");
-        }
-        if (serviceType != thatServiceType) return false;
-        if (!name.equals(thatName)) return false;
-
-        return true;
+    public Double getCpm() {
+        return cpm;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Application that = (Application) o;
-
-        if (serviceType != that.serviceType) return false;
-        if (!name.equals(that.name)) return false;
-
-        return true;
+    public void setCpm(Double cpm) {
+        this.cpm = cpm;
     }
 
-    @Override
-    public int hashCode() {
-        int result = name.hashCode();
-        result = 31 * result + serviceType.hashCode();
-        return result;
+    public Double getErrorRate() {
+        return errorRate;
     }
 
-    @Override
-    public String toString() {
-        return name + "(" + serviceType + ":" + code + ")";
+    public void setErrorRate(Double errorRate) {
+        this.errorRate = errorRate;
     }
 }

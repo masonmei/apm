@@ -19,7 +19,7 @@ import java.time.ZoneId;
  * Created by mason on 8/13/15.
  */
 @RestController
-@RequestMapping("api/apm/trend")
+@RequestMapping("trend")
 public class TrendController {
 
     @Autowired

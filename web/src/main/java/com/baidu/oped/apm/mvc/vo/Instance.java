@@ -4,76 +4,85 @@ package com.baidu.oped.apm.mvc.vo;
  * Created by mason on 8/12/15.
  */
 public class Instance {
-    private String instanceId;
-    private String name;
-    private double apdex;
-    private double responseTime;
-    private double countPerMins;
-    private double errorRate;
-    private double cpuUsage;
-    private double memoryUsage;
+    private Long appId;
+    private Long instanceId;
+    private String instanceName;
+    private Double apdex;
+    private Double responseTime;
+    private Double cpm;
+    private Double errorRate;
+    private Double cpuUsage;
+    private Double memoryUsage;
 
-    public String getInstanceId() {
+    public Long getAppId() {
+        return appId;
+    }
+
+    public void setAppId(Long appId) {
+        this.appId = appId;
+    }
+
+    public Long getInstanceId() {
         return instanceId;
     }
 
-    public void setInstanceId(String instanceId) {
+    public void setInstanceId(Long instanceId) {
         this.instanceId = instanceId;
     }
 
-    public String getName() {
-        return name;
+    public String getInstanceName() {
+        return instanceName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setInstanceName(String instanceName) {
+        this.instanceName = instanceName;
     }
 
-    public double getApdex() {
+    public Double getApdex() {
         return apdex;
     }
 
-    public void setApdex(double apdex) {
+    public void setApdex(Double apdex) {
         this.apdex = apdex;
     }
 
-    public double getResponseTime() {
+    public Double getResponseTime() {
         return responseTime;
     }
 
-    public void setResponseTime(double responseTime) {
+    public void setResponseTime(Double responseTime) {
         this.responseTime = responseTime;
     }
 
-    public double getCountPerMins() {
-        return countPerMins;
+    public Double getCpm() {
+        return cpm;
     }
 
-    public void setCountPerMins(double countPerMins) {
-        this.countPerMins = countPerMins;
+    public void setCpm(Double cpm) {
+        this.cpm = cpm;
     }
 
-    public double getErrorRate() {
+    public Double getErrorRate() {
         return errorRate;
     }
 
-    public void setErrorRate(double errorRate) {
+    public void setErrorRate(Double errorRate) {
         this.errorRate = errorRate;
     }
 
-    public double getCpuUsage() {
+    public Double getCpuUsage() {
         return cpuUsage;
     }
 
-    public void setCpuUsage(double cpuUsage) {
+    public void setCpuUsage(Double cpuUsage) {
         this.cpuUsage = cpuUsage;
     }
 
-    public double getMemoryUsage() {
+    public Double getMemoryUsage() {
         return memoryUsage;
     }
 
-    public void setMemoryUsage(double memoryUsage) {
+    public void setMemoryUsage(Double memoryUsage) {
         this.memoryUsage = memoryUsage;
     }
 }
