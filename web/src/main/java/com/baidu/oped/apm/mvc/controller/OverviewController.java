@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -13,29 +12,27 @@ import org.springframework.web.bind.annotation.RestController;
 import com.baidu.oped.apm.mvc.vo.Instance;
 import com.baidu.oped.apm.mvc.vo.Transaction;
 import com.baidu.oped.apm.mvc.vo.TrendResponse;
+import com.baidu.oped.apm.utils.Constaints;
 
 /**
  * Created by mason on 8/25/15.
  */
 @RestController
-@RequestMapping("overview/applications/${appId}")
+@RequestMapping("overview/applications")
 public class OverviewController {
 
     /**
      * Get Application Response Time trend data
      *
      * @param appId
-     * @param from
-     * @param to
+     * @param time
      * @param period
      */
     @RequestMapping(value = {"trend/rt"}, method = RequestMethod.GET)
     public TrendResponse responseTime(
-                @PathVariable("appId") Long appId,
-                @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime from,
-                @RequestParam(value = "to", required = false)
-                @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime to,
-                @RequestParam("period") Integer period) {
+                @RequestParam(value = "appId") Long appId,
+                @RequestParam(value = "time") String[] time,
+                @RequestParam(value = "period") Integer period) {
 
         return null;
     }
@@ -44,18 +41,15 @@ public class OverviewController {
      * Get Application Apdex trend data.
      *
      * @param appId
-     * @param from
-     * @param to
+     * @param time
      * @param period
      * @return
      */
     @RequestMapping(value = {"trend/apdex"}, method = RequestMethod.GET)
     public TrendResponse apdex(
-                @PathVariable("appId") Long appId,
-                @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime from,
-                @RequestParam(value = "to", required = false)
-                @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime to,
-                @RequestParam("period") Integer period) {
+                @RequestParam(value = "appId") Long appId,
+                @RequestParam(value = "time") String[] time,
+                @RequestParam(value = "period") Integer period) {
 
         return null;
     }
@@ -64,18 +58,15 @@ public class OverviewController {
      * Get Application count per minute trend data.
      *
      * @param appId
-     * @param from
-     * @param to
+     * @param time
      * @param period
      * @return
      */
     @RequestMapping(value = {"trend/cpm"}, method = RequestMethod.GET)
     public TrendResponse cpm(
-               @PathVariable("appId") Long appId,
-               @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime from,
-               @RequestParam(value = "to", required = false)
-               @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime to,
-               @RequestParam("period") Integer period) {
+               @RequestParam(value = "appId") Long appId,
+               @RequestParam(value = "time") String[] time,
+               @RequestParam(value = "period") Integer period) {
 
         return null;
     }
@@ -91,11 +82,12 @@ public class OverviewController {
      */
     @RequestMapping(value = {"transactions"}, method = RequestMethod.GET)
     public List<Transaction> transaction(
-                @PathVariable("appId") Long appId,
-                @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime from,
+                @RequestParam(value = "appId") Long appId,
+                @RequestParam(value = "from", required = false)
+                @DateTimeFormat(pattern = Constaints.TIME_PATTERN) LocalDateTime from,
                 @RequestParam(value = "to", required = false)
-                @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime to,
-                @RequestParam("limit") Integer limit) {
+                @DateTimeFormat(pattern = Constaints.TIME_PATTERN) LocalDateTime to,
+                @RequestParam(value = "limit") Integer limit) {
 
         return null;
     }
@@ -104,18 +96,15 @@ public class OverviewController {
      * Get Application error Rate trend data.
      *
      * @param appId
-     * @param from
-     * @param to
+     * @param time
      * @param period
      * @return
      */
     @RequestMapping(value = {"trend/errorRate"}, method = RequestMethod.GET)
     public TrendResponse errorRate(
-                @PathVariable("appId") Long appId,
-                @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime from,
-                @RequestParam(value = "to", required = false)
-                @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime to,
-                @RequestParam("period") Integer period) {
+                @RequestParam(value = "appId") Long appId,
+                @RequestParam(value = "time") String[] time,
+                @RequestParam(value = "period") Integer period) {
 
         return null;
     }
@@ -129,10 +118,11 @@ public class OverviewController {
      */
     @RequestMapping(value = {"alarm"}, method = RequestMethod.GET)
     public void alarm(
-            @PathVariable("appId") Long appId,
-            @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime from,
+            @RequestParam(value = "appId") Long appId,
+            @RequestParam(value = "from", required = false)
+            @DateTimeFormat(pattern = Constaints.TIME_PATTERN) LocalDateTime from,
             @RequestParam(value = "to", required = false)
-            @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime to) {
+            @DateTimeFormat(pattern = Constaints.TIME_PATTERN) LocalDateTime to) {
         throw new UnsupportedOperationException("not supported yet!");
     }
 
@@ -145,10 +135,11 @@ public class OverviewController {
      */
     @RequestMapping(value = {"instances"}, method = RequestMethod.GET)
     public List<Instance> listInstance(
-            @PathVariable("appId") Long appId,
-            @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime from,
+            @RequestParam(value = "appId") Long appId,
+            @RequestParam(value = "from", required = false)
+            @DateTimeFormat(pattern = Constaints.TIME_PATTERN) LocalDateTime from,
             @RequestParam(value = "to", required = false)
-            @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime to) {
+            @DateTimeFormat(pattern = Constaints.TIME_PATTERN) LocalDateTime to) {
 
         return null;
     }
@@ -157,18 +148,15 @@ public class OverviewController {
      * Get Instance Response Time trend data
      *
      * @param appId
-     * @param from
-     * @param to
+     * @param time
      * @param period
      */
-    @RequestMapping(value = {"instances/${instanceId}/trend/rt"}, method = RequestMethod.GET)
+    @RequestMapping(value = {"instances/trend/rt"}, method = RequestMethod.GET)
     public TrendResponse instnceResponseTime(
-            @PathVariable("appId") Long appId,
-            @PathVariable("instanceId") Long instanceId,
-            @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime from,
-            @RequestParam(value = "to", required = false)
-            @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime to,
-            @RequestParam("period") Integer period) {
+            @RequestParam(value = "appId") Long appId,
+            @RequestParam(value = "instanceId") Long instanceId,
+            @RequestParam(value = "time") String[] time,
+            @RequestParam(value = "period") Integer period) {
 
         return null;
     }
@@ -177,19 +165,16 @@ public class OverviewController {
      * Get Instance Apdex trend data.
      *
      * @param appId
-     * @param from
-     * @param to
+     * @param time
      * @param period
      * @return
      */
-    @RequestMapping(value = {"instances/${instanceId}/trend/apdex"}, method = RequestMethod.GET)
+    @RequestMapping(value = {"instances/trend/apdex"}, method = RequestMethod.GET)
     public TrendResponse instanceApdex(
-            @PathVariable("appId") Long appId,
-            @PathVariable("instanceId") Long instanceId,
-            @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime from,
-            @RequestParam(value = "to", required = false)
-            @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime to,
-            @RequestParam("period") Integer period) {
+            @RequestParam(value = "appId") Long appId,
+            @RequestParam(value = "instanceId") Long instanceId,
+            @RequestParam(value = "time") String[] time,
+            @RequestParam(value = "period") Integer period) {
 
         return null;
     }
@@ -198,19 +183,16 @@ public class OverviewController {
      * Get Instance count per minute trend data.
      *
      * @param appId
-     * @param from
-     * @param to
+     * @param time
      * @param period
      * @return
      */
-    @RequestMapping(value = {"instances/${instanceId}/trend/cpm"}, method = RequestMethod.GET)
+    @RequestMapping(value = {"instances/trend/cpm"}, method = RequestMethod.GET)
     public TrendResponse instanceCpm(
-            @PathVariable("appId") Long appId,
-            @PathVariable("instanceId") Long instanceId,
-            @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime from,
-            @RequestParam(value = "to", required = false)
-            @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime to,
-            @RequestParam("period") Integer period) {
+            @RequestParam(value = "appId") Long appId,
+            @RequestParam(value = "instanceId") Long instanceId,
+            @RequestParam(value = "time") String[] time,
+            @RequestParam(value = "period") Integer period) {
 
         return null;
     }
@@ -224,14 +206,15 @@ public class OverviewController {
      * @param limit
      * @return
      */
-    @RequestMapping(value = {"instances/${instanceId}/transactions"}, method = RequestMethod.GET)
+    @RequestMapping(value = {"instances/transactions"}, method = RequestMethod.GET)
     public List<Transaction> instanceTransaction(
-            @PathVariable("appId") Long appId,
-            @PathVariable("instanceId") Long instanceId,
-            @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime from,
+            @RequestParam(value = "appId") Long appId,
+            @RequestParam(value = "instanceId") Long instanceId,
+            @RequestParam(value = "from", required = false)
+            @DateTimeFormat(pattern = Constaints.TIME_PATTERN) LocalDateTime from,
             @RequestParam(value = "to", required = false)
-            @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime to,
-            @RequestParam("limit") Integer limit) {
+            @DateTimeFormat(pattern = Constaints.TIME_PATTERN) LocalDateTime to,
+            @RequestParam(value = "limit") Integer limit) {
 
         return null;
     }
@@ -240,19 +223,16 @@ public class OverviewController {
      * Get Application error Rate trend data.
      *
      * @param appId
-     * @param from
-     * @param to
+     * @param time
      * @param period
      * @return
      */
-    @RequestMapping(value = {"instances/${instanceId}/trend/errorRate"}, method = RequestMethod.GET)
+    @RequestMapping(value = {"instances/trend/errorRate"}, method = RequestMethod.GET)
     public TrendResponse instanceErrorRate(
-            @PathVariable("appId") Long appId,
-            @PathVariable("instanceId") Long instanceId,
-            @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime from,
-            @RequestParam(value = "to", required = false)
-            @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime to,
-            @RequestParam("period") Integer period) {
+            @RequestParam(value = "appId") Long appId,
+            @RequestParam(value = "instanceId") Long instanceId,
+            @RequestParam(value = "time") String[] time,
+            @RequestParam(value = "period") Integer period) {
 
         return null;
     }
@@ -264,13 +244,14 @@ public class OverviewController {
      * @param from
      * @param to
      */
-    @RequestMapping(value = {"instances/${instanceId}/alarm"}, method = RequestMethod.GET)
+    @RequestMapping(value = {"instances/alarm"}, method = RequestMethod.GET)
     public void instanceAlarm(
-            @PathVariable("appId") Long appId,
-            @PathVariable("instanceId") Long instanceId,
-            @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime from,
+            @RequestParam(value = "appId") Long appId,
+            @RequestParam(value = "instanceId") Long instanceId,
+            @RequestParam(value = "from", required = false)
+            @DateTimeFormat(pattern = Constaints.TIME_PATTERN) LocalDateTime from,
             @RequestParam(value = "to", required = false)
-            @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime to) {
+            @DateTimeFormat(pattern = Constaints.TIME_PATTERN) LocalDateTime to) {
         throw new UnsupportedOperationException("not supported yet!");
     }
 

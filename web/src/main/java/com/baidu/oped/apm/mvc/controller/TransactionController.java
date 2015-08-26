@@ -1,33 +1,25 @@
 package com.baidu.oped.apm.mvc.controller;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.baidu.oped.apm.model.service.TransactionService;
-import com.baidu.oped.apm.mvc.vo.BusinessTransaction;
-import com.baidu.oped.apm.mvc.vo.BusinessTransactions;
-import com.baidu.oped.apm.mvc.vo.Range;
 import com.baidu.oped.apm.mvc.vo.Transaction;
-import com.baidu.oped.apm.mvc.vo.TransactionSummary;
 import com.baidu.oped.apm.mvc.vo.TrendResponse;
+import com.baidu.oped.apm.utils.Constaints;
 
 /**
  * Created by mason on 8/13/15.
  */
 @RestController
-@RequestMapping("transactions/applications/${appId}")
+@RequestMapping("transactions/applications")
 public class TransactionController {
     @Autowired
     private TransactionService transactionService;
@@ -43,12 +35,13 @@ public class TransactionController {
      */
     @RequestMapping(method = RequestMethod.GET)
     public List<Transaction> transactions(
-            @PathVariable("appId") Long appId,
+            @RequestParam(value = "appId") Long appId,
+            @RequestParam(value = "instanceId") Long instanceId,
             @RequestParam(value = "from", required = false)
-            @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime from,
+            @DateTimeFormat(pattern = Constaints.TIME_PATTERN) LocalDateTime from,
             @RequestParam(value = "to", required = false)
-            @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime to,
-            @RequestParam("limit") Integer limit){
+            @DateTimeFormat(pattern = Constaints.TIME_PATTERN) LocalDateTime to,
+            @RequestParam(value = "limit") Integer limit){
 
         return null;
     }
@@ -57,21 +50,17 @@ public class TransactionController {
      * Get top n transaction response time trend data.
      *
      * @param appId
-     * @param from
-     * @param to
+     * @param time
      * @param period
      * @param limit
      * @return
      */
     @RequestMapping(value = {"trend/rt"})
     public TrendResponse responseTime(
-            @PathVariable("appId") Long appId,
-            @RequestParam(value = "from", required = false)
-            @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime from,
-            @RequestParam(value = "to", required = false)
-            @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime to,
-            @RequestParam("period") Integer period,
-            @RequestParam("limit") Integer limit) {
+            @RequestParam(value = "appId") Long appId,
+            @RequestParam(value = "time") String[] time,
+            @RequestParam(value = "period") Integer period,
+            @RequestParam(value = "limit") Integer limit) {
 
         return null;
     }
@@ -80,18 +69,14 @@ public class TransactionController {
      *  Get all transaction cpm of the application.
      *
      * @param appId
-     * @param from
-     * @param to
+     * @param time
      * @param period
      */
     @RequestMapping(value = {"trend/cpm"})
     public TrendResponse cpm(
-            @PathVariable("appId") Long appId,
-            @RequestParam(value = "from", required = false)
-            @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime from,
-            @RequestParam(value = "to", required = false)
-            @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime to,
-            @RequestParam("period") Integer period) {
+            @RequestParam(value = "appId") Long appId,
+            @RequestParam(value = "time") String[] time,
+            @RequestParam(value = "period") Integer period) {
 
         return null;
     }
@@ -100,8 +85,7 @@ public class TransactionController {
      * Get all transactions order by response time desc.
      *
      * @param appId
-     * @param from
-     * @param to
+     * @param time
      * @param pageCount
      * @param pageSize
      * @param orderby
@@ -109,14 +93,11 @@ public class TransactionController {
      */
     @RequestMapping(value = {"traces"})
     public List<Transaction> slowTransactions(
-            @PathVariable("appId") Long appId,
-            @RequestParam(value = "from", required = false)
-            @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime from,
-            @RequestParam(value = "to", required = false)
-            @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime to,
+            @RequestParam(value = "appId") Long appId,
+            @RequestParam(value = "time") String[] time,
             @RequestParam(value = "pageCount", defaultValue = "1") Integer pageCount,
             @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
-            @RequestParam(value = "orderby", required = false) String orderby) {
+            @RequestParam(value = "orderBy", required = false) String orderby) {
 
         return null;
     }
@@ -131,15 +112,15 @@ public class TransactionController {
      * @param limit
      * @return
      */
-    @RequestMapping(value = {"instances/${instanceId}"}, method = RequestMethod.GET)
+    @RequestMapping(value = {"instances"}, method = RequestMethod.GET)
     public List<Transaction> instanceTransactions(
-            @PathVariable("appId") Long appId,
-            @PathVariable("instanceId") Long instanceId,
+            @RequestParam(value = "appId") Long appId,
+            @RequestParam(value = "instanceId") Long instanceId,
             @RequestParam(value = "from", required = false)
-            @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime from,
+            @DateTimeFormat(pattern = Constaints.TIME_PATTERN) LocalDateTime from,
             @RequestParam(value = "to", required = false)
-            @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime to,
-            @RequestParam("limit") Integer limit){
+            @DateTimeFormat(pattern = Constaints.TIME_PATTERN) LocalDateTime to,
+            @RequestParam(value = "limit") Integer limit){
 
         return null;
     }
@@ -149,22 +130,18 @@ public class TransactionController {
      *
      * @param appId
      * @param instanceId
-     * @param from
-     * @param to
+     * @param time
      * @param period
      * @param limit
      * @return
      */
-    @RequestMapping(value = {"instances/${instanceId}/trend/rt"})
+    @RequestMapping(value = {"instances/trend/rt"})
     public TrendResponse instanceResponseTime(
-            @PathVariable("appId") Long appId,
-            @PathVariable("instanceId") Long instanceId,
-            @RequestParam(value = "from", required = false)
-            @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime from,
-            @RequestParam(value = "to", required = false)
-            @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime to,
-            @RequestParam("period") Integer period,
-            @RequestParam("limit") Integer limit) {
+            @RequestParam(value = "appId") Long appId,
+            @RequestParam(value = "instanceId") Long instanceId,
+            @RequestParam(value = "time") String[] time,
+            @RequestParam(value = "period") Integer period,
+            @RequestParam(value = "limit") Integer limit) {
 
         return null;
     }
@@ -174,20 +151,16 @@ public class TransactionController {
      *
      * @param appId
      * @param instanceId
-     * @param from
-     * @param to
+     * @param time
      * @param period
      * @return
      */
-    @RequestMapping(value = {"instances/${instanceId}/trend/cpm"})
+    @RequestMapping(value = {"instances/trend/cpm"})
     public TrendResponse instanceCpm(
-            @PathVariable("appId") Long appId,
-            @PathVariable("instanceId") Long instanceId,
-            @RequestParam(value = "from", required = false)
-            @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime from,
-            @RequestParam(value = "to", required = false)
-            @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime to,
-            @RequestParam("period") Integer period) {
+            @RequestParam(value = "appId") Long appId,
+            @RequestParam(value = "instanceId") Long instanceId,
+            @RequestParam(value = "time") String[] time,
+            @RequestParam(value = "period") Integer period) {
 
         return null;
     }
@@ -200,20 +173,20 @@ public class TransactionController {
      * @param to
      * @param pageCount
      * @param pageSize
-     * @param orderby
+     * @param orderBy
      * @return
      */
-    @RequestMapping(value = {"instances/${instanceId}/traces"})
+    @RequestMapping(value = {"instances/traces"})
     public List<Transaction> instanceSlowTransactions(
-            @PathVariable("appId") Long appId,
-            @PathVariable("instanceId") Long instanceId,
+            @RequestParam(value = "appId") Long appId,
+            @RequestParam(value = "instanceId") Long instanceId,
             @RequestParam(value = "from", required = false)
-            @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime from,
+            @DateTimeFormat(pattern = Constaints.TIME_PATTERN) LocalDateTime from,
             @RequestParam(value = "to", required = false)
-            @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime to,
+            @DateTimeFormat(pattern = Constaints.TIME_PATTERN) LocalDateTime to,
             @RequestParam(value = "pageCount", defaultValue = "1") Integer pageCount,
             @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
-            @RequestParam(value = "orderby", required = false) String orderby) {
+            @RequestParam(value = "orderBy", required = false) String orderBy) {
 
         return null;
     }
