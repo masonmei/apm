@@ -43,14 +43,18 @@ public class TimeUtils {
     public static LocalDateTime getLocalDateTime(String stringDatetime) {
         Assert.hasLength(stringDatetime, "cannot convert an empty string to LocalDateTime");
         if (!StringUtils.isEmpty(stringDatetime)) {
-            return fromString(stringDatetime);
+            return readFromString(stringDatetime);
         } else {
             return LocalDateTime.now();
         }
     }
 
-    public static LocalDateTime fromString(String stringTime) {
+    public static LocalDateTime readFromString(String stringTime) {
         Assert.hasLength(stringTime, "cannot convert an empty string to LocalDateTime");
         return LocalDateTime.parse(stringTime, DateTimeFormatter.ofPattern(Constaints.TIME_PATTERN));
+    }
+
+    public static String writeToString(LocalDateTime localDateTime){
+        return localDateTime.format(DateTimeFormatter.ofPattern(Constaints.TIME_PATTERN));
     }
 }

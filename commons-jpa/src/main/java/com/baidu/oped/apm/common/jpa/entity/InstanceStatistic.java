@@ -6,6 +6,8 @@ import java.math.BigDecimal;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
@@ -23,6 +25,11 @@ public class InstanceStatistic extends AbstractPersistable<Long> implements Seri
     @Basic
     @Column(name = "period", nullable = false, insertable = true, updatable = true)
     private Integer period;
+
+    @Basic
+    @Column(name = "service_type", nullable = false, insertable = true, updatable = false)
+    @Enumerated(EnumType.STRING)
+    private ServiceType serviceType;
 
     @Basic
     @Column(name = "timestamp", nullable = false, insertable = true, updatable = true)
@@ -86,6 +93,14 @@ public class InstanceStatistic extends AbstractPersistable<Long> implements Seri
 
     public void setPeriod(Integer period) {
         this.period = period;
+    }
+
+    public ServiceType getServiceType() {
+        return serviceType;
+    }
+
+    public void setServiceType(ServiceType serviceType) {
+        this.serviceType = serviceType;
     }
 
     public Long getTimestamp() {
