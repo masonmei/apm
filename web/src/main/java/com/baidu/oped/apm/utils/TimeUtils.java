@@ -2,6 +2,8 @@ package com.baidu.oped.apm.utils;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -13,6 +15,15 @@ import com.baidu.oped.apm.mvc.vo.TimeRange;
  */
 public class TimeUtils {
     private static final String TIME_RANGE_ELEMENT_SPLITER = "|";
+
+    public static List<TimeRange> convertToRange(String... stringRanges){
+        List<TimeRange> timeRanges = new ArrayList<>();
+        for (String stringRange : stringRanges) {
+            TimeRange timeRange = convertToRange(stringRange);
+            timeRanges.add(timeRange);
+        }
+        return timeRanges;
+    }
 
     public static TimeRange convertToRange(String stringRange) {
         Assert.hasLength(stringRange, "Cannot convert empty string to timeRange");
