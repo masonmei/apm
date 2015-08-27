@@ -10,5 +10,4 @@ import com.baidu.oped.apm.common.jpa.entity.StringMetaData;
  */
 public interface StringMetaDataRepository extends JpaRepository<StringMetaData, Long>,
                                                           QueryDslPredicateExecutor<StringMetaData> {
-    StringMetaData findOneByAgentIdAndStringIdAndStartTime(String agentId, int stringId, long startTime);
 }

@@ -10,5 +10,4 @@ import com.baidu.oped.apm.common.jpa.entity.ApiMetaData;
  */
 public interface ApiMetaDataRepository extends JpaRepository<ApiMetaData, Long>,
                                                        QueryDslPredicateExecutor<ApiMetaData> {
-    ApiMetaData findOneByAgentIdAndApiIdAndStartTime(String agentId, int apiId, long startTime);
 }

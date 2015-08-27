@@ -10,58 +10,55 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 
 /**
  * The persistent class for the apm_sql_meta_data database table.
- * 
  */
 @Entity
-@Table(name="apm_sql_meta_data")
-public class SqlMetaData extends AbstractPersistable<Long> implements Serializable {
-	private static final long serialVersionUID = 1L;
+@Table(name = "apm_sql_meta_data")
+public class SqlMetaData extends AbstractPersistable<Long> {
 
-	@Column(name="agent_id", nullable=false, length=128)
-	private String agentId;
+    @Column(name = "instance_id", nullable = false, insertable = true, updatable = true)
+    private Long instanceId;
 
-	@Column(name="hash_code", nullable=false)
-	private int hashCode;
+    @Column(name = "hash_code", nullable = false, insertable = true, updatable = true)
+    private int hashCode;
 
-	@Column(name = "`sql`",length=512)
-	private String sql;
+    @Column(name = "`sql`", nullable = true, insertable = true, updatable = true, length = 512)
+    private String sql;
 
-	@Column(name="start_time", nullable=false)
-	private long startTime;
+    @Column(name = "start_time", nullable = false, insertable = true, updatable = true)
+    private long startTime;
 
-	public SqlMetaData() {
-	}
+    public SqlMetaData() {
+    }
 
-	public String getAgentId() {
-		return this.agentId;
-	}
+    public Long getInstanceId() {
+        return instanceId;
+    }
 
-	public void setAgentId(String agentId) {
-		this.agentId = agentId;
-	}
+    public void setInstanceId(Long instanceId) {
+        this.instanceId = instanceId;
+    }
 
-	public int getHashCode() {
-		return this.hashCode;
-	}
+    public int getHashCode() {
+        return hashCode;
+    }
 
-	public void setHashCode(int hashCode) {
-		this.hashCode = hashCode;
-	}
+    public void setHashCode(int hashCode) {
+        this.hashCode = hashCode;
+    }
 
-	public String getSql() {
-		return this.sql;
-	}
+    public String getSql() {
+        return sql;
+    }
 
-	public void setSql(String sql) {
-		this.sql = sql;
-	}
+    public void setSql(String sql) {
+        this.sql = sql;
+    }
 
-	public long getStartTime() {
-		return this.startTime;
-	}
+    public long getStartTime() {
+        return startTime;
+    }
 
-	public void setStartTime(long startTime) {
-		this.startTime = startTime;
-	}
-
+    public void setStartTime(long startTime) {
+        this.startTime = startTime;
+    }
 }

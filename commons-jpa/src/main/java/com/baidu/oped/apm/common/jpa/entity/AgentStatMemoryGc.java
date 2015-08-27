@@ -2,6 +2,7 @@ package com.baidu.oped.apm.common.jpa.entity;
 
 import java.io.Serializable;
 
+import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -17,49 +18,55 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 public class AgentStatMemoryGc extends AbstractPersistable<Long> implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	@Column(name="agent_id", nullable=false, length=128)
-	private String agentId;
+	@Basic
+	@Column(name = "app_id", nullable = false, insertable = true, updatable = true)
+	private Long appId;
 
-	@Column(name="gc_type", nullable=false, length=255)
+	@Basic
+	@Column(name = "instance_id", nullable = false, insertable = true, updatable = true)
+	private Long instanceId;
+
+	@Column(name="gc_type", nullable=false, length=64)
 	private String gcType;
 
-	@Column(name="jvm_gc_old_count", nullable=false)
+	@Column(name="jvm_gc_old_count", nullable=false, insertable = true, updatable = true)
 	private long jvmGcOldCount;
 
-	@Column(name="jvm_gc_old_time", nullable=false)
+	@Column(name="jvm_gc_old_time", nullable=false, insertable = true, updatable = true)
 	private long jvmGcOldTime;
 
-	@Column(name="jvm_memory_heap_max", nullable=false)
+	@Column(name="jvm_memory_heap_max", nullable=false, insertable = true, updatable = true)
 	private long jvmMemoryHeapMax;
 
-	@Column(name="jvm_memory_heap_used", nullable=false)
+	@Column(name="jvm_memory_heap_used", nullable=false, insertable = true, updatable = true)
 	private long jvmMemoryHeapUsed;
 
-	@Column(name="jvm_memory_non_heap_max", nullable=false)
+	@Column(name="jvm_memory_non_heap_max", nullable=false, insertable = true, updatable = true)
 	private long jvmMemoryNonHeapMax;
 
-	@Column(name="jvm_memory_non_heap_used", nullable=false)
+	@Column(name="jvm_memory_non_heap_used", nullable=false, insertable = true, updatable = true)
 	private long jvmMemoryNonHeapUsed;
 
-	@Column(name="start_timestamp", nullable=false)
-	private long startTimestamp;
-
-	@Column(nullable=false)
+	@Column(name = "timestamp", nullable=false, updatable = false, insertable = true)
 	private long timestamp;
 
 	public AgentStatMemoryGc() {
 	}
 
-	public static long getSerialVersionUID() {
-		return serialVersionUID;
+	public Long getAppId() {
+		return appId;
 	}
 
-	public String getAgentId() {
-		return agentId;
+	public void setAppId(Long appId) {
+		this.appId = appId;
 	}
 
-	public void setAgentId(String agentId) {
-		this.agentId = agentId;
+	public Long getInstanceId() {
+		return instanceId;
+	}
+
+	public void setInstanceId(Long instanceId) {
+		this.instanceId = instanceId;
 	}
 
 	public String getGcType() {
@@ -116,14 +123,6 @@ public class AgentStatMemoryGc extends AbstractPersistable<Long> implements Seri
 
 	public void setJvmMemoryNonHeapUsed(long jvmMemoryNonHeapUsed) {
 		this.jvmMemoryNonHeapUsed = jvmMemoryNonHeapUsed;
-	}
-
-	public long getStartTimestamp() {
-		return startTimestamp;
-	}
-
-	public void setStartTimestamp(long startTimestamp) {
-		this.startTimestamp = startTimestamp;
 	}
 
 	public long getTimestamp() {

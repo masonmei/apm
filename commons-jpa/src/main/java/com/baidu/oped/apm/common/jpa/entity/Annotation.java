@@ -2,11 +2,10 @@ package com.baidu.oped.apm.common.jpa.entity;
 
 import java.io.Serializable;
 
+import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.springframework.data.jpa.domain.AbstractPersistable;
@@ -17,27 +16,24 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 @Entity
 @Table(name = "apm_annotation")
 public class Annotation extends AbstractPersistable<Long> implements Serializable {
-    private static final long serialVersionUID = 1L;
 
     @Lob
-    @Column(name = "byte_value")
+    @Column(name = "byte_value", nullable = true, insertable = true, updatable = true)
     private byte[] byteValue;
 
-    @Column(name = "`key`")
+    @Column(name = "`key`", nullable = true, insertable = true, updatable = true)
     private int key;
 
-    @Column(name = "value_type")
+    @Column(name = "value_type", nullable = true, insertable = true, updatable = true)
     private byte valueType;
 
-    //bi-directional many-to-one association to Trace
-    @ManyToOne
-    @JoinColumn(name = "trace_id")
-    private Trace trace;
+    @Basic
+    @Column(name = "trace_id", nullable = true, insertable = true, updatable = true)
+    private Long traceId;
 
-    //bi-directional many-to-one association to TraceEvent
-    @ManyToOne
-    @JoinColumn(name = "trace_event_id")
-    private TraceEvent traceEvent;
+    @Basic
+    @Column(name = "trace_event_id", nullable = true, insertable = true, updatable = true)
+    private Long traceEventId;
 
     public Annotation() {
     }
@@ -66,20 +62,19 @@ public class Annotation extends AbstractPersistable<Long> implements Serializabl
         this.valueType = valueType;
     }
 
-    public Trace getTrace() {
-        return trace;
+    public Long getTraceId() {
+        return traceId;
     }
 
-    public void setTrace(Trace trace) {
-        this.trace = trace;
+    public void setTraceId(Long traceId) {
+        this.traceId = traceId;
     }
 
-    public TraceEvent getTraceEvent() {
-        return this.traceEvent;
+    public Long getTraceEventId() {
+        return traceEventId;
     }
 
-    public void setTraceEvent(TraceEvent traceEvent) {
-        this.traceEvent = traceEvent;
+    public void setTraceEventId(Long traceEventId) {
+        this.traceEventId = traceEventId;
     }
-
 }

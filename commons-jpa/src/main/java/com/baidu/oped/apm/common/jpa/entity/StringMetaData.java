@@ -1,7 +1,5 @@
 package com.baidu.oped.apm.common.jpa.entity;
 
-import java.io.Serializable;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -13,34 +11,33 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
  */
 @Entity
 @Table(name = "apm_string_meta_data")
-public class StringMetaData extends AbstractPersistable<Long> implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class StringMetaData extends AbstractPersistable<Long> {
 
-    @Column(name = "agent_id", nullable = false, length = 128)
-    private String agentId;
+    @Column(name = "instance_id", nullable = false, insertable = true, updatable = true)
+    private Long instanceId;
 
-    @Column(name = "start_time", nullable = false)
+    @Column(name = "start_time", nullable = false, insertable = true, updatable = true)
     private long startTime;
 
-    @Column(name = "string_id", nullable = false)
+    @Column(name = "string_id", nullable = false, insertable = true, updatable = true)
     private int stringId;
 
-    @Column(name = "string_value", length = 512)
+    @Column(name = "string_value", insertable = true, updatable = true, length = 512)
     private String stringValue;
 
     public StringMetaData() {
     }
 
-    public String getAgentId() {
-        return this.agentId;
+    public Long getInstanceId() {
+        return instanceId;
     }
 
-    public void setAgentId(String agentId) {
-        this.agentId = agentId;
+    public void setInstanceId(Long instanceId) {
+        this.instanceId = instanceId;
     }
 
     public long getStartTime() {
-        return this.startTime;
+        return startTime;
     }
 
     public void setStartTime(long startTime) {
@@ -48,7 +45,7 @@ public class StringMetaData extends AbstractPersistable<Long> implements Seriali
     }
 
     public int getStringId() {
-        return this.stringId;
+        return stringId;
     }
 
     public void setStringId(int stringId) {
@@ -56,11 +53,10 @@ public class StringMetaData extends AbstractPersistable<Long> implements Seriali
     }
 
     public String getStringValue() {
-        return this.stringValue;
+        return stringValue;
     }
 
     public void setStringValue(String stringValue) {
         this.stringValue = stringValue;
     }
-
 }

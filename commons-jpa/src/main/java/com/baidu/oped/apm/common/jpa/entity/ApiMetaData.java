@@ -2,6 +2,7 @@ package com.baidu.oped.apm.common.jpa.entity;
 
 import java.io.Serializable;
 
+import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -10,69 +11,71 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 
 /**
  * The persistent class for the apm_api_meta_data database table.
- * 
  */
 @Entity
-@Table(name="apm_api_meta_data")
+@Table(name = "apm_api_meta_data")
 public class ApiMetaData extends AbstractPersistable<Long> implements Serializable {
-	private static final long serialVersionUID = 1L;
 
-	@Column(name="agent_id", nullable=false, length=128)
-	private String agentId;
+    @Basic
+    @Column(name = "instance_id", nullable = false, insertable = true, updatable = true)
+    private Long instanceId;
 
-	@Column(name="api_id", nullable=false)
-	private int apiId;
+    @Basic
+    @Column(name = "api_id", nullable = false, insertable = true, updatable = true)
+    private int apiId;
 
-	@Column(name="api_info", length=512)
-	private String apiInfo;
+    @Basic
+    @Column(name = "api_info", insertable = true, updatable = true, nullable = true, length = 512)
+    private String apiInfo;
 
-	@Column(name="line_number")
-	private int lineNumber;
+    @Basic
+    @Column(name = "line_number", nullable = true, insertable = true, updatable = true)
+    private int lineNumber;
 
-	@Column(name="start_time", nullable=false)
-	private long startTime;
+    @Basic
+    @Column(name = "start_time", nullable = false, insertable = true, updatable = true)
+    private long startTime;
 
-	public ApiMetaData() {
-	}
+    public ApiMetaData() {
+    }
 
-	public String getAgentId() {
-		return this.agentId;
-	}
+    public Long getInstanceId() {
+        return instanceId;
+    }
 
-	public void setAgentId(String agentId) {
-		this.agentId = agentId;
-	}
+    public void setInstanceId(Long instanceId) {
+        this.instanceId = instanceId;
+    }
 
-	public int getApiId() {
-		return this.apiId;
-	}
+    public int getApiId() {
+        return apiId;
+    }
 
-	public void setApiId(int apiId) {
-		this.apiId = apiId;
-	}
+    public void setApiId(int apiId) {
+        this.apiId = apiId;
+    }
 
-	public String getApiInfo() {
-		return this.apiInfo;
-	}
+    public String getApiInfo() {
+        return apiInfo;
+    }
 
-	public void setApiInfo(String apiInfo) {
-		this.apiInfo = apiInfo;
-	}
+    public void setApiInfo(String apiInfo) {
+        this.apiInfo = apiInfo;
+    }
 
-	public int getLineNumber() {
-		return this.lineNumber;
-	}
+    public int getLineNumber() {
+        return lineNumber;
+    }
 
-	public void setLineNumber(int lineNumber) {
-		this.lineNumber = lineNumber;
-	}
+    public void setLineNumber(int lineNumber) {
+        this.lineNumber = lineNumber;
+    }
 
-	public long getStartTime() {
-		return this.startTime;
-	}
+    public long getStartTime() {
+        return startTime;
+    }
 
-	public void setStartTime(long startTime) {
-		this.startTime = startTime;
-	}
-
+    public void setStartTime(long startTime) {
+        this.startTime = startTime;
+    }
 }

@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
@@ -83,15 +84,11 @@ public class Trace extends AbstractPersistable<Long> implements Serializable {
     @Column(name = "trace_transaction_sequence")
     private long traceTransactionSequence;
 
+    @Basic
+    @Column(name = "version", nullable = false, insertable = true, updatable = true)
     private int version;
 
-    //bi-directional many-to-one association to Annotation
-    @OneToMany(mappedBy = "trace")
-    private List<Annotation> annotations = new ArrayList<>();
 
-    //bi-directional many-to-one association to TraceEvent
-    @OneToMany(mappedBy = "trace")
-    private List<TraceEvent> traceEvents = new ArrayList<>();
 
     public Trace() {
     }
@@ -280,48 +277,7 @@ public class Trace extends AbstractPersistable<Long> implements Serializable {
         this.version = version;
     }
 
-    public List<Annotation> getAnnotations() {
-        return this.annotations;
+    public boolean isHasException() {
+        return hasException;
     }
-
-    public void setAnnotations(List<Annotation> annotations) {
-        this.annotations = annotations;
-    }
-
-    public Annotation addAnnotation(Annotation annotation) {
-        getAnnotations().add(annotation);
-        annotation.setTrace(this);
-
-        return annotation;
-    }
-
-    public Annotation removeAnnotation(Annotation annotation) {
-        getAnnotations().remove(annotation);
-        annotation.setTrace(null);
-
-        return annotation;
-    }
-
-    public List<TraceEvent> getTraceEvents() {
-        return this.traceEvents;
-    }
-
-    public void setTraceEvents(List<TraceEvent> traceEvents) {
-        this.traceEvents = traceEvents;
-    }
-
-    public TraceEvent addSpanEvent(TraceEvent traceEvent) {
-        getTraceEvents().add(traceEvent);
-        traceEvent.setTrace(this);
-
-        return traceEvent;
-    }
-
-    public TraceEvent removeSpanEvent(TraceEvent traceEvent) {
-        getTraceEvents().remove(traceEvent);
-        traceEvent.setTrace(null);
-
-        return traceEvent;
-    }
-
 }
