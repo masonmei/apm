@@ -1,6 +1,6 @@
 package com.baidu.oped.apm.utils;
 
-import com.sun.tools.javac.util.Pair;
+import org.springframework.data.domain.Sort;
 import org.springframework.util.StringUtils;
 
 /**
@@ -13,16 +13,21 @@ import org.springframework.util.StringUtils;
  */
 public class PageUtils {
 
-    public static Pair<Boolean, String> parseOrder(String orderBy) {
+    public static Sort toSort(String orderBy) {
         if (StringUtils.isEmpty(orderBy)) {
             return null;
         }
-        boolean order = true;
+
         if (orderBy.startsWith("-")) {
-            order = false;
+            return new Sort(Sort.Direction.DESC, orderBy.substring(1));
         }
-        Pair<Boolean, String> pair = new Pair<>(order, orderBy.substring(1));
-        return pair;
+
+        if (!orderBy.startsWith("+")) {
+            orderBy = "+" + orderBy;
+        }
+
+        return new Sort(Sort.Direction.ASC, orderBy.substring(1));
+
     }
 
 }
