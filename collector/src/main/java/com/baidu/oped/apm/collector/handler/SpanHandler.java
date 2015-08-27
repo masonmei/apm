@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import com.baidu.oped.apm.collector.dao.HostApplicationMapDao;
 import com.baidu.oped.apm.collector.dao.TracesDao;
 import com.baidu.oped.apm.common.ServiceType;
 import com.baidu.oped.apm.common.util.SpanEventUtils;
@@ -32,9 +31,6 @@ public class SpanHandler implements SimpleHandler {
 
     @Autowired
     private StatisticsHandler statisticsHandler;
-
-    @Autowired
-    private HostApplicationMapDao hostApplicationMapDao;
 
     public void handleSimple(TBase<?, ?> tbase) {
 
@@ -139,6 +135,5 @@ public class SpanHandler implements SimpleHandler {
 
         final String parentApplicationName = span.getParentApplicationName();
         final short parentServiceType = span.getParentApplicationType();
-        hostApplicationMapDao.insert(acceptorHost, spanApplicationName, spanServiceType, parentApplicationName, parentServiceType);
     }
 }

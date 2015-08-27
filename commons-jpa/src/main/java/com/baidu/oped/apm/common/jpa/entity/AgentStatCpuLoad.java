@@ -1,7 +1,5 @@
 package com.baidu.oped.apm.common.jpa.entity;
 
-import java.io.Serializable;
-
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,8 +12,7 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
  */
 @Entity
 @Table(name = "apm_agent_stat_cpu_load")
-public class AgentStatCpuLoad extends AbstractPersistable<Long> implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class AgentStatCpuLoad extends AbstractPersistable<Long> {
 
     @Basic
     @Column(name = "app_id", nullable = false, insertable = true, updatable = true)

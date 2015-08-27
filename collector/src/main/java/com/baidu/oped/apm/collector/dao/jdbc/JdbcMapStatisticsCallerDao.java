@@ -31,9 +31,6 @@ public class JdbcMapStatisticsCallerDao implements MapStatisticsCallerDao {
     private AcceptedTimeService acceptedTimeService;
     @Autowired
     private TimeSlot timeSlot;
-//        @Autowired
-//        @Qualifier("callerMerge")
-//        private RowKeyMerge rowKeyMerge;
 
     public JdbcMapStatisticsCallerDao() {
         this(true);

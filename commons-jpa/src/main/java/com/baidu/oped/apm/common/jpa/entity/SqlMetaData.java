@@ -1,7 +1,5 @@
 package com.baidu.oped.apm.common.jpa.entity;
 
-import java.io.Serializable;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -18,8 +16,8 @@ public class SqlMetaData extends AbstractPersistable<Long> {
     @Column(name = "instance_id", nullable = false, insertable = true, updatable = true)
     private Long instanceId;
 
-    @Column(name = "hash_code", nullable = false, insertable = true, updatable = true)
-    private int hashCode;
+    @Column(name = "sql_id", nullable = false, insertable = true, updatable = true)
+    private int sqlId;
 
     @Column(name = "`sql`", nullable = true, insertable = true, updatable = true, length = 512)
     private String sql;
@@ -38,12 +36,12 @@ public class SqlMetaData extends AbstractPersistable<Long> {
         this.instanceId = instanceId;
     }
 
-    public int getHashCode() {
-        return hashCode;
+    public int getSqlId() {
+        return sqlId;
     }
 
-    public void setHashCode(int hashCode) {
-        this.hashCode = hashCode;
+    public void setSqlId(int sqlId) {
+        this.sqlId = sqlId;
     }
 
     public String getSql() {

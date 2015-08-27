@@ -6,15 +6,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.baidu.oped.apm.collector.dao.ApiMetaDataDao;
+import com.baidu.oped.apm.common.jpa.entity.AgentInstanceMap;
 import com.baidu.oped.apm.common.jpa.entity.ApiMetaData;
+import com.baidu.oped.apm.common.jpa.entity.QApiMetaData;
 import com.baidu.oped.apm.common.jpa.repository.ApiMetaDataRepository;
 import com.baidu.oped.apm.thrift.dto.TApiMetaData;
+import com.mysema.query.types.expr.BooleanExpression;
 
 /**
  * Created by mason on 8/17/15.
  */
 @Component
-public class JdbcApiMetaDataDao implements ApiMetaDataDao {
+public class JdbcApiMetaDataDao extends BaseService implements ApiMetaDataDao {
     private static final Logger LOG = LoggerFactory.getLogger(JdbcApiMetaDataDao.class);
 
     @Autowired
@@ -30,8 +33,16 @@ public class JdbcApiMetaDataDao implements ApiMetaDataDao {
             LOG.debug("insert:{}", apiMetaData);
         }
 
+        AgentInstanceMap map =
+                findAgentInstanceMap(apiMetaData.getAgentId(), apiMetaData.getAgentStartTime());
+        if (map == null) {
+            LOG.warn("AgentInstanceMap not found for agendId {} and startTime {}, this stat data will be ignored",
+                            apiMetaData.getAgentId(), apiMetaData.getAgentStartTime());
+            return;
+        }
+
         ApiMetaData metaData = new ApiMetaData();
-        metaData.setAgentId(apiMetaData.getAgentId());
+        metaData.setInstanceId(map.getInstanceId());
         metaData.setStartTime(apiMetaData.getAgentStartTime());
         metaData.setApiId(apiMetaData.getApiId());
         if (apiMetaData.isSetLine()) {
@@ -41,8 +52,12 @@ public class JdbcApiMetaDataDao implements ApiMetaDataDao {
         }
         metaData.setApiInfo(apiMetaData.getApiInfo());
 
-        ApiMetaData result = apiMetaDataRepository.findOneByAgentIdAndApiIdAndStartTime(
-                                    apiMetaData.getAgentId(), apiMetaData.getApiId(), apiMetaData.getAgentStartTime());
+        QApiMetaData qApiMetaData = QApiMetaData.apiMetaData;
+        BooleanExpression instanceCondition = qApiMetaData.instanceId.eq(map.getInstanceId());
+        BooleanExpression apiIdCondition = qApiMetaData.apiId.eq(apiMetaData.getApiId());
+        BooleanExpression whereCondition = instanceCondition.and(apiIdCondition);
+
+        ApiMetaData result = apiMetaDataRepository.findOne(whereCondition);
         if (result == null) {
             apiMetaDataRepository.save(metaData);
         }
