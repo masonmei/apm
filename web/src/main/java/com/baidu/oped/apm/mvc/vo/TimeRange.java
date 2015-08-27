@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 
 import org.springframework.util.Assert;
 
+import com.baidu.oped.apm.utils.TimeUtils;
+
 /**
  * Created by mason on 8/27/15.
  */
@@ -32,5 +34,10 @@ public class TimeRange {
 
     public void setTo(LocalDateTime to) {
         this.to = to;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s|%s", TimeUtils.writeToString(from), TimeUtils.writeToString(to));
     }
 }

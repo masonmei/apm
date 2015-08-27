@@ -8,4 +8,20 @@ import java.util.List;
 public class TrendResponse {
     private List<Metric> metrics;
     private List<MetricData> values;
+
+    public List<Metric> getMetrics() {
+        return metrics;
+    }
+
+    public void setMetrics(List<Metric> metrics) {
+        this.metrics = metrics;
+    }
+
+    public List<MetricData> getValues() {
+        return values;
+    }
+
+    public void setValues(List<MetricData> values) {
+        this.values = values;
+    }
 }
