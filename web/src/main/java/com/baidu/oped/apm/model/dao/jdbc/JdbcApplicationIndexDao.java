@@ -5,7 +5,7 @@
 //import org.springframework.stereotype.Repository;
 //
 //import com.baidu.oped.apm.model.dao.ApplicationIndexDao;
-//import com.baidu.oped.apm.mvc.vo.Application;
+//import com.baidu.oped.apm.mvc.vo.ApplicationVo;
 //
 ///**
 // * Created by mason on 8/16/15.
@@ -13,7 +13,7 @@
 //@Repository
 //public class JdbcApplicationIndexDao implements ApplicationIndexDao {
 //    @Override
-//    public List<Application> selectAllApplicationNames() {
+//    public List<ApplicationVo> selectAllApplicationNames() {
 //        return null;
 //    }
 //

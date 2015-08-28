@@ -3,7 +3,7 @@
 //
 //import java.util.List;
 //
-//import com.baidu.oped.apm.Application;
+//import com.baidu.oped.apm.ApplicationVo;
 //import com.baidu.oped.apm.mvc.vo.Range;
 //
 ///**
@@ -12,6 +12,6 @@
 // * @author meidongxu@baidu.com
 // */
 //public interface MapResponseDao {
-////    List<ResponseTime> selectResponseTime(Application application, Range range);
+////    List<ResponseTime> selectResponseTime(ApplicationVo application, Range range);
 //
 //}

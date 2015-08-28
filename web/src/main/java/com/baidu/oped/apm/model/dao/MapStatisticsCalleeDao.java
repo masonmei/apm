@@ -3,7 +3,7 @@
 //
 //import java.util.List;
 //
-//import com.baidu.oped.apm.Application;
+//import com.baidu.oped.apm.ApplicationVo;
 //import com.baidu.oped.apm.mvc.vo.Range;
 //
 ///**
@@ -12,8 +12,8 @@
 // * @author meidongxu@baidu.com
 // */
 //public interface MapStatisticsCalleeDao {
-////    LinkDataMap selectCallee(Application calleeApplication, Range range);
+////    LinkDataMap selectCallee(ApplicationVo calleeApplication, Range range);
 ////
 ////    @Deprecated
-////    List<LinkDataMap> selectCalleeStatistics(Application callerApplication, Application calleeApplication, Range range);
+////    List<LinkDataMap> selectCalleeStatistics(ApplicationVo callerApplication, ApplicationVo calleeApplication, Range range);
 //}

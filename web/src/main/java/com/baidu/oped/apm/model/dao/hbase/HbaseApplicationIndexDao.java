@@ -4,7 +4,7 @@
 //import com.baidu.oped.apm.common.hbase.HBaseTables;
 //import com.baidu.oped.apm.common.hbase.HbaseOperations2;
 //import com.baidu.oped.apm.model.dao.ApplicationIndexDao;
-//import com.baidu.oped.apm.mvc.vo.Application;
+//import com.baidu.oped.apm.mvc.vo.ApplicationVo;
 //import org.apache.hadoop.hbase.client.Delete;
 //import org.apache.hadoop.hbase.client.Get;
 //import org.apache.hadoop.hbase.client.Scan;
@@ -31,19 +31,19 @@
 //
 //    @Autowired
 //    @Qualifier("applicationNameMapper")
-//    private RowMapper<List<Application>> applicationNameMapper;
+//    private RowMapper<List<ApplicationVo>> applicationNameMapper;
 //
 ////    @Autowired
 ////    @Qualifier("agentIdMapper")
 //    private RowMapper<List<String>> agentIdMapper;
 //
 //    @Override
-//    public List<Application> selectAllApplicationNames() {
+//    public List<ApplicationVo> selectAllApplicationNames() {
 //        Scan scan = new Scan();
 //        scan.setCaching(30);
-//        List<List<Application>> results = hbaseOperations2.find(HBaseTables.APPLICATION_INDEX, scan, applicationNameMapper);
-//        List<Application> applications = new ArrayList<Application>();
-//        for (List<Application> result : results) {
+//        List<List<ApplicationVo>> results = hbaseOperations2.find(HBaseTables.APPLICATION_INDEX, scan, applicationNameMapper);
+//        List<ApplicationVo> applications = new ArrayList<ApplicationVo>();
+//        for (List<ApplicationVo> result : results) {
 //            applications.addAll(result);
 //        }
 //        return applications;

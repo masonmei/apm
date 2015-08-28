@@ -3,7 +3,7 @@
 //
 //import java.util.List;
 //
-//import com.baidu.oped.apm.mvc.vo.Application;
+//import com.baidu.oped.apm.mvc.vo.ApplicationVo;
 //
 ///**
 // * class ApplicationIndexDao
@@ -11,7 +11,7 @@
 // * @author meidongxu@baidu.com
 // */
 //public interface ApplicationIndexDao {
-//    List<Application> selectAllApplicationNames();
+//    List<ApplicationVo> selectAllApplicationNames();
 //
 //    List<String> selectAgentIds(String applicationName);
 //

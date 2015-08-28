@@ -12,5 +12,5 @@
 ////    @Deprecated
 ////    Set<AcceptApplication> findAcceptApplicationName(String host, Range range);
 ////
-////    Set<AcceptApplication> findAcceptApplicationName(Application fromApplication, Range range);
+////    Set<AcceptApplication> findAcceptApplicationName(ApplicationVo fromApplication, Range range);
 //}

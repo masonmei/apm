@@ -1,20 +1,23 @@
 package com.baidu.oped.apm.mvc.controller;
 
-import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-
+import com.baidu.oped.apm.common.jpa.entity.Application;
+import com.baidu.oped.apm.common.jpa.entity.ApplicationStatistic;
+import com.baidu.oped.apm.common.jpa.entity.Instance;
+import com.baidu.oped.apm.common.jpa.entity.InstanceStatistic;
+import com.baidu.oped.apm.model.service.ApplicationService;
+import com.baidu.oped.apm.mvc.vo.InstanceVo;
+import com.baidu.oped.apm.mvc.vo.QueryResponse;
+import com.baidu.oped.apm.utils.Constaints;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.baidu.oped.apm.model.service.ApplicationService;
-import com.baidu.oped.apm.mvc.vo.Application;
-import com.baidu.oped.apm.mvc.vo.Instance;
-import com.baidu.oped.apm.utils.Constaints;
+import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * Created by mason on 8/12/15.
@@ -27,40 +30,55 @@ public class ApplicationController {
     private ApplicationService applicationService;
 
     /**
-     * 获取所有app列表
+     *
+     * 获取 app 列表
      *
      * @param from
      * @param to
+     * @param orderBy
+     * @param pageSize
+     * @param pageNumber
      * @return
      */
     @RequestMapping(method = RequestMethod.GET)
-    public List<Application> findApplication(
-            @RequestParam(value = "simplify", required = false) boolean simplify,
+    public QueryResponse applications(
             @DateTimeFormat(pattern = Constaints.TIME_PATTERN) LocalDateTime from,
-            @RequestParam(value = "to", required = false)
-            @DateTimeFormat(pattern = Constaints.TIME_PATTERN) LocalDateTime to) {
-
-        return Collections.emptyList();
-        //        return applicationService.selectAllApplicationNames();
+            @DateTimeFormat(pattern = Constaints.TIME_PATTERN) LocalDateTime to,
+            @RequestParam(value = "orderBy", required = false, defaultValue = Constaints.ORDER_DESC_ID) String orderBy,
+            @RequestParam(value = "pageSize", required = false, defaultValue = Constaints.PAGE_SIZE) int pageSize,
+            @RequestParam(value = "pageNumber", required = false, defaultValue = Constaints.PAGE_NUMBER) int pageNumber
+    ) {
+        Page<Application> apps =
+                applicationService.selectApplctions("", orderBy, pageSize, pageNumber);
+        Iterable<ApplicationStatistic> appStatistics =
+                applicationService.selectApplicationStatistics(from, to, apps.getContent());
+        return applicationService.packageApplications(apps, appStatistics, from, to);
     }
 
     /**
-     * 根据application名字获取对应的实例列表
+     * 获取app对应的instance列表
      *
-     * @param applicationId
-     * @param simplify
+     * @param appId
      * @param from
      * @param to
+     * @param orderBy
+     * @param pageSize
+     * @param pageNumber
      * @return
      */
     @RequestMapping(value = {"instances"}, method = RequestMethod.GET)
-    public List<Instance> findApplicationInstance(
-             @RequestParam("appId") String applicationId,
-             @RequestParam(value = "simplify", required = false) boolean simplify,
+    public List<InstanceVo> findApplicationInstance(
+             @RequestParam("appId") long appId,
              @DateTimeFormat(pattern = Constaints.TIME_PATTERN) LocalDateTime from,
-             @RequestParam(value = "to", required = false)
-             @DateTimeFormat(pattern = Constaints.TIME_PATTERN) LocalDateTime to) {
-        return applicationService.findApplicationInstanceByApplication(applicationId, simplify);
+             @DateTimeFormat(pattern = Constaints.TIME_PATTERN) LocalDateTime to,
+             @RequestParam(value = "orderBy", required = false, defaultValue = Constaints.ORDER_DESC_ID) String orderBy,
+             @RequestParam(value = "pageSize", required = false, defaultValue = Constaints.PAGE_SIZE) int pageSize,
+             @RequestParam(value = "pageNumber", required = false, defaultValue = Constaints.PAGE_NUMBER) int pageNumber) {
+        Page<Instance> instances =
+                applicationService.selectInstances(appId, orderBy, pageSize, pageNumber);
+        Iterable<InstanceStatistic> instanceStatistics =
+                applicationService.selectInstanceStatistics(from, to, instances.getContent());
+        return applicationService.packageInstances(instances, instanceStatistics, from, to);
     }
 
 

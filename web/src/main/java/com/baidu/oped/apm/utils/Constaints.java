@@ -10,6 +10,7 @@ public class Constaints {
     public static final String PAGE_NUMBER = "1";
     public static final String DEFAULT_BOOL = "false";
     public static final String DEFAULT_USER = "testuser";
+    public static final String ORDER_DESC_ID = "-id";
 
     public enum MetricName {
         RESPONSE_TIME("responseTime", "", ""),
@@ -48,4 +49,5 @@ public class Constaints {
             return unit;
         }
     }
+
 }
