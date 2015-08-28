@@ -42,7 +42,9 @@ public class ApplicationController {
      */
     @RequestMapping(method = RequestMethod.GET)
     public QueryResponse applications(
+            @RequestParam(value = "from", required = false)
             @DateTimeFormat(pattern = Constaints.TIME_PATTERN) LocalDateTime from,
+            @RequestParam(value = "to", required = false)
             @DateTimeFormat(pattern = Constaints.TIME_PATTERN) LocalDateTime to,
             @RequestParam(value = "orderBy", required = false, defaultValue = Constaints.ORDER_DESC_ID) String orderBy,
             @RequestParam(value = "pageSize", required = false, defaultValue = Constaints.PAGE_SIZE) int pageSize,
@@ -69,7 +71,9 @@ public class ApplicationController {
     @RequestMapping(value = {"instances"}, method = RequestMethod.GET)
     public List<InstanceVo> findApplicationInstance(
              @RequestParam("appId") long appId,
+             @RequestParam(value = "from", required = false)
              @DateTimeFormat(pattern = Constaints.TIME_PATTERN) LocalDateTime from,
+             @RequestParam(value = "to", required = false)
              @DateTimeFormat(pattern = Constaints.TIME_PATTERN) LocalDateTime to,
              @RequestParam(value = "orderBy", required = false, defaultValue = Constaints.ORDER_DESC_ID) String orderBy,
              @RequestParam(value = "pageSize", required = false, defaultValue = Constaints.PAGE_SIZE) int pageSize,
@@ -78,7 +82,7 @@ public class ApplicationController {
                 applicationService.selectInstances(appId, orderBy, pageSize, pageNumber);
         Iterable<InstanceStatistic> instanceStatistics =
                 applicationService.selectInstanceStatistics(from, to, instances.getContent());
-        return applicationService.packageInstances(instances, instanceStatistics, from, to);
+        return applicationService.packageInstances(appId, instances, instanceStatistics, from, to);
     }
 
 

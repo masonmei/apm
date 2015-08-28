@@ -6,6 +6,7 @@ import com.baidu.oped.apm.utils.NumberUtils;
  * Created by mason on 8/12/15.
  */
 public class InstanceVo {
+    private Long appId;
     private Long instanceId;
     private String instanceName;
     private Double apdex;
@@ -18,8 +19,9 @@ public class InstanceVo {
     public InstanceVo() {
     }
 
-    public InstanceVo(long instanceId, String instanceName, Long pv, Long satisfied, Double rt,
+    public InstanceVo(long appId, long instanceId, String instanceName, Long pv, Long satisfied, Double rt,
                       Long error, long period, double cpuUsage, double memoryUsage) {
+        this.appId = appId;
         this.instanceId = instanceId;
         this.instanceName = instanceName;
         this.apdex = NumberUtils.format(Double.valueOf(satisfied) / Double.valueOf(pv));
@@ -28,6 +30,14 @@ public class InstanceVo {
         this.errorRate = NumberUtils.format(Double.valueOf(error) / Double.valueOf(pv));
         this.cpuUsage = cpuUsage;
         this.memoryUsage = memoryUsage;
+    }
+
+    public Long getAppId() {
+        return appId;
+    }
+
+    public void setAppId(Long appId) {
+        this.appId = appId;
     }
 
     public Long getInstanceId() {

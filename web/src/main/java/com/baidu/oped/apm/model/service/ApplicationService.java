@@ -204,7 +204,7 @@ public class ApplicationService {
 
     }
 
-    public List<InstanceVo> packageInstances(Page<Instance> instances, Iterable<InstanceStatistic> instanceStatistics,
+    public List<InstanceVo> packageInstances(long appId, Page<Instance> instances, Iterable<InstanceStatistic> instanceStatistics,
                                              LocalDateTime from, LocalDateTime to) {
 
         com.baidu.oped.apm.mvc.vo.Page page = new com.baidu.oped.apm.mvc.vo.Page();
@@ -276,7 +276,7 @@ public class ApplicationService {
 
         List<InstanceVo> instanceVos = new ArrayList<>();
         for (long instanceId : pvMap.keySet()) {
-            instanceVos.add(new InstanceVo(instanceId, instanceNames.get(instanceId),
+            instanceVos.add(new InstanceVo(appId, instanceId, instanceNames.get(instanceId),
                     pvMap.get(instanceId), apdexMap.get(instanceId), rtMap.get(instanceId),
                     errorMap.get(instanceId), period, cpuMap.get(instanceId) / cpuMap.size(),
                     memMap.get(instanceId) / memMap.size()));
