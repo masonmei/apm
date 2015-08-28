@@ -9,7 +9,7 @@
 // * @author meidongxu@baidu.com
 // */
 //public interface MapStatisticsCallerDao {
-////    LinkDataMap selectCaller(Application callerApplication, Range range);
+////    LinkDataMap selectCaller(ApplicationVo callerApplication, Range range);
 ////
-////    List<LinkDataMap> selectCallerStatistics(Application callerApplication, Application calleeApplication, Range range);
+////    List<LinkDataMap> selectCallerStatistics(ApplicationVo callerApplication, ApplicationVo calleeApplication, Range range);
 //}

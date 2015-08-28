@@ -1,19 +1,31 @@
 
 package com.baidu.oped.apm.mvc.vo;
 
-import com.baidu.oped.apm.common.ServiceType;
+import com.baidu.oped.apm.utils.NumberUtils;
 
 /**
- * class Application 
+ * class ApplicationVo
  *
  * @author meidongxu@baidu.com
  */
-public final class Application {
-    private Long appId;
-    private String appName;
-    private Double responseTime;
-    private Double cpm;
-    private Double errorRate;
+public final class ApplicationVo {
+
+    private Long appId = 0L;
+    private String appName = "";
+    private Double responseTime = 0.0D;
+    private Double cpm = 0.0D;
+    private Double errorRate = 0.0D;
+
+    public ApplicationVo() {
+    }
+
+    public ApplicationVo(long appId, String appName, double allRt, long pv, double error, long period) {
+        this.appId = appId;
+        this.appName = appName;
+        this.responseTime = NumberUtils.format(allRt / Double.valueOf(pv));
+        this.cpm = NumberUtils.format(Double.valueOf(pv) / Double.valueOf(period));
+        this.errorRate = NumberUtils.format(Double.valueOf(error) / Double.valueOf(pv));
+    }
 
     public Long getAppId() {
         return appId;

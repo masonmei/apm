@@ -1,9 +1,14 @@
 package com.baidu.oped.apm.mvc.controller;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-
+import com.baidu.oped.apm.common.jpa.entity.ApplicationStatistic;
+import com.baidu.oped.apm.model.service.OverviewService;
+import com.baidu.oped.apm.mvc.vo.InstanceVo;
+import com.baidu.oped.apm.mvc.vo.TimeRange;
+import com.baidu.oped.apm.mvc.vo.Transaction;
+import com.baidu.oped.apm.mvc.vo.TrendResponse;
+import com.baidu.oped.apm.utils.Constaints;
+import com.baidu.oped.apm.utils.MetricUtils;
+import com.baidu.oped.apm.utils.TimeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.util.Assert;
@@ -12,15 +17,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.baidu.oped.apm.common.jpa.entity.ApplicationStatistic;
-import com.baidu.oped.apm.model.service.OverviewService;
-import com.baidu.oped.apm.mvc.vo.Instance;
-import com.baidu.oped.apm.mvc.vo.TimeRange;
-import com.baidu.oped.apm.mvc.vo.Transaction;
-import com.baidu.oped.apm.mvc.vo.TrendResponse;
-import com.baidu.oped.apm.utils.Constaints;
-import com.baidu.oped.apm.utils.MetricUtils;
-import com.baidu.oped.apm.utils.TimeUtils;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by mason on 8/25/15.
@@ -156,7 +155,7 @@ public class OverviewController {
      * @return
      */
     @RequestMapping(value = {"instances"}, method = RequestMethod.GET)
-    public List<Instance> listInstance(
+    public List<InstanceVo> listInstance(
             @RequestParam(value = "appId") Long appId,
             @RequestParam(value = "from", required = false)
             @DateTimeFormat(pattern = Constaints.TIME_PATTERN) LocalDateTime from,
@@ -167,7 +166,7 @@ public class OverviewController {
     }
 
     /**
-     * Get Instance Response Time trend data
+     * Get InstanceVo Response Time trend data
      *
      * @param appId
      * @param time
@@ -184,7 +183,7 @@ public class OverviewController {
     }
 
     /**
-     * Get Instance Apdex trend data.
+     * Get InstanceVo Apdex trend data.
      *
      * @param appId
      * @param time
@@ -202,7 +201,7 @@ public class OverviewController {
     }
 
     /**
-     * Get Instance count per minute trend data.
+     * Get InstanceVo count per minute trend data.
      *
      * @param appId
      * @param time
@@ -220,7 +219,7 @@ public class OverviewController {
     }
 
     /**
-     * Get Instance Transaction limit top n, ordered by average response time.
+     * Get InstanceVo Transaction limit top n, ordered by average response time.
      *
      * @param appId
      * @param from
