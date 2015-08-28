@@ -5,17 +5,25 @@ import static com.baidu.oped.apm.utils.TimeUtils.toMillSecond;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
+import com.baidu.oped.apm.common.jpa.entity.Application;
 import com.baidu.oped.apm.common.jpa.entity.ApplicationStatistic;
+import com.baidu.oped.apm.common.jpa.entity.Instance;
 import com.baidu.oped.apm.common.jpa.entity.InstanceStatistic;
+import com.baidu.oped.apm.common.jpa.entity.QApplication;
 import com.baidu.oped.apm.common.jpa.entity.QApplicationStatistic;
+import com.baidu.oped.apm.common.jpa.entity.QInstance;
 import com.baidu.oped.apm.common.jpa.entity.QInstanceStatistic;
 import com.baidu.oped.apm.common.jpa.entity.ServiceType;
+import com.baidu.oped.apm.common.jpa.repository.ApplicationRepository;
 import com.baidu.oped.apm.common.jpa.repository.ApplicationStatisticRepository;
+import com.baidu.oped.apm.common.jpa.repository.InstanceRepository;
 import com.baidu.oped.apm.common.jpa.repository.InstanceStatisticRepository;
 import com.baidu.oped.apm.mvc.vo.TimeRange;
 import com.mysema.query.types.expr.BooleanExpression;
@@ -27,7 +35,13 @@ import com.mysema.query.types.expr.BooleanExpression;
 public class OverviewService {
 
     @Autowired
+    private ApplicationRepository applicationRepository;
+
+    @Autowired
     private ApplicationStatisticRepository applicationStatisticRepository;
+
+    @Autowired
+    private InstanceRepository instanceRepository;
 
     @Autowired
     private InstanceStatisticRepository instanceStatisticRepository;
@@ -104,5 +118,35 @@ public class OverviewService {
         });
 
         return result;
+    }
+
+    public Iterable<InstanceStatistic> getExistInstanceStatistics(Iterable<Instance> instances, TimeRange timeRange) {
+        Assert.notNull(instances, "ApplicationId must not be null while retrieving instances of.");
+        Assert.notNull(timeRange, "TimeRange must not be null while retrieving instances of.");
+
+        List<Long> instanceIds = StreamSupport.stream(instances.spliterator(), false)
+                                         .map(instance -> instance.getId())
+                                         .collect(Collectors.toList());
+
+        QInstanceStatistic qInstanceStatistic = QInstanceStatistic.instanceStatistic;
+        BooleanExpression instanceIdCondition = qInstanceStatistic.instanceId.in(instanceIds);
+        BooleanExpression timestampCondition = qInstanceStatistic.timestamp.between(toMillSecond(timeRange.getFrom()),
+                                                                                           toMillSecond(timeRange
+                                                                                                                .getTo()));
+        BooleanExpression whereCondition = instanceIdCondition.and(timestampCondition);
+        return instanceStatisticRepository.findAll(whereCondition);
+    }
+
+    public Iterable<Instance> getApplicationInstances(Long appId) {
+        Assert.notNull(appId, "ApplicationId must not be null while retrieving instances of.");
+        QInstance qInstance = QInstance.instance;
+        BooleanExpression appIdCondition = qInstance.appId.eq(appId);
+        Iterable<Instance> instances = instanceRepository.findAll(appIdCondition);
+        return instances;
+    }
+
+    public Application getApplication(Long appId) {
+        Assert.notNull(appId, "ApplicationId must not be null while retrieving instances of.");
+        return applicationRepository.findOne(appId);
     }
 }

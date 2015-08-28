@@ -3,6 +3,7 @@ package com.baidu.oped.apm.utils;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,5 +63,21 @@ public class TimeUtils {
     public static long toMillSecond(LocalDateTime localDateTime) {
         Assert.notNull(localDateTime, "Cannot convert an null LocalDateTime object to long.");
         return localDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+    }
+
+    public static TimeRange createTimeRange(LocalDateTime from, LocalDateTime to) {
+        if (from == null) {
+            from = LocalDateTime.now();
+        }
+
+        if (to == null) {
+            to = LocalDateTime.now();
+        }
+
+        if (from.compareTo(to) >= 0) {
+            from.minus(1, ChronoUnit.HOURS);
+        }
+
+        return new TimeRange(from, to);
     }
 }

@@ -15,6 +15,9 @@ public class InstanceVo {
     private Double cpuUsage;
     private Double memoryUsage;
 
+    public InstanceVo() {
+    }
+
     public InstanceVo(long instanceId, String instanceName, Long pv, Long satisfied, Double rt,
                       Long error, long period, double cpuUsage, double memoryUsage) {
         this.instanceId = instanceId;

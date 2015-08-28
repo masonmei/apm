@@ -20,15 +20,13 @@ public class InstanceUtils {
         Assert.notNull(application);
         Assert.notNull(appInstances);
         Assert.notNull(instanceStatistics);
-        List<InstanceVo> instances =
-                StreamSupport.stream(appInstances.spliterator(), false)
-                        .map(instance -> {
-                            InstanceVo instanceVo = new InstanceVo();
-                            instanceVo.setInstanceId(instance.getId());
-                            instanceVo.setInstanceName(buildName(instance, application));
-
-                            return instanceVo;
-                        }).collect(Collectors.toList());
+        List<InstanceVo> instances = StreamSupport.stream(appInstances.spliterator(), false)
+                                             .map(instance -> {
+                                                 InstanceVo instanceVo = new InstanceVo();
+                                                 instanceVo.setInstanceId(instance.getId());
+                                                 instanceVo.setInstanceName(buildName(instance, application));
+                                                 return instanceVo;
+                                             }).collect(Collectors.toList());
         return instances;
     }
 
