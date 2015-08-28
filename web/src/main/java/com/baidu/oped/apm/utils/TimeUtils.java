@@ -1,6 +1,7 @@
 package com.baidu.oped.apm.utils;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +17,7 @@ import com.baidu.oped.apm.mvc.vo.TimeRange;
 public class TimeUtils {
     private static final String TIME_RANGE_ELEMENT_SPLITER = "|";
 
-    public static List<TimeRange> convertToRange(String... stringRanges){
+    public static List<TimeRange> convertToRange(String... stringRanges) {
         List<TimeRange> timeRanges = new ArrayList<>();
         for (String stringRange : stringRanges) {
             TimeRange timeRange = convertToRange(stringRange);
@@ -54,7 +55,12 @@ public class TimeUtils {
         return LocalDateTime.parse(stringTime, DateTimeFormatter.ofPattern(Constaints.TIME_PATTERN));
     }
 
-    public static String writeToString(LocalDateTime localDateTime){
+    public static String writeToString(LocalDateTime localDateTime) {
         return localDateTime.format(DateTimeFormatter.ofPattern(Constaints.TIME_PATTERN));
+    }
+
+    public static long toMillSecond(LocalDateTime localDateTime) {
+        Assert.notNull(localDateTime, "Cannot convert an null LocalDateTime object to long.");
+        return localDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
     }
 }

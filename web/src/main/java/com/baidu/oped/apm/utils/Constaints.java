@@ -5,9 +5,12 @@ package com.baidu.oped.apm.utils;
  */
 public class Constaints {
     public static final String TIME_PATTERN = "yyyy-MM-dd'T'HH:mm:ss";
+    public static final Double PERIOD_TO_MINUTE_FACTOR = 1.0 / 60;
 
     public enum MetricName {
         RESPONSE_TIME("responseTime", "", ""),
+        PV("pv", "", ""),
+        ERROR("error", "", ""),
         CPM("cpm", "", ""),
         ERROR_RATE("errorRate", "", ""),
         APDEX("apdex", "", ""),

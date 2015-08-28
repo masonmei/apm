@@ -4,6 +4,10 @@ package com.baidu.oped.apm.utils;
  * Created by mason on 8/13/15.
  */
 public class ApdexUtils {
+    public static Double calculateApdex(Long satisfied, Long tolerated, Long frustrated) {
+        return null;
+    }
+
     public enum Level {
         SATISFIED,
         TOLERATED,
