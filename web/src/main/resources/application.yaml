@@ -1,6 +1,6 @@
 server:
   port: 8888
-  context-path: api/apm
+  context-path: /api/apm
 spring:
   application:
     name: web
