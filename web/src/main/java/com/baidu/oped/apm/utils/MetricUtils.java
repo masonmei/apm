@@ -10,11 +10,13 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import com.baidu.oped.apm.common.jpa.entity.ApplicationStatistic;
 import com.baidu.oped.apm.common.jpa.entity.InstanceStatistic;
 import com.baidu.oped.apm.common.jpa.entity.ServiceType;
+import com.baidu.oped.apm.common.jpa.entity.TransactionStatistic;
 import com.baidu.oped.apm.mvc.vo.DataPoint;
 import com.baidu.oped.apm.mvc.vo.Metric;
 import com.baidu.oped.apm.mvc.vo.MetricData;
@@ -126,6 +128,117 @@ public class MetricUtils {
 
         trendResponse.setValues(values);
         return trendResponse;
+    }
+
+    /**
+     * Convert instance metric to standard output.
+     *
+     * @param metricDatas
+     * @param metricNames
+     *
+     * @param serviceType
+     * @return
+     */
+    public static TrendResponse transactionMetricToTrendResponse(Map<TimeRange, Iterable<TransactionStatistic>> metricDatas,
+                                                                 Constaints.MetricName[] metricNames,
+                                                                 ServiceType serviceTypes) {
+        Assert.notNull(metricNames, "MetricNames must not be null while convert to trendResponse.");
+        Assert.notNull(metricDatas, "MetricData must not be null while convert to trendResponse.");
+
+        TrendResponse trendResponse = new TrendResponse();
+        List<Metric> metrics = new ArrayList<>();
+        for (Constaints.MetricName metricName : metricNames) {
+            Metric metric = new Metric();
+            metric.setDescription(metricName.getDescription());
+            metric.setName(metricName.getFieldName());
+            metric.setUnit(metricName.getUnit());
+            metrics.add(metric);
+        }
+        trendResponse.setMetrics(metrics);
+
+        List<MetricData> values = new ArrayList<>();
+
+        for (Map.Entry<TimeRange, Iterable<TransactionStatistic>> entry : metricDatas.entrySet()) {
+            Iterable<TransactionStatistic> multiServiceTypeStatistics = entry.getValue();
+            Map<ServiceType, List<TransactionStatistic>> splitMap =
+                    splitStatisticsStatisticsByServiceType(multiServiceTypeStatistics, serviceTypes);
+
+            for (ServiceType serviceType : splitMap.keySet()) {
+                MetricData metricData = new MetricData();
+                metricData.setTime(entry.getKey().toString());
+                metricData.setLegend(serviceType.getDescription());
+                List<DataPoint> dataPoints = splitMap.get(serviceType).stream().map(instanceStatistic -> {
+                    DataPoint dataPoint = new DataPoint();
+                    dataPoint.setTimestamp(instanceStatistic.getTimestamp());
+                    dataPoint.setItems(readValuesFromTransactionStatistics(instanceStatistic, metricNames));
+                    return dataPoint;
+                }).sorted(Comparator.comparingLong(DataPoint::getTimestamp).reversed()).collect(Collectors.toList());
+                metricData.setData(dataPoints);
+
+                values.add(metricData);
+            }
+
+        }
+
+        trendResponse.setValues(values);
+        return trendResponse;
+    }
+
+    private static List<Double> readValuesFromTransactionStatistics(TransactionStatistic instanceStatistic,
+                                                                    Constaints.MetricName[] metricNames) {
+        Assert.notNull(instanceStatistic, "Cannot read values from a null ApplicationStatistics Object.");
+        Assert.notNull(metricNames, "MetricNames must not be null for read value from ApplicationStatistics.");
+
+        List<Double> values = new ArrayList<>(metricNames.length);
+
+        for (Constaints.MetricName name : metricNames) {
+            Double value;
+            switch (name) {
+                case RESPONSE_TIME:
+                    value = format(instanceStatistic.getMinResponseTime());
+                    break;
+                case PV:
+                    value = format(instanceStatistic.getPv());
+                    break;
+                case ERROR:
+                    value = format(instanceStatistic.getError());
+                    break;
+                case CPM:
+                    Double original = calculateCpm(instanceStatistic.getPv(), instanceStatistic.getPeriod());
+                    value = format(original);
+                    break;
+                case ERROR_RATE:
+                    value = format(calculateRate(instanceStatistic.getError(), instanceStatistic.getPv()));
+                    break;
+                case APDEX:
+                    value = format(ApdexUtils.calculateApdex(instanceStatistic.getSatisfied(),
+                                                                    instanceStatistic.getTolerated(),
+                                                                    instanceStatistic.getFrustrated()));
+                    break;
+                case SATISFIED:
+                    value = format(instanceStatistic.getSatisfied());
+                    break;
+                case TOLERATED:
+                    value = format(instanceStatistic.getTolerated());
+                    break;
+                case FRUSTRATED:
+                    value = format(instanceStatistic.getFrustrated());
+                    break;
+                case MAX_RESPONSE_TIME:
+                    value = format(instanceStatistic.getMaxResponseTime());
+                    break;
+                case MIN_RESPONSE_TIME:
+                    value = format(instanceStatistic.getMinResponseTime());
+                    break;
+                case CPU_USAGE:
+                case MEMORY_USAGE:
+                default:
+                    throw new IllegalArgumentException("Unsupported metric");
+            }
+            values.add(value);
+        }
+
+        return values;
     }
 
     private static List<Double> readValuesFromInstanceStatistics(InstanceStatistic instanceStatistic,
@@ -329,4 +442,25 @@ public class MetricUtils {
         });
         return splitMap;
     }
+
+    /**
+     *  Split a set of TransactionStatistic group by ServiceType.
+     *
+     * @param statistics
+     * @param serviceType
+     * @return
+     */
+    private static Map<ServiceType, List<TransactionStatistic>> splitStatisticsStatisticsByServiceType(
+            Iterable<TransactionStatistic> statistics, ServiceType serviceType) {
+        Assert.notNull(statistics, "Cannot split a null iterable to map by serviceType");
+        Map<ServiceType, List<TransactionStatistic>> splitMap = new HashMap<>();
+        StreamSupport.stream(statistics.spliterator(), false).forEach(applicationStatistic -> {
+            if (splitMap.get(serviceType) == null) {
+                splitMap.put(serviceType, new ArrayList<>());
+            }
+            splitMap.get(serviceType).add(applicationStatistic);
+        });
+        return splitMap;
+    }
+
 }
