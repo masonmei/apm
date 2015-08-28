@@ -5,6 +5,10 @@ package com.baidu.oped.apm.utils;
  */
 public class Constaints {
     public static final String TIME_PATTERN = "yyyy-MM-dd'T'HH:mm:ss";
+    public static final String PAGE_SIZE = "20";
+    public static final String PAGE_NUMBER = "1";
+    public static final String DEFAULT_BOOL = "false";
+    public static final String DEFAULT_USER = "testuser";
 
     public enum MetricName {
         RESPONSE_TIME("responseTime", "", ""),
