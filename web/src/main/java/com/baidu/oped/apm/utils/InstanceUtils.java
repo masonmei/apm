@@ -27,7 +27,14 @@ public class InstanceUtils {
                                                  instanceVo.setInstanceName(buildName(instance, application));
                                                  return instanceVo;
                                              }).collect(Collectors.toList());
+        calculateMetricData(instances, instanceStatistics);
         return instances;
+    }
+
+    //TODO calculateMetricData
+    private static void calculateMetricData(List<InstanceVo> instances,
+                                            Iterable<InstanceStatistic> instanceStatistics) {
+
     }
 
     private static String buildName(Instance instance, Application application) {

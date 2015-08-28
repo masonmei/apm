@@ -193,6 +193,7 @@ public class OverviewController {
                       LocalDateTime from,
                       @RequestParam(value = "to", required = false) @DateTimeFormat(pattern = Constaints.TIME_PATTERN)
                       LocalDateTime to) {
+        //TODO: to be implemented
         throw new UnsupportedOperationException("not supported yet!");
     }
 
@@ -229,10 +230,10 @@ public class OverviewController {
      * @param period
      */
     @RequestMapping(value = {"instances/trend/rt"}, method = RequestMethod.GET)
-    public TrendResponse instnceResponseTime(@RequestParam(value = "appId") Long appId,
-                                             @RequestParam(value = "instanceId") Long instanceId,
-                                             @RequestParam(value = "time") String[] time,
-                                             @RequestParam(value = "period") Integer period) {
+    public TrendResponse instanceResponseTime(@RequestParam(value = "appId") Long appId,
+                                              @RequestParam(value = "instanceId") Long instanceId,
+                                              @RequestParam(value = "time") String[] time,
+                                              @RequestParam(value = "period") Integer period) {
         Assert.notNull(appId, "ApplicationId must not be null while retrieve application response time trend data.");
         Assert.notNull(instanceId, "InstanceId must not be null while retrieve application response time trend data.");
         Assert.notEmpty(time, "Time ranges must not be null while retrieve application response time trend data.");
@@ -333,7 +334,7 @@ public class OverviewController {
                                                  @RequestParam(value = "to", required = false)
                                                  @DateTimeFormat(pattern = Constaints.TIME_PATTERN) LocalDateTime to,
                                                  @RequestParam(value = "limit") Integer limit) {
-
+        //TODO: to be implemented
         return null;
     }
 
@@ -381,6 +382,7 @@ public class OverviewController {
                               @DateTimeFormat(pattern = Constaints.TIME_PATTERN) LocalDateTime from,
                               @RequestParam(value = "to", required = false)
                               @DateTimeFormat(pattern = Constaints.TIME_PATTERN) LocalDateTime to) {
+        //TODO: to be implemented
         throw new UnsupportedOperationException("not supported yet!");
     }
 
