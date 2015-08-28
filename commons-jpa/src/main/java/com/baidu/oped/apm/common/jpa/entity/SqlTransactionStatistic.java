@@ -29,16 +29,12 @@ public class SqlTransactionStatistic extends AbstractPersistable<Long> {
     private Double responseTime;
 
     @Basic
-    @Column(name = "cpm", nullable = true, insertable = true, updatable = true, precision = 4)
-    private Double cpm;
+    @Column(name = "pv", nullable = true, insertable = true, updatable = true)
+    private Long pv;
 
     @Basic
-    @Column(name = "error_rate", nullable = true, insertable = true, updatable = true, precision = 4)
-    private Double errorRate;
-
-    @Basic
-    @Column(name = "apdex", nullable = true, insertable = true, updatable = true, precision = 4)
-    private Double apdex;
+    @Column(name = "error", nullable = true, insertable = true, updatable = true)
+    private Long error;
 
     @Basic
     @Column(name = "satisfied", nullable = true, insertable = true, updatable = true)
@@ -92,28 +88,20 @@ public class SqlTransactionStatistic extends AbstractPersistable<Long> {
         this.responseTime = responseTime;
     }
 
-    public Double getCpm() {
-        return cpm;
+    public Long getPv() {
+        return pv;
     }
 
-    public void setCpm(Double cpm) {
-        this.cpm = cpm;
+    public void setPv(Long pv) {
+        this.pv = pv;
     }
 
-    public Double getErrorRate() {
-        return errorRate;
+    public Long getError() {
+        return error;
     }
 
-    public void setErrorRate(Double errorRate) {
-        this.errorRate = errorRate;
-    }
-
-    public Double getApdex() {
-        return apdex;
-    }
-
-    public void setApdex(Double apdex) {
-        this.apdex = apdex;
+    public void setError(Long error) {
+        this.error = error;
     }
 
     public Long getSatisfied() {

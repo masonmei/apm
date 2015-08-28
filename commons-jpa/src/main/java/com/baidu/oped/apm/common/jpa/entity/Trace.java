@@ -1,13 +1,10 @@
 package com.baidu.oped.apm.common.jpa.entity;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.springframework.data.jpa.domain.AbstractPersistable;
@@ -87,8 +84,6 @@ public class Trace extends AbstractPersistable<Long> implements Serializable {
     @Basic
     @Column(name = "version", nullable = false, insertable = true, updatable = true)
     private int version;
-
-
 
     public Trace() {
     }
@@ -193,10 +188,6 @@ public class Trace extends AbstractPersistable<Long> implements Serializable {
         return this.hasException;
     }
 
-    public void setHasException(boolean hasException) {
-        this.hasException = hasException;
-    }
-
     public long getParentSpanId() {
         return this.parentSpanId;
     }
@@ -279,5 +270,9 @@ public class Trace extends AbstractPersistable<Long> implements Serializable {
 
     public boolean isHasException() {
         return hasException;
+    }
+
+    public void setHasException(boolean hasException) {
+        this.hasException = hasException;
     }
 }
