@@ -3,6 +3,8 @@ package com.baidu.oped.apm.common.jpa.entity;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Index;
+import javax.persistence.Table;
 
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
@@ -10,8 +12,10 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
  * Created by mason on 8/27/15.
  */
 @Entity
-@javax.persistence.Table(name = "apm_transaction_statistic")
-public class TransactionStatistic extends AbstractPersistable<Long> {
+@Table(name = "apm_transaction_statistic", indexes = {
+        @Index(name = "web_tran_statistic_point_unique", columnList = "transaction_id,period,timestamp", unique = true)
+})
+public class WebTransactionStatistic extends AbstractPersistable<Long> implements BaseStatistic {
 
     @Basic
     @Column(name = "transaction_id", nullable = false, insertable = true, updatable = true)
@@ -26,8 +30,8 @@ public class TransactionStatistic extends AbstractPersistable<Long> {
     private Long timestamp;
 
     @Basic
-    @Column(name = "response_time", nullable = true, insertable = true, updatable = true, precision = 4)
-    private Double responseTime;
+    @Column(name = "sum_response_time", nullable = true, insertable = true, updatable = true, precision = 4)
+    private Double sumResponseTime;
 
     @Basic
     @Column(name = "pv", nullable = true, insertable = true, updatable = true)
@@ -65,6 +69,7 @@ public class TransactionStatistic extends AbstractPersistable<Long> {
         this.transactionId = transactionId;
     }
 
+    @Override
     public Integer getPeriod() {
         return period;
     }
@@ -73,6 +78,7 @@ public class TransactionStatistic extends AbstractPersistable<Long> {
         this.period = period;
     }
 
+    @Override
     public Long getTimestamp() {
         return timestamp;
     }
@@ -81,14 +87,16 @@ public class TransactionStatistic extends AbstractPersistable<Long> {
         this.timestamp = timestamp;
     }
 
-    public Double getResponseTime() {
-        return responseTime;
+    @Override
+    public Double getSumResponseTime() {
+        return sumResponseTime;
     }
 
-    public void setResponseTime(Double responseTime) {
-        this.responseTime = responseTime;
+    public void setSumResponseTime(Double sumResponseTime) {
+        this.sumResponseTime = sumResponseTime;
     }
 
+    @Override
     public Long getPv() {
         return pv;
     }
@@ -97,6 +105,7 @@ public class TransactionStatistic extends AbstractPersistable<Long> {
         this.pv = pv;
     }
 
+    @Override
     public Long getError() {
         return error;
     }
@@ -105,6 +114,7 @@ public class TransactionStatistic extends AbstractPersistable<Long> {
         this.error = error;
     }
 
+    @Override
     public Long getSatisfied() {
         return satisfied;
     }
@@ -113,6 +123,7 @@ public class TransactionStatistic extends AbstractPersistable<Long> {
         this.satisfied = satisfied;
     }
 
+    @Override
     public Long getTolerated() {
         return tolerated;
     }
@@ -121,6 +132,7 @@ public class TransactionStatistic extends AbstractPersistable<Long> {
         this.tolerated = tolerated;
     }
 
+    @Override
     public Long getFrustrated() {
         return frustrated;
     }
@@ -129,6 +141,7 @@ public class TransactionStatistic extends AbstractPersistable<Long> {
         this.frustrated = frustrated;
     }
 
+    @Override
     public Double getMaxResponseTime() {
         return maxResponseTime;
     }
@@ -137,6 +150,7 @@ public class TransactionStatistic extends AbstractPersistable<Long> {
         this.maxResponseTime = maxResponseTime;
     }
 
+    @Override
     public Double getMinResponseTime() {
         return minResponseTime;
     }

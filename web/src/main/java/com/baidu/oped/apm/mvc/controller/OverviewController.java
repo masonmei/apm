@@ -131,7 +131,7 @@ public class OverviewController {
     }
 
     /**
-     * Get Application Transaction limit top n, ordered by average response time.
+     * Get Application WebTransaction limit top n, ordered by average response time.
      *
      * @param appId
      * @param from
@@ -317,7 +317,7 @@ public class OverviewController {
     }
 
     /**
-     * Get InstanceVo Transaction limit top n, ordered by average response time.
+     * Get InstanceVo WebTransaction limit top n, ordered by average response time.
      *
      * @param appId
      * @param from

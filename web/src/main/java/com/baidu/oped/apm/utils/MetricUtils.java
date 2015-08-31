@@ -10,13 +10,12 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import com.baidu.oped.apm.common.jpa.entity.ApplicationStatistic;
 import com.baidu.oped.apm.common.jpa.entity.InstanceStatistic;
 import com.baidu.oped.apm.common.jpa.entity.ServiceType;
-import com.baidu.oped.apm.common.jpa.entity.TransactionStatistic;
+import com.baidu.oped.apm.common.jpa.entity.WebTransactionStatistic;
 import com.baidu.oped.apm.mvc.vo.DataPoint;
 import com.baidu.oped.apm.mvc.vo.Metric;
 import com.baidu.oped.apm.mvc.vo.MetricData;
@@ -139,7 +138,7 @@ public class MetricUtils {
      * @param serviceType
      * @return
      */
-    public static TrendResponse transactionMetricToTrendResponse(Map<TimeRange, Iterable<TransactionStatistic>> metricDatas,
+    public static TrendResponse transactionMetricToTrendResponse(Map<TimeRange, Iterable<WebTransactionStatistic>> metricDatas,
                                                                  Constaints.MetricName[] metricNames,
                                                                  ServiceType serviceTypes) {
         Assert.notNull(metricNames, "MetricNames must not be null while convert to trendResponse.");
@@ -158,9 +157,9 @@ public class MetricUtils {
 
         List<MetricData> values = new ArrayList<>();
 
-        for (Map.Entry<TimeRange, Iterable<TransactionStatistic>> entry : metricDatas.entrySet()) {
-            Iterable<TransactionStatistic> multiServiceTypeStatistics = entry.getValue();
-            Map<ServiceType, List<TransactionStatistic>> splitMap =
+        for (Map.Entry<TimeRange, Iterable<WebTransactionStatistic>> entry : metricDatas.entrySet()) {
+            Iterable<WebTransactionStatistic> multiServiceTypeStatistics = entry.getValue();
+            Map<ServiceType, List<WebTransactionStatistic>> splitMap =
                     splitStatisticsStatisticsByServiceType(multiServiceTypeStatistics, serviceTypes);
 
             for (ServiceType serviceType : splitMap.keySet()) {
@@ -184,7 +183,7 @@ public class MetricUtils {
         return trendResponse;
     }
 
-    private static List<Double> readValuesFromTransactionStatistics(TransactionStatistic instanceStatistic,
+    private static List<Double> readValuesFromTransactionStatistics(WebTransactionStatistic instanceStatistic,
                                                                     Constaints.MetricName[] metricNames) {
         Assert.notNull(instanceStatistic, "Cannot read values from a null ApplicationStatistics Object.");
         Assert.notNull(metricNames, "MetricNames must not be null for read value from ApplicationStatistics.");
@@ -444,16 +443,16 @@ public class MetricUtils {
     }
 
     /**
-     *  Split a set of TransactionStatistic group by ServiceType.
+     *  Split a set of WebTransactionStatistic group by ServiceType.
      *
      * @param statistics
      * @param serviceType
      * @return
      */
-    private static Map<ServiceType, List<TransactionStatistic>> splitStatisticsStatisticsByServiceType(
-            Iterable<TransactionStatistic> statistics, ServiceType serviceType) {
+    private static Map<ServiceType, List<WebTransactionStatistic>> splitStatisticsStatisticsByServiceType(
+            Iterable<WebTransactionStatistic> statistics, ServiceType serviceType) {
         Assert.notNull(statistics, "Cannot split a null iterable to map by serviceType");
-        Map<ServiceType, List<TransactionStatistic>> splitMap = new HashMap<>();
+        Map<ServiceType, List<WebTransactionStatistic>> splitMap = new HashMap<>();
         StreamSupport.stream(statistics.spliterator(), false).forEach(applicationStatistic -> {
             if (splitMap.get(serviceType) == null) {
                 splitMap.put(serviceType, new ArrayList<>());

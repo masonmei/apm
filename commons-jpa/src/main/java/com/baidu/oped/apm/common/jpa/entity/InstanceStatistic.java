@@ -1,12 +1,10 @@
 package com.baidu.oped.apm.common.jpa.entity;
 
-import java.io.Serializable;
-
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
+import javax.persistence.Index;
+import javax.persistence.Table;
 
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
@@ -14,11 +12,13 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
  * Created by mason on 8/27/15.
  */
 @Entity
-@javax.persistence.Table(name = "apm_instance_statistic", schema = "", catalog = "apm")
-public class InstanceStatistic extends AbstractPersistable<Long> implements Serializable {
+@Table(name = "apm_instance_statistic", schema = "", catalog = "apm", indexes = {
+        @Index(name = "instance_statistic_point_unique", columnList = "instance_id,period,timestamp", unique = true)
+})
+public class InstanceStatistic extends AbstractPersistable<Long> implements BaseStatistic, HostStatistic {
 
     @Basic
-    @javax.persistence.Column(name = "instance_id", nullable = false, insertable = true, updatable = true)
+    @Column(name = "instance_id", nullable = false, insertable = true, updatable = true)
     private Long instanceId;
 
     @Basic
@@ -26,17 +26,20 @@ public class InstanceStatistic extends AbstractPersistable<Long> implements Seri
     private Integer period;
 
     @Basic
-    @Column(name = "service_type", nullable = false, insertable = true, updatable = false)
-    @Enumerated(EnumType.STRING)
-    private ServiceType serviceType;
-
-    @Basic
     @Column(name = "timestamp", nullable = false, insertable = true, updatable = true)
     private Long timestamp;
 
     @Basic
-    @Column(name = "response_time", nullable = true, insertable = true, updatable = true, precision = 4)
-    private Double responseTime;
+    @Column(name = "sum_response_time", nullable = true, insertable = true, updatable = true, precision = 4)
+    private Double sumResponseTime;
+
+    @Basic
+    @Column(name = "max_response_time", nullable = true, insertable = true, updatable = true, precision = 4)
+    private Double maxResponseTime;
+
+    @Basic
+    @Column(name = "min_response_time", nullable = true, insertable = true, updatable = true, precision = 4)
+    private Double minResponseTime;
 
     @Basic
     @Column(name = "pv", nullable = true, insertable = true, updatable = true)
@@ -57,14 +60,6 @@ public class InstanceStatistic extends AbstractPersistable<Long> implements Seri
     @Basic
     @Column(name = "frustrated", nullable = true, insertable = true, updatable = true)
     private Long frustrated;
-
-    @Basic
-    @Column(name = "max_response_time", nullable = true, insertable = true, updatable = true, precision = 4)
-    private Double maxResponseTime;
-
-    @Basic
-    @Column(name = "min_response_time", nullable = true, insertable = true, updatable = true, precision = 4)
-    private Double minResponseTime;
 
     @Basic
     @Column(name = "cpu_usage", nullable = true, insertable = true, updatable = true, precision = 4)
@@ -90,14 +85,6 @@ public class InstanceStatistic extends AbstractPersistable<Long> implements Seri
         this.period = period;
     }
 
-    public ServiceType getServiceType() {
-        return serviceType;
-    }
-
-    public void setServiceType(ServiceType serviceType) {
-        this.serviceType = serviceType;
-    }
-
     public Long getTimestamp() {
         return timestamp;
     }
@@ -106,12 +93,28 @@ public class InstanceStatistic extends AbstractPersistable<Long> implements Seri
         this.timestamp = timestamp;
     }
 
-    public Double getResponseTime() {
-        return responseTime;
+    public Double getSumResponseTime() {
+        return sumResponseTime;
     }
 
-    public void setResponseTime(Double responseTime) {
-        this.responseTime = responseTime;
+    public void setSumResponseTime(Double sumResponseTime) {
+        this.sumResponseTime = sumResponseTime;
+    }
+
+    public Double getMaxResponseTime() {
+        return maxResponseTime;
+    }
+
+    public void setMaxResponseTime(Double maxResponseTime) {
+        this.maxResponseTime = maxResponseTime;
+    }
+
+    public Double getMinResponseTime() {
+        return minResponseTime;
+    }
+
+    public void setMinResponseTime(Double minResponseTime) {
+        this.minResponseTime = minResponseTime;
     }
 
     public Long getPv() {
@@ -152,22 +155,6 @@ public class InstanceStatistic extends AbstractPersistable<Long> implements Seri
 
     public void setFrustrated(Long frustrated) {
         this.frustrated = frustrated;
-    }
-
-    public Double getMaxResponseTime() {
-        return maxResponseTime;
-    }
-
-    public void setMaxResponseTime(Double maxResponseTime) {
-        this.maxResponseTime = maxResponseTime;
-    }
-
-    public Double getMinResponseTime() {
-        return minResponseTime;
-    }
-
-    public void setMinResponseTime(Double minResponseTime) {
-        this.minResponseTime = minResponseTime;
     }
 
     public Double getCpuUsage() {

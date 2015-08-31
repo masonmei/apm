@@ -30,6 +30,8 @@
         <module>testapp</module>
         <module>collector</module>
         <module>web</module>
+        <module>statistics</module>
+        <module>test</module>
     </modules>
 
     <properties>

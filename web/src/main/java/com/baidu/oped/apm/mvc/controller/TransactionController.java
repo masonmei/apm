@@ -20,17 +20,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.baidu.oped.apm.common.jpa.entity.ApplicationStatistic;
-import com.baidu.oped.apm.common.jpa.entity.InstanceStatistic;
 import com.baidu.oped.apm.common.jpa.entity.ServiceType;
-import com.baidu.oped.apm.common.jpa.entity.TransactionStatistic;
+import com.baidu.oped.apm.common.jpa.entity.WebTransactionStatistic;
 import com.baidu.oped.apm.model.service.TransactionService;
 import com.baidu.oped.apm.mvc.vo.TimeRange;
 import com.baidu.oped.apm.mvc.vo.Transaction;
 import com.baidu.oped.apm.mvc.vo.TrendResponse;
 import com.baidu.oped.apm.utils.Constaints;
 import com.baidu.oped.apm.utils.MetricUtils;
-import com.baidu.oped.apm.utils.PageUtils;
 import com.baidu.oped.apm.utils.TimeUtils;
 
 /**
@@ -89,7 +86,7 @@ public class TransactionController {
         final ServiceType serviceType = ServiceType.WEB;
         List<TimeRange> timeRanges = TimeUtils.convertToRange(time);
 
-        Map<TimeRange, Iterable<TransactionStatistic>> applicationMetricData =
+        Map<TimeRange, Iterable<WebTransactionStatistic>> applicationMetricData =
                 transactionService.getApplicationLevelTransactionMetricData(appId, timeRanges, period);
 
         return MetricUtils.transactionMetricToTrendResponse(applicationMetricData, metricName, serviceType);
@@ -116,7 +113,7 @@ public class TransactionController {
         final ServiceType serviceType = ServiceType.WEB;
         List<TimeRange> timeRanges = TimeUtils.convertToRange(time);
 
-        Map<TimeRange, Iterable<TransactionStatistic>> instanceMetricData =
+        Map<TimeRange, Iterable<WebTransactionStatistic>> instanceMetricData =
                 transactionService.getApplicationLevelTransactionMetricData(appId, timeRanges, period);
 
         return MetricUtils.transactionMetricToTrendResponse(instanceMetricData, metricName, serviceType);
@@ -195,7 +192,7 @@ public class TransactionController {
         final ServiceType serviceType = ServiceType.WEB;
         List<TimeRange> timeRanges = TimeUtils.convertToRange(time);
 
-        Map<TimeRange, Iterable<TransactionStatistic>> instanceMetricData =
+        Map<TimeRange, Iterable<WebTransactionStatistic>> instanceMetricData =
                 transactionService.getInstanceLevelTransactionMetricData(instanceId, timeRanges, period);
 
         return MetricUtils.transactionMetricToTrendResponse(instanceMetricData, metricName, serviceType);
@@ -227,7 +224,7 @@ public class TransactionController {
         final ServiceType serviceType = ServiceType.WEB;
         List<TimeRange> timeRanges = TimeUtils.convertToRange(time);
 
-        Map<TimeRange, Iterable<TransactionStatistic>> instanceMetricData =
+        Map<TimeRange, Iterable<WebTransactionStatistic>> instanceMetricData =
                 transactionService.getInstanceLevelTransactionMetricData(instanceId, timeRanges, period);
 
         return MetricUtils.transactionMetricToTrendResponse(instanceMetricData, metricName, serviceType);

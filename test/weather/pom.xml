@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <description>The web service url is: http://wsf.cdyne.com/WeatherWS/Weather.asmx?WSDL</description>
+
+    <artifactId>weather</artifactId>
+    <groupId>com.baidu.oped.apm.test.weather</groupId>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>1.2.5.RELEASE</version>
+    </parent>
+
+    <properties>
+        <eclipselink.version>2.4.0</eclipselink.version>
+        <derby.version>10.9.1.0</derby.version>
+        <cxf.version>3.1.1</cxf.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-autoconfigure</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+        </dependency>
+    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.springframework</groupId>
+                        <artifactId>springloaded</artifactId>
+                        <version>1.2.3.RELEASE</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <!--<jvmArguments>-->
+                        <!--&#45;&#45;javaagent:${project.basedir}/../../agent/java-agent/target/pinpoint-agent/bootstrap-1.1.0.jar-->
+                        <!--&#45;&#45;Dpinpoint.agentId=${pom.build.finalName} -Dpinpoint.applicationName=weather-->
+                    <!--</jvmArguments>-->
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.cxf</groupId>
+                <artifactId>cxf-codegen-plugin</artifactId>
+                <version>${cxf.version}</version>
+                <executions>
+                    <execution>
+                        <id>generate-sources</id>
+                        <phase>generate-sources</phase>
+                        <configuration>
+                            <sourceRoot>${project.build.directory}/generated/cxf</sourceRoot>
+                            <wsdlOptions>
+                                <wsdlOption>
+                                    <wsdl>http://wsf.cdyne.com/WeatherWS/Weather.asmx?WSDL</wsdl>
+                                </wsdlOption>
+                            </wsdlOptions>
+                        </configuration>
+                        <goals>
+                            <goal>wsdl2java</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!--<plugin>-->
+                <!--<groupId>org.codehaus.mojo</groupId>-->
+                <!--<artifactId>exec-maven-plugin</artifactId>-->
+                <!--<executions>-->
+                    <!--<execution>-->
+                        <!--<phase>test</phase>-->
+                        <!--<goals>-->
+                            <!--<goal>java</goal>-->
+                        <!--</goals>-->
+                    <!--</execution>-->
+                <!--</executions>-->
+                <!--<configuration>-->
+                    <!--<includeProjectDependencies>false</includeProjectDependencies>-->
+                    <!--<includePluginDependencies>true</includePluginDependencies>-->
+                    <!--<executableDependency>-->
+                        <!--<groupId>org.hsqldb</groupId>-->
+                        <!--<artifactId>hsqldb</artifactId>-->
+                    <!--</executableDependency>-->
+                    <!--<mainClass>org.hsqldb.server.Server</mainClass>-->
+                    <!--<arguments>-->
+                        <!--<argument>-database.0</argument>-->
+                        <!--<argument>file:db/mydatabase</argument>-->
+                    <!--</arguments>-->
+                <!--</configuration>-->
+            <!--</plugin>-->
+        </plugins>
+    </build>
+
+</project>

@@ -1,0 +1,43 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: none
+    generate-ddl: false
+    show-sql: false
+    data:
+      repositories:
+        enabled: true
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/apm?autoReconnect=true&useUnicode=true&characterEncoding=utf-8
+    username: root
+    password: root
+    driverClassName: com.mysql.jdbc.Driver
+    max-active: 100
+    min-idle: 8
+    max-idle: 8
+    validation-query: select 1
+    test-on-borrow: true
+  #Disable so that spring-boot will not start the job automatically, jobs are started via @Scheduled instead
+  batch:
+    job:
+      enabled: false
+apm:
+  statistics:
+    webTransaction:
+      fixedDelay: 60000
+      initialDelay: 10000
+    externalTransaction:
+      fixedDelay: 60000
+      initialDelay: 20000
+    sqlTransaction:
+      fixedDelay: 60000
+      initialDelay: 30000
+    dbTransaction:
+      fixedDelay: 60000
+      initialDelay: 40000
+    application:
+      fixedDelay: 60000
+      initialDelay: 50000
+    instance:
+      fixedDelay: 60000
+      initialDelay: 60000

@@ -11,8 +11,8 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
  * Created by mason on 8/27/15.
  */
 @Entity
-@Table(name = "apm_transaction")
-public class Transaction extends AbstractPersistable<Long> {
+@Table(name = "apm_web_transaction")
+public class WebTransaction extends AbstractPersistable<Long> {
 
     @Basic
     @Column(name = "app_id", nullable = false, insertable = true, updatable = true)
