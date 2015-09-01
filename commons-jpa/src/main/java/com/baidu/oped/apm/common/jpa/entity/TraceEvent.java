@@ -17,22 +17,28 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 public class TraceEvent extends AbstractPersistable<Long> implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    @Column(name = "agent_id", nullable = false, length = 128)
-    private String agentId;
+    @Basic
+    @Column(name = "app_id", nullable = false, insertable = true, updatable = true)
+    private Long appId;
 
-    @Column(name = "agent_start_time", nullable = false)
-    private long agentStartTime;
+    @Basic
+    @Column(name = "instance_id", nullable = false, insertable = true, updatable = true)
+    private Long instanceId;
 
-    @Column(name = "api_id")
-    private int apiId;
+    @Column(name = "trace_id", nullable = false, insertable = true, updatable = true)
+    private Long traceId;
 
-    @Column(name = "application_id", nullable = false, length = 128)
-    private String applicationId;
+    private short sequence;
+
+    // api meta data unique id
+    @Basic
+    @Column(name = "api_id", nullable = false, insertable = true, updatable = true)
+    private Long apiId;
 
     @Column(name = "collector_accept_time")
     private long collectorAcceptTime;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private int depth;
 
     @Column(name = "destination_id", length = 512)
@@ -56,19 +62,15 @@ public class TraceEvent extends AbstractPersistable<Long> implements Serializabl
     @Column(name = "has_exception")
     private boolean hasException;
 
-    @Column(name = "next_span_id", nullable = false)
+    @Column(name = "next_span_id", nullable = true)
     private long nextSpanId;
 
     @Column(length = 512)
     private String rpc;
 
-    private short sequence;
-
     @Column(name = "service_type")
     private int serviceType;
 
-    @Column(name = "trace_id")
-    private long traceId;
 
     @Column(name = "start_elapsed")
     private int startElapsed;
@@ -83,42 +85,42 @@ public class TraceEvent extends AbstractPersistable<Long> implements Serializabl
     private long traceTransactionSequence;
 
     @Basic
-    @Column(name = "version", nullable = false, insertable = true, updatable = true)
+    @Column(name = "version", nullable = true, insertable = true, updatable = true)
     private int version;
 
     public TraceEvent() {
     }
 
-    public String getAgentId() {
-        return agentId;
+    public Long getAppId() {
+        return appId;
     }
 
-    public void setAgentId(String agentId) {
-        this.agentId = agentId;
+    public void setAppId(Long appId) {
+        this.appId = appId;
     }
 
-    public long getAgentStartTime() {
-        return agentStartTime;
+    public Long getInstanceId() {
+        return instanceId;
     }
 
-    public void setAgentStartTime(long agentStartTime) {
-        this.agentStartTime = agentStartTime;
+    public void setInstanceId(Long instanceId) {
+        this.instanceId = instanceId;
     }
 
-    public int getApiId() {
+    public long getTraceId() {
+        return traceId;
+    }
+
+    public void setTraceId(long traceId) {
+        this.traceId = traceId;
+    }
+
+    public Long getApiId() {
         return apiId;
     }
 
-    public void setApiId(int apiId) {
+    public void setApiId(Long apiId) {
         this.apiId = apiId;
-    }
-
-    public String getApplicationId() {
-        return applicationId;
-    }
-
-    public void setApplicationId(String applicationId) {
-        this.applicationId = applicationId;
     }
 
     public long getCollectorAcceptTime() {
@@ -223,14 +225,6 @@ public class TraceEvent extends AbstractPersistable<Long> implements Serializabl
 
     public void setServiceType(int serviceType) {
         this.serviceType = serviceType;
-    }
-
-    public long getTraceId() {
-        return traceId;
-    }
-
-    public void setTraceId(long traceId) {
-        this.traceId = traceId;
     }
 
     public int getStartElapsed() {

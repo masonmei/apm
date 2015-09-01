@@ -1,10 +1,9 @@
 package com.baidu.oped.apm.common.jpa.entity;
 
-import java.io.Serializable;
-
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Index;
 import javax.persistence.Table;
 
 import org.springframework.data.jpa.domain.AbstractPersistable;
@@ -13,26 +12,42 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
  * The persistent class for the apm_span database table.
  */
 @Entity
-@Table(name = "apm_span")
-public class Trace extends AbstractPersistable<Long> implements Serializable {
-    private static final long serialVersionUID = 1L;
+@Table(name = "apm_span", indexes = {
+        @Index(name = "trace_instance_unique",
+               columnList = "app_id,instance_id,agent_start_time,span_id", unique = true)
+})
+public class Trace extends AbstractPersistable<Long> {
 
-    @Column(name = "agent_id", nullable = false, length = 128)
-    private String agentId;
+    @Basic
+    @Column(name = "app_id", nullable = false, insertable = true, updatable = true)
+    private Long appId;
 
-    @Column(name = "agent_start_time", nullable = false)
-    private long agentStartTime;
+    @Basic
+    @Column(name = "instance_id", nullable = false, insertable = true, updatable = true)
+    private Long instanceId;
 
-    @Column(name = "api_id")
-    private int apiId;
+    @Basic
+    @Column(name = "agent_start_time", nullable = false, insertable = true, updatable = true)
+    private Long agentStartTime;
 
-    @Column(name = "application_id", nullable = false, length = 128)
-    private String applicationId;
+    @Column(name = "span_id", nullable = false, insertable = true, updatable = true)
+    private long spanId;
 
-    @Column(name = "collector_accept_time")
-    private long collectorAcceptTime;
+    // api meta data unique id
+    @Basic
+    @Column(name = "api_id", nullable = true, insertable = true, updatable = true)
+    private Long apiId;
 
+    @Basic
+    @Column(name = "collector_accept_time", nullable = true, insertable = true, updatable = false)
+    private Long collectorAcceptTime;
+
+    @Basic
+    @Column(name = "elapsed", nullable = true, insertable = true, updatable = false)
     private int elapsed;
+
+    @Column(name = "start_time", nullable = true, insertable = true, updatable = false)
+    private long startTime;
 
     @Column(name = "end_point", length = 512)
     private String endPoint;
@@ -51,7 +66,7 @@ public class Trace extends AbstractPersistable<Long> implements Serializable {
 
     private short flag;
 
-    @Column(name = "has_exception", nullable = false)
+    @Column(name = "has_exception", nullable = true)
     private boolean hasException = false;
 
     @Column(name = "parent_span_id")
@@ -66,12 +81,6 @@ public class Trace extends AbstractPersistable<Long> implements Serializable {
     @Column(name = "service_type")
     private int serviceType;
 
-    @Column(name = "span_id")
-    private long spanId;
-
-    @Column(name = "start_time")
-    private long startTime;
-
     @Column(name = "trace_agent_id", length = 128)
     private String traceAgentId;
 
@@ -82,62 +91,70 @@ public class Trace extends AbstractPersistable<Long> implements Serializable {
     private long traceTransactionSequence;
 
     @Basic
-    @Column(name = "version", nullable = false, insertable = true, updatable = true)
+    @Column(name = "version", nullable = true, insertable = true, updatable = true)
     private int version;
 
     public Trace() {
     }
 
-    public String getAgentId() {
-        return this.agentId;
+    public Long getAppId() {
+        return appId;
     }
 
-    public void setAgentId(String agentId) {
-        this.agentId = agentId;
+    public void setAppId(Long appId) {
+        this.appId = appId;
     }
 
-    public long getAgentStartTime() {
-        return this.agentStartTime;
+    public Long getInstanceId() {
+        return instanceId;
     }
 
-    public void setAgentStartTime(long agentStartTime) {
+    public void setInstanceId(Long instanceId) {
+        this.instanceId = instanceId;
+    }
+
+    public Long getAgentStartTime() {
+        return agentStartTime;
+    }
+
+    public void setAgentStartTime(Long agentStartTime) {
         this.agentStartTime = agentStartTime;
     }
 
-    public int getApiId() {
-        return this.apiId;
+    public Long getApiId() {
+        return apiId;
     }
 
-    public void setApiId(int apiId) {
+    public void setApiId(Long apiId) {
         this.apiId = apiId;
     }
 
-    public String getApplicationId() {
-        return this.applicationId;
+    public Long getCollectorAcceptTime() {
+        return collectorAcceptTime;
     }
 
-    public void setApplicationId(String applicationId) {
-        this.applicationId = applicationId;
-    }
-
-    public long getCollectorAcceptTime() {
-        return this.collectorAcceptTime;
-    }
-
-    public void setCollectorAcceptTime(long collectorAcceptTime) {
+    public void setCollectorAcceptTime(Long collectorAcceptTime) {
         this.collectorAcceptTime = collectorAcceptTime;
     }
 
     public int getElapsed() {
-        return this.elapsed;
+        return elapsed;
     }
 
     public void setElapsed(int elapsed) {
         this.elapsed = elapsed;
     }
 
+    public long getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(long startTime) {
+        this.startTime = startTime;
+    }
+
     public String getEndPoint() {
-        return this.endPoint;
+        return endPoint;
     }
 
     public void setEndPoint(String endPoint) {
@@ -145,7 +162,7 @@ public class Trace extends AbstractPersistable<Long> implements Serializable {
     }
 
     public int getErrCode() {
-        return this.errCode;
+        return errCode;
     }
 
     public void setErrCode(int errCode) {
@@ -153,7 +170,7 @@ public class Trace extends AbstractPersistable<Long> implements Serializable {
     }
 
     public String getExceptionClass() {
-        return this.exceptionClass;
+        return exceptionClass;
     }
 
     public void setExceptionClass(String exceptionClass) {
@@ -161,7 +178,7 @@ public class Trace extends AbstractPersistable<Long> implements Serializable {
     }
 
     public int getExceptionId() {
-        return this.exceptionId;
+        return exceptionId;
     }
 
     public void setExceptionId(int exceptionId) {
@@ -169,7 +186,7 @@ public class Trace extends AbstractPersistable<Long> implements Serializable {
     }
 
     public String getExceptionMessage() {
-        return this.exceptionMessage;
+        return exceptionMessage;
     }
 
     public void setExceptionMessage(String exceptionMessage) {
@@ -184,12 +201,16 @@ public class Trace extends AbstractPersistable<Long> implements Serializable {
         this.flag = flag;
     }
 
-    public boolean getHasException() {
-        return this.hasException;
+    public boolean isHasException() {
+        return hasException;
+    }
+
+    public void setHasException(boolean hasException) {
+        this.hasException = hasException;
     }
 
     public long getParentSpanId() {
-        return this.parentSpanId;
+        return parentSpanId;
     }
 
     public void setParentSpanId(long parentSpanId) {
@@ -197,7 +218,7 @@ public class Trace extends AbstractPersistable<Long> implements Serializable {
     }
 
     public String getRemoteAddr() {
-        return this.remoteAddr;
+        return remoteAddr;
     }
 
     public void setRemoteAddr(String remoteAddr) {
@@ -205,7 +226,7 @@ public class Trace extends AbstractPersistable<Long> implements Serializable {
     }
 
     public String getRpc() {
-        return this.rpc;
+        return rpc;
     }
 
     public void setRpc(String rpc) {
@@ -221,23 +242,15 @@ public class Trace extends AbstractPersistable<Long> implements Serializable {
     }
 
     public long getSpanId() {
-        return this.spanId;
+        return spanId;
     }
 
     public void setSpanId(long spanId) {
         this.spanId = spanId;
     }
 
-    public long getStartTime() {
-        return this.startTime;
-    }
-
-    public void setStartTime(long startTime) {
-        this.startTime = startTime;
-    }
-
     public String getTraceAgentId() {
-        return this.traceAgentId;
+        return traceAgentId;
     }
 
     public void setTraceAgentId(String traceAgentId) {
@@ -245,7 +258,7 @@ public class Trace extends AbstractPersistable<Long> implements Serializable {
     }
 
     public long getTraceAgentStartTime() {
-        return this.traceAgentStartTime;
+        return traceAgentStartTime;
     }
 
     public void setTraceAgentStartTime(long traceAgentStartTime) {
@@ -253,7 +266,7 @@ public class Trace extends AbstractPersistable<Long> implements Serializable {
     }
 
     public long getTraceTransactionSequence() {
-        return this.traceTransactionSequence;
+        return traceTransactionSequence;
     }
 
     public void setTraceTransactionSequence(long traceTransactionSequence) {
@@ -261,18 +274,10 @@ public class Trace extends AbstractPersistable<Long> implements Serializable {
     }
 
     public int getVersion() {
-        return this.version;
+        return version;
     }
 
     public void setVersion(int version) {
         this.version = version;
-    }
-
-    public boolean isHasException() {
-        return hasException;
-    }
-
-    public void setHasException(boolean hasException) {
-        this.hasException = hasException;
     }
 }

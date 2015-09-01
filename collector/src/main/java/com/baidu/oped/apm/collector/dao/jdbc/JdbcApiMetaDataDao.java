@@ -41,10 +41,9 @@ public class JdbcApiMetaDataDao extends BaseService implements ApiMetaDataDao {
             return;
         }
 
-        ApiMetaData metaData = new ApiMetaData();
-        metaData.setInstanceId(map.getInstanceId());
-        metaData.setStartTime(apiMetaData.getAgentStartTime());
-        metaData.setApiId(apiMetaData.getApiId());
+        ApiMetaData metaData =
+                findApiMetaData(map.getInstanceId(), apiMetaData.getAgentStartTime(), apiMetaData.getApiId());
+
         if (apiMetaData.isSetLine()) {
             metaData.setLineNumber(apiMetaData.getLine());
         } else {
@@ -52,14 +51,7 @@ public class JdbcApiMetaDataDao extends BaseService implements ApiMetaDataDao {
         }
         metaData.setApiInfo(apiMetaData.getApiInfo());
 
-        QApiMetaData qApiMetaData = QApiMetaData.apiMetaData;
-        BooleanExpression instanceCondition = qApiMetaData.instanceId.eq(map.getInstanceId());
-        BooleanExpression apiIdCondition = qApiMetaData.apiId.eq(apiMetaData.getApiId());
-        BooleanExpression whereCondition = instanceCondition.and(apiIdCondition);
+        apiMetaDataRepository.saveAndFlush(metaData);
 
-        ApiMetaData result = apiMetaDataRepository.findOne(whereCondition);
-        if (result == null) {
-            apiMetaDataRepository.save(metaData);
-        }
     }
 }

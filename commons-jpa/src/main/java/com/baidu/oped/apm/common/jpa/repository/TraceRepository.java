@@ -9,5 +9,5 @@ import com.baidu.oped.apm.common.jpa.entity.Trace;
  * Created by mason on 8/23/15.
  */
 public interface TraceRepository extends JpaRepository<Trace, Long>, QueryDslPredicateExecutor<Trace> {
-    Trace findOneByAgentIdAndAgentStartTimeAndSpanId(String agentId, long agentStartTime, long spanId);
+
 }

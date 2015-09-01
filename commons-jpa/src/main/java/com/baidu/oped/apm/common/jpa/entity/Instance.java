@@ -19,15 +19,15 @@ public class Instance extends AbstractPersistable<Long> {
     private Long appId;
 
     @Basic
-    @Column(name = "port", nullable = false, insertable = true, updatable = true)
+    @Column(name = "port", nullable = true, insertable = true, updatable = true)
     private Integer port;
 
     @Basic
-    @Column(name = "host", nullable = false, insertable = true, updatable = true, length = 128)
+    @Column(name = "host", nullable = true, insertable = true, updatable = true, length = 128)
     private String host;
 
     @Basic
-    @Column(name = "ip", nullable = false, insertable = true, updatable = true, length = 128)
+    @Column(name = "ip", nullable = true, insertable = true, updatable = true, length = 128)
     private String ip;
 
     @Basic
@@ -35,11 +35,11 @@ public class Instance extends AbstractPersistable<Long> {
     private Integer pid;
 
     @Basic
-    @Column(name = "start_time", nullable = false, insertable = true, updatable = true)
+    @Column(name = "start_time", nullable = true, insertable = true, updatable = true)
     private Long startTime;
 
     @Basic
-    @Column(name = "instance_type", nullable = false, insertable = true, updatable = true)
+    @Column(name = "instance_type", nullable = true, insertable = true, updatable = true)
     private Integer instanceType;
 
     @Basic

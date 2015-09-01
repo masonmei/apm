@@ -1,7 +1,5 @@
 package com.baidu.oped.apm.common.jpa.entity;
 
-import java.io.Serializable;
-
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,11 +11,11 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
  * Created by mason on 8/27/15.
  */
 @Entity
-@Table(name = "apm_application", schema = "", catalog = "apm")
-public class Application extends AbstractPersistable<Long> implements Serializable {
+@Table(name = "apm_application")
+public class Application extends AbstractPersistable<Long> {
 
     @Basic
-    @Column(name = "app_name", nullable = false, insertable = true, updatable = true, length = 128)
+    @Column(name = "app_name", nullable = true, insertable = true, updatable = true, length = 128)
     private String appName;
 
     @Basic

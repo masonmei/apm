@@ -17,7 +17,7 @@ public class CpuStatItemReader extends BaseReader<AgentStatCpuLoad> {
     @Autowired
     private AgentStatCpuLoadRepository agentStatCpuLoadRepository;
 
-    protected CpuStatItemReader(long periodStart, long periodInMills) {
+    public CpuStatItemReader(long periodStart, long periodInMills) {
         super(periodStart, periodInMills);
     }
 

@@ -22,14 +22,14 @@ public class AgentStatCpuLoad extends AbstractPersistable<Long> {
     @Column(name = "instance_id", nullable = false, insertable = true, updatable = true)
     private Long instanceId;
 
-    @Column(name = "jvm_cpu_load", nullable = false, insertable = true, updatable = true, precision = 4)
-    private double jvmCpuLoad;
-
-    @Column(name = "system_cpu_load", nullable = false, insertable = true, updatable = true, precision = 4)
-    private double systemCpuLoad;
-
     @Column(name = "timestamp", nullable = false, updatable = false)
     private long timestamp;
+
+    @Column(name = "jvm_cpu_load", nullable = true, insertable = true, updatable = true, precision = 4)
+    private double jvmCpuLoad;
+
+    @Column(name = "system_cpu_load", nullable = true, insertable = true, updatable = true, precision = 4)
+    private double systemCpuLoad;
 
     public AgentStatCpuLoad() {
     }

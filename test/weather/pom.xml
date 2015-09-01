@@ -17,6 +17,7 @@
     <version>1.1.0</version>
 
     <properties>
+        <jdk.version>1.8</jdk.version>
         <eclipselink.version>2.4.0</eclipselink.version>
         <derby.version>10.9.1.0</derby.version>
         <cxf.version>3.1.1</cxf.version>
@@ -48,20 +49,22 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.1</version>
+                <configuration>
+                    <source>${jdk.version}</source>
+                    <target>${jdk.version}</target>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.springframework</groupId>
-                        <artifactId>springloaded</artifactId>
-                        <version>1.2.3.RELEASE</version>
-                    </dependency>
-                </dependencies>
                 <configuration>
-                    <!--<jvmArguments>-->
-                    <!--&#45;&#45;javaagent:${project.basedir}/../../agent/java-agent/target/pinpoint-agent/bootstrap-1.1.0.jar-->
-                    <!--&#45;&#45;Dpinpoint.agentId=${pom.build.finalName} -Dpinpoint.applicationName=weather-->
-                    <!--</jvmArguments>-->
+                    <jvmArguments>
+                        -javaagent:${project.basedir}/../../agent/java-agent/target/pinpoint-agent/bootstrap-1.1.0.jar
+                        -Dpinpoint.agentId=${pom.build.finalName} -Dpinpoint.applicationName=weather
+                    </jvmArguments>
                 </configuration>
             </plugin>
             <!--<plugin>-->

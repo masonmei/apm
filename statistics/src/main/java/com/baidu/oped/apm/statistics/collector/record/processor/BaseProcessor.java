@@ -5,5 +5,4 @@ package com.baidu.oped.apm.statistics.collector.record.processor;
  */
 public abstract class BaseProcessor<F, T> {
     public abstract Iterable<T> process(Iterable<F> items);
-
 }

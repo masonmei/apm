@@ -25,29 +25,29 @@ public class AgentStatMemoryGc extends AbstractPersistable<Long> implements Seri
     @Column(name = "instance_id", nullable = false, insertable = true, updatable = true)
     private Long instanceId;
 
+    @Column(name = "timestamp", nullable = false, updatable = false, insertable = true)
+    private long timestamp;
+
     @Column(name = "gc_type", nullable = false, length = 64)
     private String gcType;
 
-    @Column(name = "jvm_gc_old_count", nullable = false, insertable = true, updatable = true)
+    @Column(name = "jvm_gc_old_count", nullable = true, insertable = true, updatable = true)
     private long jvmGcOldCount;
 
-    @Column(name = "jvm_gc_old_time", nullable = false, insertable = true, updatable = true)
+    @Column(name = "jvm_gc_old_time", nullable = true, insertable = true, updatable = true)
     private long jvmGcOldTime;
 
-    @Column(name = "jvm_memory_heap_max", nullable = false, insertable = true, updatable = true)
+    @Column(name = "jvm_memory_heap_max", nullable = true, insertable = true, updatable = true)
     private long jvmMemoryHeapMax;
 
-    @Column(name = "jvm_memory_heap_used", nullable = false, insertable = true, updatable = true)
+    @Column(name = "jvm_memory_heap_used", nullable = true, insertable = true, updatable = true)
     private long jvmMemoryHeapUsed;
 
-    @Column(name = "jvm_memory_non_heap_max", nullable = false, insertable = true, updatable = true)
+    @Column(name = "jvm_memory_non_heap_max", nullable = true, insertable = true, updatable = true)
     private long jvmMemoryNonHeapMax;
 
-    @Column(name = "jvm_memory_non_heap_used", nullable = false, insertable = true, updatable = true)
+    @Column(name = "jvm_memory_non_heap_used", nullable = true, insertable = true, updatable = true)
     private long jvmMemoryNonHeapUsed;
-
-    @Column(name = "timestamp", nullable = false, updatable = false, insertable = true)
-    private long timestamp;
 
     public AgentStatMemoryGc() {
     }

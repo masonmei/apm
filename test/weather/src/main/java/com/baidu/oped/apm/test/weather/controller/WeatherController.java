@@ -41,25 +41,25 @@ public class WeatherController {
 
     @RequestMapping("city/sync")
     public boolean syncCity() {
-//        cityRepository.deleteAll();
+        cityRepository.deleteAll();
         String urlString = format(CITY_URL);
         String content = new WeatherController().getContent(urlString);
         JSONObject jsonObject = new JSONObject(content);
         Object success = jsonObject.get("success");
-        JSONObject result = (JSONObject) jsonObject.get("result");
+        final JSONObject result = (JSONObject) jsonObject.get("result");
         if (success.equals("1")) {
-            if (result instanceof Map) {
-                Map result1 = (Map) result;
-                for (Object key : result1.keySet()) {
-                    JSONObject value = (JSONObject) result1.get(key);
-                    City city = new City();
-                    city.setWeaid(value.getLong("weaid"));
-                    city.setCitynm(value.getString("citynm"));
-                    city.setCityno(value.getString("cityno"));
+            result.keySet().forEach(key -> {
+                JSONObject value = (JSONObject) result.get(key.toString());
+                City city = new City();
+                city.setWeaid(value.getLong("weaid"));
+                city.setCitynm(value.getString("citynm"));
+                String cityno = value.getString("cityno");
+                if(cityno.startsWith("bei")) {
+                    city.setCityno(cityno);
                     city.setCityid(value.getString("cityid"));
                     cityRepository.save(city);
                 }
-            }
+            });
         }
         return true;
     }

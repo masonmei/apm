@@ -3,6 +3,7 @@ package com.baidu.oped.apm.common.jpa.entity;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Index;
 import javax.persistence.Table;
 
 import org.springframework.data.jpa.domain.AbstractPersistable;
@@ -11,7 +12,9 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
  * The persistent class for the apm_agent_stat_cpu_load database table.
  */
 @Entity
-@Table(name = "apm_agent_instance_map")
+@Table(name = "apm_agent_instance_map", indexes = {
+        @Index(name = "agent_instance_unique", columnList = "agent_id,agent_start_time", unique = true)
+})
 public class AgentInstanceMap extends AbstractPersistable<Long> {
 
     @Basic
@@ -23,11 +26,11 @@ public class AgentInstanceMap extends AbstractPersistable<Long> {
     private Long agentStartTime;
 
     @Basic
-    @Column(name = "instance_id", nullable = false, insertable = true, updatable = true)
+    @Column(name = "instance_id", nullable = true, insertable = true, updatable = true)
     private Long instanceId;
 
     @Basic
-    @Column(name = "app_id", nullable = false, insertable = true, updatable = true)
+    @Column(name = "app_id", nullable = true, insertable = true, updatable = true)
     private Long appId;
 
     public String getAgentId() {

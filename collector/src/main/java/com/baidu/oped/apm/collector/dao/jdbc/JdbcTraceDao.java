@@ -12,8 +12,9 @@ import org.springframework.util.CollectionUtils;
 
 import com.baidu.oped.apm.collector.dao.TracesDao;
 import com.baidu.oped.apm.collector.util.AcceptedTimeService;
+import com.baidu.oped.apm.common.jpa.entity.AgentInstanceMap;
 import com.baidu.oped.apm.common.jpa.entity.Annotation;
-import com.baidu.oped.apm.common.jpa.entity.QTrace;
+import com.baidu.oped.apm.common.jpa.entity.ApiMetaData;
 import com.baidu.oped.apm.common.jpa.entity.Trace;
 import com.baidu.oped.apm.common.jpa.entity.TraceEvent;
 import com.baidu.oped.apm.common.jpa.repository.AnnotationRepository;
@@ -26,13 +27,12 @@ import com.baidu.oped.apm.thrift.dto.TIntStringValue;
 import com.baidu.oped.apm.thrift.dto.TSpan;
 import com.baidu.oped.apm.thrift.dto.TSpanChunk;
 import com.baidu.oped.apm.thrift.dto.TSpanEvent;
-import com.mysema.query.types.expr.BooleanExpression;
 
 /**
  * Created by mason on 8/17/15.
  */
 @Component
-public class JdbcTraceDao implements TracesDao {
+public class JdbcTraceDao extends BaseService implements TracesDao {
     private static final Logger LOG = LoggerFactory.getLogger(JdbcTraceDao.class);
 
     private static final AnnotationTranscoder transcoder = new AnnotationTranscoder();
@@ -49,21 +49,19 @@ public class JdbcTraceDao implements TracesDao {
     @Autowired
     private TraceEventRepository traceEventRepository;
 
+
     @Override
     public void insert(TSpan span) {
         if (span == null) {
             throw new NullPointerException("span must not be null");
         }
 
-        Trace trace = new Trace();
-        trace.setAgentId(span.getAgentId());
-        trace.setApplicationId(span.getApplicationName());
-        trace.setAgentStartTime(span.getAgentStartTime());
+        Trace trace = findTrace(span.getAgentId(), span.getAgentStartTime(), span.getSpanId());
 
         final TransactionId transactionId = TransactionIdUtils.parseTransactionId(span.getTransactionId());
         trace.setTraceAgentId(transactionId.getAgentId());
         if (trace.getTraceAgentId() == null) {
-            trace.setTraceAgentId(trace.getAgentId());
+            trace.setTraceAgentId(span.getAgentId());
         }
         trace.setTraceAgentStartTime(transactionId.getAgentStartTime());
         trace.setTraceTransactionSequence(transactionId.getTransactionSequence());
@@ -79,7 +77,9 @@ public class JdbcTraceDao implements TracesDao {
         trace.setServiceType(span.getServiceType());
         trace.setEndPoint(span.getEndPoint());
         trace.setFlag(span.getFlag());
-        trace.setApiId(span.getApiId());
+
+        ApiMetaData apiMetaData = findApiMetaData(trace.getInstanceId(), span.getStartTime(), span.getApiId());
+        trace.setApiId(apiMetaData.getId());
 
         trace.setErrCode(span.getErr());
 
@@ -95,7 +95,7 @@ public class JdbcTraceDao implements TracesDao {
         long acceptedTime = acceptedTimeService.getAcceptedTime();
         trace.setCollectorAcceptTime(acceptedTime);
 
-        Trace savedTrace = traceRepository.save(trace);
+        Trace savedTrace = traceRepository.saveAndFlush(trace);
 
         if (span.getAnnotations() != null) {
             List<Annotation> annotations =
@@ -119,26 +119,21 @@ public class JdbcTraceDao implements TracesDao {
         final byte[] transactionIdBytes = spanChunk.getTransactionId();
         final TransactionId transactionId = TransactionIdUtils.parseTransactionId(transactionIdBytes);
 
-        QTrace qTrace = QTrace.trace;
-        BooleanExpression agentIdCondition = qTrace.agentId.eq(transactionId.getAgentId());
-        BooleanExpression agentStartTimeCondition = qTrace.agentStartTime.eq(transactionId.getAgentStartTime());
-        BooleanExpression spanIdCondition = qTrace.spanId.eq(spanChunk.getSpanId());
-
-        BooleanExpression whereCondition = agentIdCondition.and(agentStartTimeCondition).and(spanIdCondition);
-        Trace trace = traceRepository.findOne(whereCondition);
+        Trace trace = findTrace(spanChunk.getAgentId(), spanChunk.getAgentStartTime(), spanChunk.getSpanId());
 
         long acceptedTime = acceptedTimeService.getAcceptedTime();
         spanChunk.getSpanEventList().stream().forEach(spanEvent -> {
             TraceEvent event = new TraceEvent();
-            event.setAgentId(trace.getAgentId());
-            event.setApplicationId(trace.getApplicationId());
-            event.setAgentStartTime(trace.getAgentStartTime());
+            event.setAppId(trace.getAppId());
+            event.setInstanceId(trace.getInstanceId());
+            event.setTraceId(trace.getId());
 
             event.setTraceAgentId(transactionId.getAgentId());
 
             if (event.getTraceAgentId() == null) {
-                event.setTraceAgentId(event.getAgentId());
+                event.setTraceAgentId(spanChunk.getAgentId());
             }
+
             event.setTraceAgentStartTime(transactionId.getAgentStartTime());
             event.setTraceTransactionSequence(transactionId.getTransactionSequence());
 
@@ -153,7 +148,9 @@ public class JdbcTraceDao implements TracesDao {
             event.setDestinationId(spanEvent.getDestinationId());
 
             event.setEndPoint(spanEvent.getEndPoint());
-            event.setApiId(spanEvent.getApiId());
+
+            ApiMetaData apiMetaData = findApiMetaData(trace.getInstanceId(), trace.getStartTime(), spanEvent.getApiId());
+            event.setApiId(apiMetaData.getId());
 
             if (spanEvent.isSetDepth()) {
                 event.setDepth(spanEvent.getDepth());
@@ -173,7 +170,7 @@ public class JdbcTraceDao implements TracesDao {
             event.setCollectorAcceptTime(acceptedTime);
 
             event.setTraceId(trace.getId());
-            TraceEvent savedTraceEvent = traceEventRepository.save(event);
+            TraceEvent savedTraceEvent = traceEventRepository.saveAndFlush(event);
 
             if (spanEvent.getAnnotations() != null) {
                 List<Annotation> annotations =
@@ -184,7 +181,7 @@ public class JdbcTraceDao implements TracesDao {
                                     Object value = transcoder.getMappingValue(tAnnotation);
                                     annotation.setValueType(transcoder.getTypeCode(value));
                                     annotation.setByteValue(transcoder.encode(value, annotation.getValueType()));
-                                    annotation.setTraceEventId(savedTraceEvent.getTraceId());
+                                    annotation.setTraceEventId(savedTraceEvent.getId());
                                     return annotation;
                                 }).collect(Collectors.toList());
                 annotationRepository.save(annotations);
@@ -204,15 +201,16 @@ public class JdbcTraceDao implements TracesDao {
 
         spanEventBoList.stream().filter(spanEvent -> spanEvent != null).forEach(spanEvent -> {
             TraceEvent event = new TraceEvent();
-            event.setAgentId(span.getAgentId());
-            event.setApplicationId(span.getApplicationName());
-            event.setAgentStartTime(span.getAgentStartTime());
+
+            event.setAppId(trace.getAppId());
+            event.setInstanceId(trace.getInstanceId());
+            event.setTraceId(trace.getId());
 
             final TransactionId transactionId = TransactionIdUtils.parseTransactionId(span.getTransactionId());
             event.setTraceAgentId(transactionId.getAgentId());
 
             if (event.getTraceAgentId() == null) {
-                event.setTraceAgentId(event.getAgentId());
+                event.setTraceAgentId(span.getAgentId());
             }
             event.setTraceAgentStartTime(transactionId.getAgentStartTime());
             event.setTraceTransactionSequence(transactionId.getTransactionSequence());
@@ -228,7 +226,8 @@ public class JdbcTraceDao implements TracesDao {
             event.setDestinationId(spanEvent.getDestinationId());
 
             event.setEndPoint(spanEvent.getEndPoint());
-            event.setApiId(spanEvent.getApiId());
+            ApiMetaData apiMetaData = findApiMetaData(trace.getInstanceId(), trace.getStartTime(), spanEvent.getApiId());
+            event.setApiId(apiMetaData.getId());
 
             if (spanEvent.isSetDepth()) {
                 event.setDepth(spanEvent.getDepth());
@@ -260,7 +259,7 @@ public class JdbcTraceDao implements TracesDao {
                                     Object value = transcoder.getMappingValue(tAnnotation);
                                     annotation.setValueType(transcoder.getTypeCode(value));
                                     annotation.setByteValue(transcoder.encode(value, annotation.getValueType()));
-                                    annotation.setTraceEventId(saveTraceEvent.getTraceId());
+                                    annotation.setTraceEventId(saveTraceEvent.getId());
                                     return annotation;
                                 }).collect(Collectors.toList());
                 annotationRepository.save(annotations);

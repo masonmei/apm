@@ -39,21 +39,10 @@ public class JdbcStringMetaDataDao extends BaseService implements StringMetaData
             return;
         }
 
-        StringMetaData metaData = new StringMetaData();
-        metaData.setInstanceId(map.getInstanceId());
-        metaData.setStartTime(stringMetaData.getAgentStartTime());
-        metaData.setStringId(stringMetaData.getStringId());
+        StringMetaData metaData = findStringMetaData(map.getInstanceId(), stringMetaData.getAgentStartTime(),
+                                                                   stringMetaData.getStringId());
         metaData.setStringValue(stringMetaData.getStringValue());
 
-
-        QStringMetaData qApiMetaData = QStringMetaData.stringMetaData;
-        BooleanExpression instanceCondition = qApiMetaData.instanceId.eq(map.getInstanceId());
-        BooleanExpression apiIdCondition = qApiMetaData.stringId.eq(stringMetaData.getStringId());
-        BooleanExpression whereCondition = instanceCondition.and(apiIdCondition);
-
-        StringMetaData result = stringMetaDataRepository.findOne(whereCondition);
-        if (result == null) {
-            stringMetaDataRepository.save(metaData);
-        }
+        stringMetaDataRepository.saveAndFlush(metaData);
     }
 }

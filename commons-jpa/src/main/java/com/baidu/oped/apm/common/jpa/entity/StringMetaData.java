@@ -2,6 +2,7 @@ package com.baidu.oped.apm.common.jpa.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Index;
 import javax.persistence.Table;
 
 import org.springframework.data.jpa.domain.AbstractPersistable;
@@ -10,7 +11,9 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
  * The persistent class for the apm_string_meta_data database table.
  */
 @Entity
-@Table(name = "apm_string_meta_data")
+@Table(name = "apm_string_meta_data", indexes = {
+        @Index(name = "string_meta_unique", columnList = "instance_id,start_time,string_id", unique = true)
+})
 public class StringMetaData extends AbstractPersistable<Long> {
 
     @Column(name = "instance_id", nullable = false, insertable = true, updatable = true)

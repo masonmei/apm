@@ -17,7 +17,9 @@ public class ApplicationStatisticItemWriter extends BaseWriter<ApplicationStatis
     @Autowired
     private ApplicationStatisticRepository applicationStatisticRepository;
 
-    protected ApplicationStatisticItemWriter(long periodStart, long periodInMills) {
+
+
+    public ApplicationStatisticItemWriter(long periodStart, long periodInMills) {
         super(periodStart, periodInMills);
     }
 
