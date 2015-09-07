@@ -7,36 +7,12 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
  */
 public abstract class BaseReader<T extends AbstractPersistable<Long>> {
 
-    private final long periodStart;
-    private final long periodInMills;
-
-    protected BaseReader(long periodStart, long periodInMills) {
-        this.periodStart = periodStart;
-        this.periodInMills = periodInMills;
-    }
-
     /**
-     * Get the startMills of the current period.
+     * Read items of the given period from database.
      *
+     * @param periodStart
+     * @param periodInMills
      * @return
      */
-    public long getPeriodStart() {
-        return periodStart;
-    }
-
-    /**
-     * Get the endMills of the current period.
-     *
-     * @return
-     */
-    public long getPeriodEnd() {
-        return periodStart + periodInMills;
-    }
-
-    /**
-     * Read the items of current period.
-     *
-     * @return
-     */
-    public abstract Iterable<T> readItems();
+    public abstract Iterable<T> readItems(long periodStart, long periodInMills);
 }

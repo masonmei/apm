@@ -1,24 +1,27 @@
 package com.baidu.oped.apm.test.weather.controller;
 
-import com.baidu.oped.apm.test.weather.domain.City;
-import com.baidu.oped.apm.test.weather.domain.Weather;
-import com.baidu.oped.apm.test.weather.repository.CityRepository;
-import com.baidu.oped.apm.test.weather.repository.WeatherRepository;
+import static java.lang.String.format;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.util.Random;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.Map;
-
-import static java.lang.String.format;
+import com.baidu.oped.apm.test.weather.domain.City;
+import com.baidu.oped.apm.test.weather.domain.Weather;
+import com.baidu.oped.apm.test.weather.repository.CityRepository;
+import com.baidu.oped.apm.test.weather.repository.WeatherRepository;
 
 /**
  * Created by mason on 8/31/15.
@@ -28,7 +31,7 @@ public class WeatherController {
     private static final String AUTH_AND_FORMAT = "&appkey=15198&sign=3c009bbf405331a22f377757771431a7&format=json";
     private static final String WEATHER_URL = "http://api.k780.com:88/?app=weather.today&weaid=%s" + AUTH_AND_FORMAT;
     private static final String CITY_URL = "http://api.k780.com:88/?app=weather.city" + AUTH_AND_FORMAT;
-
+    private static final String BAIDU_URL = "http://www.baidu.com/";
 
     @Autowired
     private CityRepository cityRepository;
@@ -42,8 +45,11 @@ public class WeatherController {
     @RequestMapping("city/sync")
     public boolean syncCity() {
         cityRepository.deleteAll();
+//        randomSleep();
         String urlString = format(CITY_URL);
-        String content = new WeatherController().getContent(urlString);
+        String content = getContent(BAIDU_URL);
+        System.out.println(content);
+        content = getContent(urlString);
         JSONObject jsonObject = new JSONObject(content);
         Object success = jsonObject.get("success");
         final JSONObject result = (JSONObject) jsonObject.get("result");
@@ -54,7 +60,7 @@ public class WeatherController {
                 city.setWeaid(value.getLong("weaid"));
                 city.setCitynm(value.getString("citynm"));
                 String cityno = value.getString("cityno");
-                if(cityno.startsWith("bei")) {
+                if (cityno.startsWith("bei")) {
                     city.setCityno(cityno);
                     city.setCityid(value.getString("cityid"));
                     cityRepository.save(city);
@@ -65,14 +71,13 @@ public class WeatherController {
     }
 
     @RequestMapping("weather/sync")
-    public boolean syncWeather(
-            @RequestParam("cityName")
-            String cityName) {
+    public boolean syncWeather(@RequestParam("cityName") String cityName) {
         City city = cityRepository.findOneByCityno(cityName);
         if (city == null) {
             return false;
         }
 
+        randomSleep();
         String urlString = format(WEATHER_URL, city.getWeaid());
         String content = getContent(urlString);
         if (content.equals("")) {
@@ -114,16 +119,14 @@ public class WeatherController {
 
     private String getContent(String urlString) {
         try {
-
-            URL url = new URL(urlString);
-
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.connect();
-            int responseCode = conn.getResponseCode();
-            if (responseCode != 200) {
+            HttpClient client = HttpClientBuilder.create().build();
+            HttpGet get = new HttpGet(urlString);
+            HttpResponse response = client.execute(get);
+            if (response.getStatusLine().getStatusCode() != 200) {
                 return "";
             }
-            Reader inputStreamReader = new InputStreamReader(conn.getInputStream());
+
+            Reader inputStreamReader = new InputStreamReader(response.getEntity().getContent());
             BufferedReader reader = new BufferedReader(inputStreamReader);
 
             StringBuilder builder = new StringBuilder();
@@ -136,6 +139,18 @@ public class WeatherController {
             return builder.toString();
         } catch (IOException exception) {
             return "";
+        }
+    }
+
+    private void randomSleep() {
+        Random random = new Random();
+        long randLong = random.nextLong();
+        while (randLong > 3000 || randLong < 300) {
+            randLong = random.nextLong();
+        }
+        try {
+            Thread.sleep(randLong);
+        } catch (InterruptedException e) {
         }
     }
 

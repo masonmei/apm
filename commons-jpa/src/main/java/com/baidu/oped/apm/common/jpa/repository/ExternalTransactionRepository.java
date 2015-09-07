@@ -3,11 +3,11 @@ package com.baidu.oped.apm.common.jpa.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 
-import com.baidu.oped.apm.common.jpa.entity.ExternalTransaction;
+import com.baidu.oped.apm.common.jpa.entity.ExternalService;
 
 /**
  * Created by mason on 8/23/15.
  */
-public interface ExternalTransactionRepository extends JpaRepository<ExternalTransaction, Long>,
-                                                               QueryDslPredicateExecutor<ExternalTransaction> {
+public interface ExternalTransactionRepository extends JpaRepository<ExternalService, Long>,
+                                                               QueryDslPredicateExecutor<ExternalService> {
 }

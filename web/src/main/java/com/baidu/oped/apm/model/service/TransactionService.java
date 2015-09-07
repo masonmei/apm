@@ -13,8 +13,8 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import com.baidu.oped.apm.common.jpa.entity.QTransaction;
-import com.baidu.oped.apm.common.jpa.entity.QTransactionStatistic;
+import com.baidu.oped.apm.common.jpa.entity.QWebTransaction;
+import com.baidu.oped.apm.common.jpa.entity.QWebTransactionStatistic;
 import com.baidu.oped.apm.common.jpa.entity.WebTransaction;
 import com.baidu.oped.apm.common.jpa.entity.WebTransactionStatistic;
 import com.baidu.oped.apm.common.jpa.repository.WebTransactionRepository;
@@ -34,7 +34,7 @@ public class TransactionService {
     private WebTransactionStatisticRepository webTransactionStatisticRepository;
 
     public Map<TimeRange, Iterable<WebTransactionStatistic>> getApplicationLevelTransactionMetricData(
-            Long appId, List<TimeRange> timeRanges, Integer period) {
+            Long appId, List<TimeRange> timeRanges, Long period) {
         Assert.notNull(appId);
         Assert.notNull(period);
 
@@ -43,7 +43,7 @@ public class TransactionService {
                         .map(AbstractPersistable::getId)
                         .collect(Collectors.toList());
 
-        QTransactionStatistic applicationStatistic = QTransactionStatistic.transactionStatistic;
+        QWebTransactionStatistic applicationStatistic = QWebTransactionStatistic.webTransactionStatistic;
         BooleanExpression transactionIdCondition = applicationStatistic.transactionId.in(transactionIds);
         BooleanExpression periodCondition = applicationStatistic.period.eq(period);
 
@@ -64,7 +64,7 @@ public class TransactionService {
     }
 
     public Map<TimeRange, Iterable<WebTransactionStatistic>> getInstanceLevelTransactionMetricData(
-            Long instanceId, List<TimeRange> timeRanges, Integer period) {
+            Long instanceId, List<TimeRange> timeRanges, Long period) {
 
         Assert.notNull(instanceId);
         Assert.notNull(period);
@@ -74,7 +74,7 @@ public class TransactionService {
                                             .map(AbstractPersistable::getId)
                                             .collect(Collectors.toList());
 
-        QTransactionStatistic applicationStatistic = QTransactionStatistic.transactionStatistic;
+        QWebTransactionStatistic applicationStatistic = QWebTransactionStatistic.webTransactionStatistic;
         BooleanExpression transactionIdCondition = applicationStatistic.transactionId.in(transactionIds);
         BooleanExpression periodCondition = applicationStatistic.period.eq(period);
 
@@ -96,15 +96,15 @@ public class TransactionService {
 
     public Iterable<WebTransaction> findTransactionWithAppId(Long appId){
         Assert.notNull(appId, "ApplicationId must not be null while retrieving transactions with appId");
-        QTransaction qTransaction = QTransaction.transaction;
-        BooleanExpression appIdCondition = qTransaction.appId.eq(appId);
+        QWebTransaction qWebTransaction = QWebTransaction.webTransaction;
+        BooleanExpression appIdCondition = qWebTransaction.appId.eq(appId);
         return webTransactionRepository.findAll(appIdCondition);
     }
 
     public Iterable<WebTransaction> findTransactionWithInstanceId(Long instanceId){
         Assert.notNull(instanceId, "ApplicationId must not be null while retrieving transactions with appId");
-        QTransaction qTransaction = QTransaction.transaction;
-        BooleanExpression instanceIdCondition = qTransaction.instanceId.eq(instanceId);
+        QWebTransaction qWebTransaction = QWebTransaction.webTransaction;
+        BooleanExpression instanceIdCondition = qWebTransaction.instanceId.eq(instanceId);
         return webTransactionRepository.findAll(instanceIdCondition);
     }
 }

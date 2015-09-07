@@ -15,7 +15,7 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 @Table(name = "apm_transaction_statistic", indexes = {
         @Index(name = "web_tran_statistic_point_unique", columnList = "transaction_id,period,timestamp", unique = true)
 })
-public class WebTransactionStatistic extends AbstractPersistable<Long> implements BaseStatistic {
+public class WebTransactionStatistic extends AbstractPersistable<Long> implements CommonStatistic {
 
     @Basic
     @Column(name = "transaction_id", nullable = false, insertable = true, updatable = true)
@@ -23,7 +23,7 @@ public class WebTransactionStatistic extends AbstractPersistable<Long> implement
 
     @Basic
     @Column(name = "period", nullable = false, insertable = true, updatable = true)
-    private Integer period;
+    private Long period;
 
     @Basic
     @Column(name = "timestamp", nullable = false, insertable = true, updatable = true)
@@ -70,11 +70,11 @@ public class WebTransactionStatistic extends AbstractPersistable<Long> implement
     }
 
     @Override
-    public Integer getPeriod() {
+    public Long getPeriod() {
         return period;
     }
 
-    public void setPeriod(Integer period) {
+    public void setPeriod(Long period) {
         this.period = period;
     }
 

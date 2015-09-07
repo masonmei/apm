@@ -51,7 +51,7 @@ public class ApplicationController {
             @RequestParam(value = "pageNumber", required = false, defaultValue = Constaints.PAGE_NUMBER) int pageNumber
     ) {
         Page<Application> apps =
-                applicationService.selectApplctions("", orderBy, pageSize, pageNumber);
+                applicationService.selectApplications("", orderBy, pageSize, pageNumber);
         Iterable<ApplicationStatistic> appStatistics =
                 applicationService.selectApplicationStatistics(from, to, apps.getContent());
         return applicationService.packageApplications(apps, appStatistics, from, to);

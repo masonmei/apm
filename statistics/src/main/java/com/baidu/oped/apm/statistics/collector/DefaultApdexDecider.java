@@ -5,6 +5,8 @@ import static com.baidu.oped.apm.common.utils.ApdexUtils.Level.SATISFIED;
 import static com.baidu.oped.apm.common.utils.ApdexUtils.Level.TOLERATED;
 import static com.baidu.oped.apm.common.utils.ApdexUtils.Level.getLevel;
 
+import org.springframework.stereotype.Component;
+
 /**
  * Created by mason on 9/1/15.
  */

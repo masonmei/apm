@@ -51,11 +51,11 @@
 //        this.transactionName = transactionName;
 //    }
 //
-//    public String getTransactionId() {
+//    public String getStatisticState() {
 //        return transactionId;
 //    }
 //
-//    public void setTransactionId(String transactionId) {
+//    public void setStatisticState(String transactionId) {
 //        this.transactionId = transactionId;
 //    }
 //

@@ -69,7 +69,7 @@
 //            qualifier = columnName.getBuffer();
 //        } else {
 //            // OLD
-//            // byte[] transactionId = SpanUtils.getTransactionId(span);
+//            // byte[] transactionId = SpanUtils.getStatisticState(span);
 //            qualifier = SpanUtils.getVarTransactionId(span);
 //        }
 //        return qualifier;

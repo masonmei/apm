@@ -40,43 +40,7 @@ public class ApplicationService {
     @Autowired
     InstanceStatisticRepository instanceStatisticRepository;
 
-
-//    public List<InstanceVo> findApplicationInstanceByApplication(String applicationName, boolean simplify) {
-//        Assert.hasLength(applicationName, "ApplicationName cannot be empty when finding Instances.");
-//        QAgentInfo qAgentInfo = QAgentInfo.agentInfo;
-//        BooleanExpression appNameEqualExp = qAgentInfo.applicationName.eq(applicationName);
-//        Iterable<AgentInfo> agentInfoIterable = agentInfoRepository.findAll(appNameEqualExp);
-//        return StreamSupport.stream(agentInfoIterable.spliterator(), false).map(agentInfoBo -> {
-//            InstanceVo instance = new InstanceVo();
-//            instance.setName(agentInfoBo.getApplicationName());
-//            instance.setInstanceId(buildInstanceId(agentInfoBo));
-//            if (!simplify) {
-//                buildMetricInfo(instance, agentInfoBo);
-//            }
-//            return instance;
-//        }).collect(Collectors.toList());
-//    }
-
-//    private void buildMetricInfo(final InstanceVo instance, final AgentInfo agentInfoBo) {
-//        Assert.notNull(instance, "InstanceVo cannot be null while building metric for.");
-//        Assert.notNull(agentInfoBo, "AgentInfoBo cannot be null while building metric for.");
-//
-//        instance.setErrorRate(0.0);
-//        instance.setCountPerMins(10.0);
-//        instance.setApdex(0.95);
-//        instance.setCpuUsage(0.032);
-//        instance.setMemoryUsage(1003.9);
-//        instance.setResponseTime(231);
-//    }
-//
-//    private String buildInstanceId(AgentInfo agentInfoBo) {
-//        StringBuilder builder = new StringBuilder();
-//        builder.append("java").append(":").append(agentInfoBo.getApplicationName()).append(":")
-//                .append(agentInfoBo.getPorts()).append("(").append(agentInfoBo.getHostName()).append(")");
-//        return builder.toString();
-//    }
-
-    public Page<Application> selectApplctions(String userId, String orderBy, int pageSize, int pageNumber) {
+    public Page<Application> selectApplications(String userId, String orderBy, int pageSize, int pageNumber) {
         QApplication application = QApplication.application;
         BooleanExpression userEq = application.userId.eq(Constaints.DEFAULT_USER);
 
@@ -99,7 +63,7 @@ public class ApplicationService {
             appIds.add(app.getId());
         }
         BooleanExpression appIdInExpr = appStatistic.appId.in(appIds);
-        BooleanExpression periodEqExpr = appStatistic.period.eq(60);
+        BooleanExpression periodEqExpr = appStatistic.period.eq(60l);
 
         BooleanExpression condtions = timeGtFromExpr.and(timeltToExpr).and(appIdInExpr).and(periodEqExpr);
 

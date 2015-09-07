@@ -5,7 +5,7 @@ package com.baidu.oped.apm.utils;
  */
 public class Constaints {
     public static final String TIME_PATTERN = "yyyy-MM-dd'T'HH:mm:ss";
-    public static final Double PERIOD_TO_MINUTE_FACTOR = 1.0 / 60;
+    public static final Double PERIOD_TO_MINUTE_FACTOR = 1.0 / (60 * 1000);
     public static final String PAGE_SIZE = "20";
     public static final String PAGE_NUMBER = "0";
     public static final String DEFAULT_BOOL = "false";
@@ -15,8 +15,8 @@ public class Constaints {
     public enum MetricName {
         RESPONSE_TIME("responseTime", "", ""),
         PV("pv", "", ""),
-        ERROR("error", "", ""),
         CPM("cpm", "", ""),
+        ERROR("error", "", ""),
         ERROR_RATE("errorRate", "", ""),
         APDEX("apdex", "", ""),
         SATISFIED("satisfied", "", ""),

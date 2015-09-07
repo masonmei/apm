@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 
 import com.baidu.oped.apm.common.jpa.entity.ApplicationStatistic;
 import com.baidu.oped.apm.common.jpa.entity.QApplicationStatistic;
+import com.baidu.oped.apm.common.jpa.entity.StatisticType;
 import com.baidu.oped.apm.common.jpa.repository.ApplicationStatisticRepository;
 import com.mysema.query.types.expr.BooleanExpression;
 
@@ -17,12 +18,6 @@ public class ApplicationStatisticItemWriter extends BaseWriter<ApplicationStatis
     @Autowired
     private ApplicationStatisticRepository applicationStatisticRepository;
 
-
-
-    public ApplicationStatisticItemWriter(long periodStart, long periodInMills) {
-        super(periodStart, periodInMills);
-    }
-
     @Override
     protected void writeItem(ApplicationStatistic item) {
         QApplicationStatistic qApplicationStatistic = QApplicationStatistic.applicationStatistic;
@@ -33,12 +28,17 @@ public class ApplicationStatisticItemWriter extends BaseWriter<ApplicationStatis
         BooleanExpression whereCondition = appIdCondition.and(periodCondition).and(timestampCondition);
         ApplicationStatistic existStatistic = applicationStatisticRepository.findOne(whereCondition);
 
-        if(existStatistic == null){
-            applicationStatisticRepository.save(existStatistic);
+        if (existStatistic == null) {
+            applicationStatisticRepository.save(item);
         } else {
             copyStatisticValue(item, existStatistic);
             applicationStatisticRepository.saveAndFlush(existStatistic);
         }
+    }
+
+    @Override
+    protected StatisticType getStatisticType() {
+        return StatisticType.INSTANCE_STAT;
     }
 
 }

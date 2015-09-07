@@ -11,4 +11,5 @@ import com.baidu.oped.apm.common.jpa.entity.ApplicationStatistic;
  */
 public interface ApplicationStatisticRepository extends JpaRepository<ApplicationStatistic, Long>,
                                                                  QueryDslPredicateExecutor<ApplicationStatistic> {
+
 }

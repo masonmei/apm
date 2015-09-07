@@ -17,3 +17,11 @@ spring:
     max-idle: 8
     validation-query: select 1
     test-on-borrow: true
+
+logging:
+  path: log
+  file: statistic.log
+  level:
+    org.springframework.boot: INFO
+    org.springframework: INFO
+    com.baidu.oped.apm: DEBUG

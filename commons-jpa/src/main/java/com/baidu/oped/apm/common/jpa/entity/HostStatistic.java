@@ -3,15 +3,7 @@ package com.baidu.oped.apm.common.jpa.entity;
 /**
  * Created by mason on 8/31/15.
  */
-public interface HostStatistic {
-
-    Integer getPeriod();
-
-    void setPeriod(Integer period);
-
-    Long getTimestamp();
-
-    void setTimestamp(Long timestamp);
+public interface HostStatistic extends Statistic {
 
     Double getCpuUsage();
 

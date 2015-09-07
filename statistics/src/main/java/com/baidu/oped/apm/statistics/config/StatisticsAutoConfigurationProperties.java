@@ -1,5 +1,7 @@
 package com.baidu.oped.apm.statistics.config;
 
+import java.util.List;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
@@ -7,14 +9,22 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  */
 @ConfigurationProperties(prefix = "apm.statistics")
 public class StatisticsAutoConfigurationProperties {
-    private long webTransationDelay;
+    private List<Integer> periodsInSecond;
+    private boolean fillStatistic;
 
-    public long getWebTransationDelay() {
-        return webTransationDelay;
+    public List<Integer> getPeriodsInSecond() {
+        return periodsInSecond;
     }
 
-    public void setWebTransationDelay(long webTransationDelay) {
-        this.webTransationDelay = webTransationDelay;
+    public void setPeriodsInSecond(List<Integer> periodsInSecond) {
+        this.periodsInSecond = periodsInSecond;
     }
 
+    public boolean isFillStatistic() {
+        return fillStatistic;
+    }
+
+    public void setFillStatistic(boolean fillStatistic) {
+        this.fillStatistic = fillStatistic;
+    }
 }

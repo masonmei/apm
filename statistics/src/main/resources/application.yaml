@@ -1,9 +1,9 @@
 spring:
   jpa:
     hibernate:
-      ddl-auto: none
-    generate-ddl: false
-    show-sql: false
+      ddl-auto: update
+    generate-ddl: true
+    show-sql: true
     data:
       repositories:
         enabled: true
@@ -23,21 +23,5 @@ spring:
       enabled: false
 apm:
   statistics:
-    webTransaction:
-      fixedDelay: 60000
-      initialDelay: 10000
-    externalTransaction:
-      fixedDelay: 60000
-      initialDelay: 20000
-    sqlTransaction:
-      fixedDelay: 60000
-      initialDelay: 30000
-    dbTransaction:
-      fixedDelay: 60000
-      initialDelay: 40000
-    application:
-      fixedDelay: 60000
-      initialDelay: 50000
-    instance:
-      fixedDelay: 60000
-      initialDelay: 60000
+    periods-in-second: 60,300,600,3600,86400
+    fill-statistic: true

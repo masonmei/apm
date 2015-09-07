@@ -39,14 +39,14 @@ public class Trace extends AbstractPersistable<Long> {
     private Long apiId;
 
     @Basic
-    @Column(name = "collector_accept_time", nullable = true, insertable = true, updatable = false)
+    @Column(name = "collector_accept_time", nullable = true, insertable = true, updatable = true)
     private Long collectorAcceptTime;
 
     @Basic
-    @Column(name = "elapsed", nullable = true, insertable = true, updatable = false)
+    @Column(name = "elapsed", nullable = true, insertable = true, updatable = true)
     private int elapsed;
 
-    @Column(name = "start_time", nullable = true, insertable = true, updatable = false)
+    @Column(name = "start_time", nullable = true, insertable = true, updatable = true)
     private long startTime;
 
     @Column(name = "end_point", length = 512)

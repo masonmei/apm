@@ -15,7 +15,7 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 @Table(name = "apm_application_statistic", indexes = {
      @Index(name = "app_statistic_point_unique", columnList = "app_id,period,timestamp", unique = true)
 })
-public class ApplicationStatistic extends AbstractPersistable<Long> implements BaseStatistic, HostStatistic {
+public class ApplicationStatistic extends AbstractPersistable<Long> implements CommonStatistic, HostStatistic {
 
     @Basic
     @Column(name = "app_id", nullable = false, insertable = true, updatable = true)
@@ -23,7 +23,7 @@ public class ApplicationStatistic extends AbstractPersistable<Long> implements B
 
     @Basic
     @Column(name = "period", nullable = false, insertable = true, updatable = true)
-    private Integer period;
+    private Long period;
 
     @Basic
     @Column(name = "timestamp", nullable = false, insertable = true, updatable = true)
@@ -77,11 +77,11 @@ public class ApplicationStatistic extends AbstractPersistable<Long> implements B
         this.appId = appId;
     }
 
-    public Integer getPeriod() {
+    public Long getPeriod() {
         return period;
     }
 
-    public void setPeriod(Integer period) {
+    public void setPeriod(Long period) {
         this.period = period;
     }
 

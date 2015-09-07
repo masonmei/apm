@@ -23,8 +23,8 @@ public class SqlTransaction extends AbstractPersistable<Long> {
     private Long instanceId;
 
     @Basic
-    @Column(name = "sql_id", nullable = false, insertable = true, updatable = true, length = 512)
-    private String sqlId;
+    @Column(name = "end_point", nullable = false, insertable = true, updatable = true, length = 512)
+    private String endPoint;
 
     public Long getAppId() {
         return appId;
@@ -42,11 +42,11 @@ public class SqlTransaction extends AbstractPersistable<Long> {
         this.instanceId = instanceId;
     }
 
-    public String getSqlId() {
-        return sqlId;
+    public String getEndPoint() {
+        return endPoint;
     }
 
-    public void setSqlId(String sqlId) {
-        this.sqlId = sqlId;
+    public void setEndPoint(String endPoint) {
+        this.endPoint = endPoint;
     }
 }

@@ -7,17 +7,12 @@ import org.springframework.stereotype.Component;
 
 import com.baidu.oped.apm.collector.dao.AgentStatDao;
 import com.baidu.oped.apm.common.jpa.entity.AgentInstanceMap;
-import com.baidu.oped.apm.common.jpa.entity.AgentStatCpuLoad;
-import com.baidu.oped.apm.common.jpa.entity.AgentStatMemoryGc;
-import com.baidu.oped.apm.common.jpa.entity.QAgentInstanceMap;
-import com.baidu.oped.apm.common.jpa.repository.AgentInstanceMapRepository;
-import com.baidu.oped.apm.common.jpa.repository.AgentStatCpuLoadRepository;
-import com.baidu.oped.apm.common.jpa.repository.AgentStatMemoryGcRepository;
+import com.baidu.oped.apm.common.jpa.entity.InstanceStat;
+import com.baidu.oped.apm.common.jpa.repository.InstanceStatRepository;
 import com.baidu.oped.apm.thrift.dto.TAgentStat;
 import com.baidu.oped.apm.thrift.dto.TCpuLoad;
 import com.baidu.oped.apm.thrift.dto.TJvmGc;
 import com.baidu.oped.apm.thrift.dto.TJvmGcType;
-import com.mysema.query.types.expr.BooleanExpression;
 
 /**
  * ***** description *****
@@ -32,10 +27,7 @@ public class AgentStatMemoryGcDao extends BaseService implements AgentStatDao {
     private static final Logger LOG = LoggerFactory.getLogger(AgentStatMemoryGcDao.class);
 
     @Autowired
-    private AgentStatCpuLoadRepository cpuLoadRepository;
-
-    @Autowired
-    private AgentStatMemoryGcRepository memoryGcRepository;
+    private InstanceStatRepository instanceStatRepository;
 
     @Override
     public void insert(TAgentStat agentStat) {
@@ -51,51 +43,43 @@ public class AgentStatMemoryGcDao extends BaseService implements AgentStatDao {
             return;
         }
 
-        AgentStatMemoryGc memoryGc = this.parseMemoryGc(map, agentStat);
-        AgentStatCpuLoad cpuLoad = this.parseCpuLoad(map, agentStat);
-        memoryGcRepository.save(memoryGc);
-        cpuLoadRepository.save(cpuLoad);
+        InstanceStat stat = new InstanceStat();
+        stat.setAppId(map.getAppId());
+        stat.setInstanceId(map.getInstanceId());
+
+        buildStat(stat, agentStat);
+
+        instanceStatRepository.save(stat);
     }
 
+    private void buildStat(final InstanceStat instanceStat, final TAgentStat thriftObject) {
 
-    private AgentStatMemoryGc parseMemoryGc(AgentInstanceMap map, TAgentStat thriftObject) {
-        AgentStatMemoryGc memoryGc = new AgentStatMemoryGc();
-        memoryGc.setAppId(map.getAppId());
-        memoryGc.setInstanceId(map.getInstanceId());
-        memoryGc.setTimestamp(thriftObject.getTimestamp());
+        instanceStat.setTimestamp(thriftObject.getTimestamp());
 
         TJvmGc gc = thriftObject.getGc();
         if (gc != null) {
-            memoryGc.setGcType(gc.getType().name());
-            memoryGc.setJvmMemoryHeapUsed(gc.getJvmMemoryHeapUsed());
-            memoryGc.setJvmMemoryHeapMax(gc.getJvmMemoryHeapMax());
-            memoryGc.setJvmMemoryNonHeapMax(gc.getJvmMemoryNonHeapMax());
-            memoryGc.setJvmMemoryNonHeapUsed(gc.getJvmMemoryNonHeapUsed());
-            memoryGc.setJvmGcOldCount(gc.getJvmGcOldCount());
-            memoryGc.setJvmGcOldTime(gc.getJvmGcOldTime());
+            instanceStat.setGcType(gc.getType().name());
+            instanceStat.setJvmMemoryHeapUsed(gc.getJvmMemoryHeapUsed());
+            instanceStat.setJvmMemoryHeapMax(gc.getJvmMemoryHeapMax());
+            instanceStat.setJvmMemoryNonHeapMax(gc.getJvmMemoryNonHeapMax());
+            instanceStat.setJvmMemoryNonHeapUsed(gc.getJvmMemoryNonHeapUsed());
+            instanceStat.setJvmGcOldCount(gc.getJvmGcOldCount());
+            instanceStat.setJvmGcOldTime(gc.getJvmGcOldTime());
         } else {
-            memoryGc.setGcType(TJvmGcType.UNKNOWN.name());
+            instanceStat.setGcType(TJvmGcType.UNKNOWN.name());
         }
-        return memoryGc;
-    }
 
-    private AgentStatCpuLoad parseCpuLoad(AgentInstanceMap map, TAgentStat thriftObject) {
-        AgentStatCpuLoad cpuLoad = new AgentStatCpuLoad();
-        cpuLoad.setAppId(map.getAppId());
-        cpuLoad.setInstanceId(map.getInstanceId());
-        cpuLoad.setTimestamp(thriftObject.getTimestamp());
         final TCpuLoad cl = thriftObject.getCpuLoad();
         if (cl != null) {
             // jvmCpuLoad is optional
             if (cl.isSetJvmCpuLoad()) {
-                cpuLoad.setJvmCpuLoad(cl.getJvmCpuLoad());
+                instanceStat.setJvmCpuLoad(cl.getJvmCpuLoad());
             }
             // systemCpuLoad is optional
             if (cl.isSetSystemCpuLoad()) {
-                cpuLoad.setSystemCpuLoad(cl.getSystemCpuLoad());
+                instanceStat.setSystemCpuLoad(cl.getSystemCpuLoad());
             }
         }
-        return cpuLoad;
     }
 
 }

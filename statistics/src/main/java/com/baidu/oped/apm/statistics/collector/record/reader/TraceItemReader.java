@@ -17,13 +17,10 @@ public class TraceItemReader extends BaseReader<Trace> {
     @Autowired
     private TraceRepository traceRepository;
 
-    protected TraceItemReader(long periodStart, long periodInMills) {
-        super(periodStart, periodInMills);
-    }
-
-    public Iterable<Trace> readItems() {
+    public Iterable<Trace> readItems(long periodStart, long periodInMills) {
         QTrace qAgentStatCpuLoad = QTrace.trace;
-        BooleanExpression condition = qAgentStatCpuLoad.collectorAcceptTime.between(getPeriodStart(), getPeriodEnd());
+        BooleanExpression condition =
+                qAgentStatCpuLoad.collectorAcceptTime.between(periodStart, periodStart + periodInMills);
         return traceRepository.findAll(condition);
     }
 }

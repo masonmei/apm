@@ -59,7 +59,7 @@
 //        }
 //
 //        SpanBo spanBo = new SpanBo(span);
-//        final byte[] rowKey = getDistributeRowKey(SpanUtils.getTransactionId(span));
+//        final byte[] rowKey = getDistributeRowKey(SpanUtils.getStatisticState(span));
 //        Put put = new Put(rowKey);
 //
 //        byte[] spanValue = spanBo.writeValue();
@@ -106,7 +106,7 @@
 //
 //    @Override
 //    public void insertSpanChunk(TSpanChunk spanChunk) {
-//        byte[] rowKey = getDistributeRowKey(SpanUtils.getTransactionId(spanChunk));
+//        byte[] rowKey = getDistributeRowKey(SpanUtils.getStatisticState(spanChunk));
 //        Put put = new Put(rowKey);
 //
 //        long acceptedTime = acceptedTimeService.getAcceptedTime();

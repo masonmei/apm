@@ -27,10 +27,12 @@ import com.baidu.oped.apm.common.jpa.entity.ApplicationStatistic;
 import com.baidu.oped.apm.common.jpa.entity.Instance;
 import com.baidu.oped.apm.common.jpa.entity.InstanceStatistic;
 import com.baidu.oped.apm.common.jpa.entity.ServiceType;
+import com.baidu.oped.apm.model.service.AutomaticService;
 import com.baidu.oped.apm.model.service.OverviewService;
 import com.baidu.oped.apm.mvc.vo.InstanceVo;
 import com.baidu.oped.apm.mvc.vo.TimeRange;
 import com.baidu.oped.apm.mvc.vo.Transaction;
+import com.baidu.oped.apm.mvc.vo.TrendContext;
 import com.baidu.oped.apm.mvc.vo.TrendResponse;
 import com.baidu.oped.apm.utils.Constaints;
 import com.baidu.oped.apm.utils.InstanceUtils;
@@ -47,6 +49,9 @@ public class OverviewController {
     @Autowired
     private OverviewService overviewService;
 
+    @Autowired
+    private AutomaticService automaticService;
+
     /**
      * Get Application Response Time trend data
      *
@@ -57,7 +62,7 @@ public class OverviewController {
     @RequestMapping(value = {"trend/rt"}, method = RequestMethod.GET)
     public TrendResponse responseTime(@RequestParam(value = "appId") Long appId,
                                       @RequestParam(value = "time") String[] time,
-                                      @RequestParam(value = "period") Integer period) {
+                                      @RequestParam(value = "period") Long period) {
         Assert.notNull(appId, "ApplicationId must not be null while retrieve application response time trend data.");
         Assert.notEmpty(time, "Time ranges must not be null while retrieve application response time trend data.");
         Assert.notNull(period, "Period must be provided while retrieve application response time trend data.");
@@ -67,11 +72,9 @@ public class OverviewController {
         final ServiceType[] serviceTypes =
                 new ServiceType[] {ServiceType.WEB, ServiceType.DB, ServiceType.EXTERNAL, ServiceType.BACKGROUD};
         List<TimeRange> timeRanges = TimeUtils.convertToRange(time);
+        TrendContext metricDataOfApp = automaticService.getMetricDataOfApp(appId, timeRanges, period, serviceTypes);
 
-        Map<TimeRange, Iterable<ApplicationStatistic>> applicationMetricData =
-                overviewService.getApplicationMetricData(appId, timeRanges, period, serviceTypes);
-
-        return MetricUtils.toTrendResponse(applicationMetricData, metricName);
+        return MetricUtils.toTrendResponse(metricDataOfApp, metricName);
     }
 
     /**
@@ -85,21 +88,22 @@ public class OverviewController {
      */
     @RequestMapping(value = {"trend/apdex"}, method = RequestMethod.GET)
     public TrendResponse apdex(@RequestParam(value = "appId") Long appId, @RequestParam(value = "time") String[] time,
-                               @RequestParam(value = "period") Integer period) {
+                               @RequestParam(value = "period") Long period) {
         Assert.notNull(appId, "ApplicationId must not be null while retrieve application response time trend data.");
         Assert.notEmpty(time, "Time ranges must not be null while retrieve application response time trend data.");
         Assert.notNull(period, "Period must be provided while retrieve application response time trend data.");
         Assert.state(period / 60 == 0, "Period must be 60 or the times of 60.");
 
-        final Constaints.MetricName[] metricName = new Constaints.MetricName[] {APDEX, SATISFIED, TOLERATED, FRUSTRATED};
-        final ServiceType[] serviceTypes =
-                new ServiceType[] {ServiceType.WEB, ServiceType.DB, ServiceType.EXTERNAL, ServiceType.BACKGROUD};
+        final Constaints.MetricName[] metricName =
+                new Constaints.MetricName[] {APDEX, SATISFIED, TOLERATED, FRUSTRATED};
+        final ServiceType[] serviceTypes = new ServiceType[] {ServiceType.WEB, ServiceType.DB, ServiceType.EXTERNAL};
         List<TimeRange> timeRanges = TimeUtils.convertToRange(time);
+        TrendContext metricDataOfApp = automaticService.getMetricDataOfApp(appId, timeRanges, period, serviceTypes);
 
-        Map<TimeRange, Iterable<ApplicationStatistic>> applicationMetricData =
-                overviewService.getApplicationMetricData(appId, timeRanges, period, serviceTypes);
+        //        Map<TimeRange, Iterable<ApplicationStatistic>> applicationMetricData =
+        //                overviewService.getApplicationMetricData(appId, timeRanges, period, serviceTypes);
 
-        return MetricUtils.toTrendResponse(applicationMetricData, metricName);
+        return MetricUtils.toTrendResponse(metricDataOfApp, metricName);
     }
 
     /**
@@ -113,21 +117,18 @@ public class OverviewController {
      */
     @RequestMapping(value = {"trend/cpm"}, method = RequestMethod.GET)
     public TrendResponse cpm(@RequestParam(value = "appId") Long appId, @RequestParam(value = "time") String[] time,
-                             @RequestParam(value = "period") Integer period) {
+                             @RequestParam(value = "period") Long period) {
         Assert.notNull(appId, "ApplicationId must not be null while retrieve application response time trend data.");
         Assert.notEmpty(time, "Time ranges must not be null while retrieve application response time trend data.");
         Assert.notNull(period, "Period must be provided while retrieve application response time trend data.");
         Assert.state(period / 60 == 0, "Period must be 60 or the times of 60.");
 
         final Constaints.MetricName[] metricName = new Constaints.MetricName[] {RESPONSE_TIME, PV, CPM};
-        final ServiceType[] serviceTypes =
-                new ServiceType[] {ServiceType.WEB, ServiceType.DB, ServiceType.EXTERNAL, ServiceType.BACKGROUD};
+        final ServiceType[] serviceTypes = new ServiceType[] {ServiceType.WEB, ServiceType.DB, ServiceType.EXTERNAL};
         List<TimeRange> timeRanges = TimeUtils.convertToRange(time);
+        TrendContext metricDataOfApp = automaticService.getMetricDataOfApp(appId, timeRanges, period, serviceTypes);
 
-        Map<TimeRange, Iterable<ApplicationStatistic>> applicationMetricData =
-                overviewService.getApplicationMetricData(appId, timeRanges, period, serviceTypes);
-
-        return MetricUtils.toTrendResponse(applicationMetricData, metricName);
+        return MetricUtils.toTrendResponse(metricDataOfApp, metricName);
     }
 
     /**
@@ -163,7 +164,7 @@ public class OverviewController {
     @RequestMapping(value = {"trend/errorRate"}, method = RequestMethod.GET)
     public TrendResponse errorRate(@RequestParam(value = "appId") Long appId,
                                    @RequestParam(value = "time") String[] time,
-                                   @RequestParam(value = "period") Integer period) {
+                                   @RequestParam(value = "period") Long period) {
         Assert.notNull(appId, "ApplicationId must not be null while retrieve application response time trend data.");
         Assert.notEmpty(time, "Time ranges must not be null while retrieve application response time trend data.");
         Assert.notNull(period, "Period must be provided while retrieve application response time trend data.");
@@ -174,10 +175,9 @@ public class OverviewController {
                 new ServiceType[] {ServiceType.WEB, ServiceType.DB, ServiceType.EXTERNAL, ServiceType.BACKGROUD};
         List<TimeRange> timeRanges = TimeUtils.convertToRange(time);
 
-        Map<TimeRange, Iterable<ApplicationStatistic>> applicationMetricData =
-                overviewService.getApplicationMetricData(appId, timeRanges, period, serviceTypes);
+        TrendContext metricDataOfApp = automaticService.getMetricDataOfApp(appId, timeRanges, period, serviceTypes);
 
-        return MetricUtils.toTrendResponse(applicationMetricData, metricName);
+        return MetricUtils.toTrendResponse(metricDataOfApp, metricName);
     }
 
     /**
@@ -233,7 +233,7 @@ public class OverviewController {
     public TrendResponse instanceResponseTime(@RequestParam(value = "appId") Long appId,
                                               @RequestParam(value = "instanceId") Long instanceId,
                                               @RequestParam(value = "time") String[] time,
-                                              @RequestParam(value = "period") Integer period) {
+                                              @RequestParam(value = "period") Long period) {
         Assert.notNull(appId, "ApplicationId must not be null while retrieve application response time trend data.");
         Assert.notNull(instanceId, "InstanceId must not be null while retrieve application response time trend data.");
         Assert.notEmpty(time, "Time ranges must not be null while retrieve application response time trend data.");
@@ -241,14 +241,13 @@ public class OverviewController {
         Assert.state(period / 60 == 0, "Period must be 60 or the times of 60.");
 
         final Constaints.MetricName[] metricName = new Constaints.MetricName[] {RESPONSE_TIME, PV, CPM};
-        final ServiceType[] serviceTypes =
-                new ServiceType[] {ServiceType.WEB, ServiceType.DB, ServiceType.EXTERNAL, ServiceType.BACKGROUD};
+        final ServiceType[] serviceTypes = new ServiceType[] {ServiceType.WEB, ServiceType.DB, ServiceType.EXTERNAL};
         List<TimeRange> timeRanges = TimeUtils.convertToRange(time);
 
-        Map<TimeRange, Iterable<InstanceStatistic>> applicationMetricData =
-                overviewService.getInstanceMetricData(appId, timeRanges, period, serviceTypes);
+        TrendContext metricDataOfInstance =
+                automaticService.getMetricDataOfInstance(instanceId, timeRanges, period, serviceTypes);
 
-        return MetricUtils.instanceMetricToTrendResponse(applicationMetricData, metricName);
+        return MetricUtils.toTrendResponse(metricDataOfInstance, metricName);
     }
 
     /**
@@ -264,7 +263,7 @@ public class OverviewController {
     public TrendResponse instanceApdex(@RequestParam(value = "appId") Long appId,
                                        @RequestParam(value = "instanceId") Long instanceId,
                                        @RequestParam(value = "time") String[] time,
-                                       @RequestParam(value = "period") Integer period) {
+                                       @RequestParam(value = "period") Long period) {
 
         Assert.notNull(appId, "ApplicationId must not be null while retrieve application response time trend data.");
         Assert.notNull(instanceId, "InstanceId must not be null while retrieve application response time trend data.");
@@ -275,13 +274,13 @@ public class OverviewController {
         final Constaints.MetricName[] metricName =
                 new Constaints.MetricName[] {APDEX, SATISFIED, TOLERATED, FRUSTRATED};
         final ServiceType[] serviceTypes =
-                new ServiceType[] {ServiceType.WEB, ServiceType.DB, ServiceType.EXTERNAL, ServiceType.BACKGROUD};
+                new ServiceType[] {ServiceType.WEB, ServiceType.DB, ServiceType.EXTERNAL};
         List<TimeRange> timeRanges = TimeUtils.convertToRange(time);
 
-        Map<TimeRange, Iterable<InstanceStatistic>> applicationMetricData =
-                overviewService.getInstanceMetricData(appId, timeRanges, period, serviceTypes);
+        TrendContext metricDataOfInstance =
+                automaticService.getMetricDataOfInstance(instanceId, timeRanges, period, serviceTypes);
 
-        return MetricUtils.instanceMetricToTrendResponse(applicationMetricData, metricName);
+        return MetricUtils.toTrendResponse(metricDataOfInstance, metricName);
     }
 
     /**
@@ -297,7 +296,7 @@ public class OverviewController {
     public TrendResponse instanceCpm(@RequestParam(value = "appId") Long appId,
                                      @RequestParam(value = "instanceId") Long instanceId,
                                      @RequestParam(value = "time") String[] time,
-                                     @RequestParam(value = "period") Integer period) {
+                                     @RequestParam(value = "period") Long period) {
 
         Assert.notNull(appId, "ApplicationId must not be null while retrieve application response time trend data.");
         Assert.notNull(instanceId, "InstanceId must not be null while retrieve application response time trend data.");
@@ -307,13 +306,13 @@ public class OverviewController {
 
         final Constaints.MetricName[] metricName = new Constaints.MetricName[] {RESPONSE_TIME, PV, CPM};
         final ServiceType[] serviceTypes =
-                new ServiceType[] {ServiceType.WEB, ServiceType.DB, ServiceType.EXTERNAL, ServiceType.BACKGROUD};
+                new ServiceType[] {ServiceType.WEB, ServiceType.DB, ServiceType.EXTERNAL};
         List<TimeRange> timeRanges = TimeUtils.convertToRange(time);
 
-        Map<TimeRange, Iterable<InstanceStatistic>> applicationMetricData =
-                overviewService.getInstanceMetricData(appId, timeRanges, period, serviceTypes);
+        TrendContext metricDataOfInstance =
+                automaticService.getMetricDataOfInstance(instanceId, timeRanges, period, serviceTypes);
 
-        return MetricUtils.instanceMetricToTrendResponse(applicationMetricData, metricName);
+        return MetricUtils.toTrendResponse(metricDataOfInstance, metricName);
     }
 
     /**
@@ -351,7 +350,7 @@ public class OverviewController {
     public TrendResponse instanceErrorRate(@RequestParam(value = "appId") Long appId,
                                            @RequestParam(value = "instanceId") Long instanceId,
                                            @RequestParam(value = "time") String[] time,
-                                           @RequestParam(value = "period") Integer period) {
+                                           @RequestParam(value = "period") Long period) {
         Assert.notNull(appId, "ApplicationId must not be null while retrieve application response time trend data.");
         Assert.notEmpty(time, "Time ranges must not be null while retrieve application response time trend data.");
         Assert.notNull(period, "Period must be provided while retrieve application response time trend data.");
@@ -359,13 +358,14 @@ public class OverviewController {
 
         final Constaints.MetricName[] metricName = new Constaints.MetricName[] {ERROR_RATE, ERROR, PV};
         final ServiceType[] serviceTypes =
-                new ServiceType[] {ServiceType.WEB, ServiceType.DB, ServiceType.EXTERNAL, ServiceType.BACKGROUD};
+                new ServiceType[] {ServiceType.WEB, ServiceType.DB, ServiceType.EXTERNAL};
         List<TimeRange> timeRanges = TimeUtils.convertToRange(time);
 
-        Map<TimeRange, Iterable<InstanceStatistic>> instanceMetricData =
-                overviewService.getInstanceMetricData(instanceId, timeRanges, period, serviceTypes);
 
-        return MetricUtils.instanceMetricToTrendResponse(instanceMetricData, metricName);
+        TrendContext metricDataOfInstance =
+                automaticService.getMetricDataOfInstance(instanceId, timeRanges, period, serviceTypes);
+
+        return MetricUtils.toTrendResponse(metricDataOfInstance, metricName);
     }
 
     /**

@@ -44,7 +44,7 @@ public class AgentStatHandler implements Handler {
             agentStat.setStartTimestamp(startTimestamp);
             agentStatDao.insert(agentStat);
         } catch (Exception e) {
-            logger.warn("AgentStat handle error. Caused:{}", e.getMessage());
+            logger.warn("InstanceStat handle error. Caused:{}", e.getMessage());
         }
     }
 

@@ -1,16 +1,9 @@
 package com.baidu.oped.apm.statistics.collector;
 
-import com.baidu.oped.apm.statistics.collector.record.reader.BaseReader;
-
 /**
  * Created by mason on 8/29/15.
  */
-public abstract class BaseCollector {
-    private BaseReader reader;
+public interface BaseCollector {
 
-
-
-    public void collect(){
-        Iterable iterable = reader.readItems();
-    }
+    void collect(final long periodStart, final long periodInMills);
 }

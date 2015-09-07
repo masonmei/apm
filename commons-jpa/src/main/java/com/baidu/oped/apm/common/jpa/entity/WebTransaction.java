@@ -3,6 +3,7 @@ package com.baidu.oped.apm.common.jpa.entity;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Index;
 import javax.persistence.Table;
 
 import org.springframework.data.jpa.domain.AbstractPersistable;
@@ -11,7 +12,9 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
  * Created by mason on 8/27/15.
  */
 @Entity
-@Table(name = "apm_web_transaction")
+@Table(name = "apm_web_transaction", indexes = {
+        @Index(name = "web_tran_unique", columnList = "app_id,instance_id,rpc", unique = true)
+})
 public class WebTransaction extends AbstractPersistable<Long> {
 
     @Basic
@@ -23,8 +26,8 @@ public class WebTransaction extends AbstractPersistable<Long> {
     private Long instanceId;
 
     @Basic
-    @Column(name = "api_id", nullable = false, insertable = true, updatable = true)
-    private Long apiId;
+    @Column(name = "rpc", nullable = false, insertable = true, updatable = false, length = 512)
+    private String rpc;
 
     public Long getAppId() {
         return appId;
@@ -42,12 +45,11 @@ public class WebTransaction extends AbstractPersistable<Long> {
         this.instanceId = instanceId;
     }
 
-    public Long getApiId() {
-        return apiId;
+    public String getRpc() {
+        return rpc;
     }
 
-    public void setApiId(Long apiId) {
-        this.apiId = apiId;
+    public void setRpc(String rpc) {
+        this.rpc = rpc;
     }
-
 }

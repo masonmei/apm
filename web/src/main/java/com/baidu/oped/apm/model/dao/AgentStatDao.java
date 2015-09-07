@@ -3,7 +3,7 @@
 //
 //import java.util.List;
 //
-//import com.baidu.oped.apm.mvc.vo.AgentStat;
+//import com.baidu.oped.apm.mvc.vo.InstanceStat;
 //import com.baidu.oped.apm.mvc.vo.Range;
 //
 ///**
@@ -13,6 +13,6 @@
 // */
 //public interface AgentStatDao {
 //
-//    List<AgentStat> scanAgentStatList(String agentId, Range range);
+//    List<InstanceStat> scanAgentStatList(String agentId, Range range);
 //
 //}

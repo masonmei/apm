@@ -21,7 +21,7 @@
 //import com.baidu.oped.apm.common.util.TimeUtils;
 //
 //import com.baidu.oped.apm.model.dao.AgentStatDao;
-//import com.baidu.oped.apm.mvc.vo.AgentStat;
+//import com.baidu.oped.apm.mvc.vo.InstanceStat;
 //import com.baidu.oped.apm.mvc.vo.Range;
 //import com.sematext.hbase.wd.AbstractRowKeyDistributor;
 //
@@ -40,7 +40,7 @@
 //
 ////    @Autowired
 ////    @Qualifier("agentStatMapper")
-//    private RowMapper<List<AgentStat>> agentStatMapper;
+//    private RowMapper<List<InstanceStat>> agentStatMapper;
 //
 ////    @Autowired
 ////    @Qualifier("agentStatRowKeyDistributor")
@@ -52,7 +52,7 @@
 //        this.scanCacheSize = scanCacheSize;
 //    }
 //
-//    public List<AgentStat> scanAgentStatList(String agentId, Range range) {
+//    public List<InstanceStat> scanAgentStatList(String agentId, Range range) {
 //        if (agentId == null) {
 //            throw new NullPointerException("agentId must not be null");
 //        }
@@ -67,12 +67,12 @@
 //
 //        Scan scan = createScan(agentId, range);
 //
-//        List<List<AgentStat>> intermediate = hbaseOperations2.find(HBaseTables.AGENT_STAT, scan, rowKeyDistributor, agentStatMapper);
+//        List<List<InstanceStat>> intermediate = hbaseOperations2.find(HBaseTables.AGENT_STAT, scan, rowKeyDistributor, agentStatMapper);
 //
 //        int expectedSize = (int)(range.getRange() / 5000); // data for 5 seconds
-//        List<AgentStat> merged = new ArrayList<AgentStat>(expectedSize);
+//        List<InstanceStat> merged = new ArrayList<InstanceStat>(expectedSize);
 //
-//        for(List<AgentStat> each : intermediate) {
+//        for(List<InstanceStat> each : intermediate) {
 //            merged.addAll(each);
 //        }
 //
@@ -111,17 +111,17 @@
 //        return scan;
 //    }
 //
-//    //    public List<AgentStat> scanAgentStatList(String agentId, long start, long end, final int limit) {
+//    //    public List<InstanceStat> scanAgentStatList(String agentId, long start, long end, final int limit) {
 //    //        if (logger.isDebugEnabled()) {
 //    //            logger.debug("scanAgentStatList");
 //    //        }
 //    //        Scan scan = createScan(agentId, start, end);
 //    //
-//    //        List<AgentStat> list = hbaseOperations2.find(HBaseTables.AGENT_STAT, scan, rowKeyDistributor, new ResultsExtractor<List<AgentStat>>() {
+//    //        List<InstanceStat> list = hbaseOperations2.find(HBaseTables.AGENT_STAT, scan, rowKeyDistributor, new ResultsExtractor<List<InstanceStat>>() {
 //    //            @Override
-//    //            public List<AgentStat> extractData(ResultScanner results) throws Exception {
+//    //            public List<InstanceStat> extractData(ResultScanner results) throws Exception {
 //    //                TDeserializer deserializer = new TDeserializer();
-//    //                List<AgentStat> list = new ArrayList<AgentStat>();
+//    //                List<InstanceStat> list = new ArrayList<InstanceStat>();
 //    //                for (Result result : results) {
 //    //                    if (result == null) {
 //    //                        continue;
@@ -132,7 +132,7 @@
 //    //                    }
 //    //
 //    //                    for (KeyValue kv : result.raw()) {
-//    //                        AgentStat agentStat = new AgentStat();
+//    //                        InstanceStat agentStat = new InstanceStat();
 //    //                        deserializer.deserialize(agentStat, kv.getBuffer());
 //    //                        list.add(agentStat);
 //    //                    }

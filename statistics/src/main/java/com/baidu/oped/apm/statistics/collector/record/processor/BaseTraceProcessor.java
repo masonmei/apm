@@ -10,14 +10,14 @@ import java.util.stream.StreamSupport;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.baidu.oped.apm.common.jpa.entity.BaseStatistic;
+import com.baidu.oped.apm.common.jpa.entity.CommonStatistic;
 import com.baidu.oped.apm.common.jpa.entity.Trace;
 import com.baidu.oped.apm.statistics.collector.ApdexDecider;
 
 /**
  * Created by mason on 8/31/15.
  */
-public abstract class BaseTraceProcessor<T extends BaseStatistic> extends BaseProcessor<Trace, T> {
+public abstract class BaseTraceProcessor<T extends CommonStatistic> extends BaseProcessor<Trace, T> {
 
     @Autowired
     private ApdexDecider decider;
@@ -36,12 +36,11 @@ public abstract class BaseTraceProcessor<T extends BaseStatistic> extends BasePr
                                                          WebTransactionGroup group = new WebTransactionGroup();
                                                          group.setAppId(t.getAppId());
                                                          group.setInstanceId(t.getInstanceId());
-                                                         group.setSpanId(t.getSpanId());
                                                          group.setRpc(t.getRpc());
                                                          return group;
                                                      }
                                                  }));
-        grouped.forEach((instanceId, list) -> {
+        grouped.forEach((mappedKey, list) -> {
             DoubleSummaryStatistics summaryStatistics = list.stream()
                                              .mapToDouble(Trace::getElapsed)
                                              .summaryStatistics();
@@ -50,9 +49,10 @@ public abstract class BaseTraceProcessor<T extends BaseStatistic> extends BasePr
             Long toleratedCount = list.stream().filter(trace -> decider.isTolerated(trace.getElapsed())).count();
             Long frustratedCount = list.stream().filter(trace -> decider.isFrustrated(trace.getElapsed())).count();
 
-            T statistic = newStatisticInstance();
+            T statistic = findOrCreateStatisticInstance(mappedKey);
             statistic.setMaxResponseTime(summaryStatistics.getMax());
             statistic.setSumResponseTime(summaryStatistics.getSum());
+            statistic.setMinResponseTime(summaryStatistics.getMin());
             statistic.setPv(summaryStatistics.getCount());
             statistic.setError(errorCount);
             statistic.setSatisfied(satisfiedCount);
@@ -65,12 +65,11 @@ public abstract class BaseTraceProcessor<T extends BaseStatistic> extends BasePr
         return statistics;
     }
 
-    public abstract T newStatisticInstance();
+    public abstract T findOrCreateStatisticInstance(WebTransactionGroup mappedKey);
 
     class WebTransactionGroup {
         private Long appId;
         private Long instanceId;
-        private Long spanId;
         private String rpc;
 
         public Long getAppId() {
@@ -89,13 +88,6 @@ public abstract class BaseTraceProcessor<T extends BaseStatistic> extends BasePr
             this.instanceId = instanceId;
         }
 
-        public Long getSpanId() {
-            return spanId;
-        }
-
-        public void setSpanId(Long spanId) {
-            this.spanId = spanId;
-        }
 
         public String getRpc() {
             return rpc;
@@ -122,9 +114,6 @@ public abstract class BaseTraceProcessor<T extends BaseStatistic> extends BasePr
             if (instanceId != null ? !instanceId.equals(that.instanceId) : that.instanceId != null) {
                 return false;
             }
-            if (spanId != null ? !spanId.equals(that.spanId) : that.spanId != null) {
-                return false;
-            }
             return !(rpc != null ? !rpc.equals(that.rpc) : that.rpc != null);
 
         }
@@ -133,7 +122,6 @@ public abstract class BaseTraceProcessor<T extends BaseStatistic> extends BasePr
         public int hashCode() {
             int result = appId != null ? appId.hashCode() : 0;
             result = 31 * result + (instanceId != null ? instanceId.hashCode() : 0);
-            result = 31 * result + (spanId != null ? spanId.hashCode() : 0);
             result = 31 * result + (rpc != null ? rpc.hashCode() : 0);
             return result;
         }
