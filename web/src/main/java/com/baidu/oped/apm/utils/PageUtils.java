@@ -11,7 +11,7 @@ import org.springframework.util.StringUtils;
  * Time: 21:20
  * To change this template use File | Settings | File Templates.
  */
-public class PageUtils {
+public abstract class PageUtils {
 
     public static Sort toSort(String orderBy) {
         if (StringUtils.isEmpty(orderBy)) {

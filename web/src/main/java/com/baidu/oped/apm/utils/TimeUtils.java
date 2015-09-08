@@ -15,8 +15,8 @@ import com.baidu.oped.apm.mvc.vo.TimeRange;
 /**
  * Created by mason on 8/27/15.
  */
-public class TimeUtils {
-    private static final String TIME_RANGE_ELEMENT_SPLITER = "|";
+public abstract class TimeUtils {
+    private static final String TIME_RANGE_ELEMENT_SPLITER = "\\|";
 
     public static List<TimeRange> convertToRange(String... stringRanges) {
         List<TimeRange> timeRanges = new ArrayList<>();

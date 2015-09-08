@@ -36,7 +36,7 @@ public class TraceEvent extends AbstractPersistable<Long> implements Serializabl
     private Long apiId;
 
     @Column(name = "collector_accept_time")
-    private long collectorAcceptTime;
+    private Long collectorAcceptTime;
 
     @Column(nullable = true)
     private int depth;
@@ -123,11 +123,11 @@ public class TraceEvent extends AbstractPersistable<Long> implements Serializabl
         this.apiId = apiId;
     }
 
-    public long getCollectorAcceptTime() {
+    public Long getCollectorAcceptTime() {
         return collectorAcceptTime;
     }
 
-    public void setCollectorAcceptTime(long collectorAcceptTime) {
+    public void setCollectorAcceptTime(Long collectorAcceptTime) {
         this.collectorAcceptTime = collectorAcceptTime;
     }
 

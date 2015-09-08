@@ -1,9 +1,11 @@
 package com.baidu.oped.apm.mvc.vo;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 import org.springframework.util.Assert;
 
+import com.baidu.oped.apm.common.utils.TimeUtil;
 import com.baidu.oped.apm.utils.TimeUtils;
 
 /**
@@ -34,6 +36,10 @@ public class TimeRange {
 
     public void setTo(LocalDateTime to) {
         this.to = to;
+    }
+
+    public double getDuration(ChronoUnit unit) {
+        return TimeUtil.getRange(from, to, unit);
     }
 
     @Override

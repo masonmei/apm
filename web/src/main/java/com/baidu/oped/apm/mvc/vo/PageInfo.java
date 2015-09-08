@@ -1,15 +1,9 @@
 package com.baidu.oped.apm.mvc.vo;
 
 /**
- * ***** description *****
- * Created with IntelliJ IDEA.
- * User: yangbolin
- * Date: 15/8/27
- * Time: 22:10
- * To change this template use File | Settings | File Templates.
+ * Created by mason on 9/7/15.
  */
-public class Page {
-
+public class PageInfo {
     private int pageNumber;
     private int pageSize;
     private long total;

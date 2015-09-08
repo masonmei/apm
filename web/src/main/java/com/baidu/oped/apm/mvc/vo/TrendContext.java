@@ -1,15 +1,21 @@
 package com.baidu.oped.apm.mvc.vo;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
+import com.baidu.oped.apm.common.jpa.entity.ExternalServiceStatistic;
 import com.baidu.oped.apm.common.jpa.entity.ServiceType;
+import com.baidu.oped.apm.common.jpa.entity.SqlTransactionStatistic;
 import com.baidu.oped.apm.common.jpa.entity.Statistic;
+import com.baidu.oped.apm.common.jpa.entity.WebTransactionStatistic;
+import com.baidu.oped.apm.common.utils.TimeUtil;
+import com.baidu.oped.apm.model.entity.DummyStatistic;
 
 /**
  * Created by mason on 9/6/15.
@@ -19,23 +25,39 @@ public class TrendContext {
             new HashMap<>();
     private final Set<ServiceType> serviceTypes = new HashSet<>();
     private final Set<TimeRange> timeRanges = new HashSet<>();
+    private final Long periodInMillis;
 
-    public TrendContext(TimeRange... timeRanges) {
+    public TrendContext(Long periodInMillis, TimeRange... timeRanges) {
         Arrays.stream(timeRanges).forEach(this.timeRanges::add);
+        this.periodInMillis = periodInMillis;
     }
 
-    public void addServiceData(ServiceType serviceType,
-                               Map<TimeRange, Iterable<? extends Statistic>> serviceStatistics) {
+    public void addWebTransactionData(ServiceType serviceType,
+                                      Map<TimeRange, Iterable<WebTransactionStatistic>> serviceStatistics) {
         serviceTypes.add(serviceType);
-        serviceStatistics.forEach((timeRange, statistics) -> {
-            Map<ServiceType, Iterable<? extends Statistic>> serviceTypeStatisticMap =
-                    rangeServiceStatisticMap.get(timeRange);
-            if (serviceTypeStatisticMap == null) {
-                rangeServiceStatisticMap.put(timeRange, new HashMap<>());
-                serviceTypeStatisticMap = rangeServiceStatisticMap.get(timeRange);
-            }
-            serviceTypeStatisticMap.put(serviceType, statistics);
-        });
+        serviceStatistics.forEach((timeRange, statistics) -> addStatistics(serviceType, timeRange, statistics));
+    }
+
+    public void addDatabaseServiceData(ServiceType serviceType,
+                                       Map<TimeRange, Iterable<SqlTransactionStatistic>> serviceStatistics) {
+        serviceTypes.add(serviceType);
+        serviceStatistics.forEach((timeRange, statistics) -> addStatistics(serviceType, timeRange, statistics));
+    }
+
+    public void addExternalServiceData(ServiceType serviceType,
+                                       Map<TimeRange, Iterable<ExternalServiceStatistic>> serviceStatistics) {
+        serviceTypes.add(serviceType);
+        serviceStatistics.forEach((timeRange, statistics) -> addStatistics(serviceType, timeRange, statistics));
+    }
+
+    private void addStatistics(ServiceType serviceType, TimeRange timeRange, Iterable<? extends Statistic> statistics) {
+        Map<ServiceType, Iterable<? extends Statistic>> serviceTypeStatisticMap =
+                rangeServiceStatisticMap.get(timeRange);
+        if (serviceTypeStatisticMap == null) {
+            rangeServiceStatisticMap.put(timeRange, new HashMap<>());
+            serviceTypeStatisticMap = rangeServiceStatisticMap.get(timeRange);
+        }
+        serviceTypeStatisticMap.put(serviceType, statistics);
     }
 
     public Set<TimeRange> getTimeRanges() {
@@ -47,7 +69,21 @@ public class TrendContext {
     }
 
     public List<Statistic> getStatistic(TimeRange timeRange, ServiceType serviceType) {
-        //TODO:
-        return Collections.emptyList();
+        Iterable<? extends Statistic> statistics = rangeServiceStatisticMap.get(timeRange).get(serviceType);
+        Map<Long, Statistic> timestampStatisticMap = new HashMap<>();
+        statistics.forEach(statistic -> timestampStatisticMap.put(statistic.getTimestamp(), statistic));
+        List<Long> timestamps = TimeUtil.getTimestamps(timeRange.getFrom(), timeRange.getTo(), periodInMillis);
+
+        List<Statistic> statisticList = timestamps.stream().map(timestamp -> {
+            Statistic statistic = timestampStatisticMap.get(timestamp);
+            if (statistic == null) {
+                statistic = new DummyStatistic();
+                statistic.setTimestamp(timestamp);
+                statistic.setPeriod(periodInMillis);
+            }
+            return statistic;
+        }).collect(Collectors.toList());
+
+        return statisticList;
     }
 }

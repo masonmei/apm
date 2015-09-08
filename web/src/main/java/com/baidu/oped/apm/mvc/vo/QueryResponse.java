@@ -12,19 +12,19 @@ import java.util.List;
  */
 public class QueryResponse<T> {
 
-    private Page page;
+    private PageInfo page;
     private List<T> data;
 
-    public QueryResponse(Page page, List<T> data) {
+    public QueryResponse(final PageInfo page, final List<T> data) {
         this.page = page;
         this.data = data;
     }
 
-    public Page getPage() {
+    public PageInfo getPage() {
         return page;
     }
 
-    public void setPage(Page page) {
+    public void setPage(PageInfo page) {
         this.page = page;
     }
 

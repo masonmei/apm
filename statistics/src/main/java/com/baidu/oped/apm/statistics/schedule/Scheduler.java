@@ -182,7 +182,7 @@ public class Scheduler {
                 break;
             }
             case EXTERNAL_SERVICE: {
-                long minTimestamp = traceEventRepository.minTimestamp();
+                Long minTimestamp = traceEventRepository.minTimestamp();
                 long periodStart = getPeriodStart(minTimestamp, statisticState.getPeriod());
                 statisticState.setTimestamp(periodStart);
                 break;

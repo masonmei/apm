@@ -14,7 +14,7 @@ import com.baidu.oped.apm.mvc.vo.InstanceVo;
 /**
  * Created by mason on 8/28/15.
  */
-public class InstanceUtils {
+public abstract class InstanceUtils {
     public static List<InstanceVo> toInstanceVo(Application application, Iterable<Instance> appInstances,
                                                 Iterable<InstanceStatistic> instanceStatistics) {
         Assert.notNull(application);

@@ -5,7 +5,7 @@ import java.text.DecimalFormat;
 /**
  * Created by mason on 8/13/15.
  */
-public class NumberUtils {
+public abstract class NumberUtils {
     public static Double format(final Double original, final int precision) {
         if(original == null){
             return null;
@@ -39,6 +39,25 @@ public class NumberUtils {
         StringBuilder formatBuilder = new StringBuilder("#.0000");
         DecimalFormat doubleFormat = new DecimalFormat(formatBuilder.toString());
         return Double.valueOf(doubleFormat.format(original));
+    }
+
+    public static Double nullToZeroFormat(final Number number){
+        if(number == null){
+            return 0.0;
+        }
+        return number.doubleValue();
+    }
+
+    public static Double calculateRate(final Number number, final Number divider) {
+        if(number == null){
+            return 0.0;
+        }
+
+        if(divider == null || divider.doubleValue() == 0.0){
+            return 0.0;
+        }
+
+        return number.doubleValue() / divider.doubleValue();
     }
 
 }
