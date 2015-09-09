@@ -1,7 +1,7 @@
 package com.baidu.oped.apm.utils;
 
-import static com.baidu.oped.apm.utils.NumberUtils.calculateRate;
-import static com.baidu.oped.apm.utils.NumberUtils.format;
+import static com.baidu.oped.apm.common.utils.NumberUtils.calculateRate;
+import static com.baidu.oped.apm.common.utils.NumberUtils.format;
 
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;

@@ -2,7 +2,7 @@
 //
 //import com.baidu.oped.apm.model.service.ApplicationService;
 //import com.baidu.oped.apm.mvc.vo.ApplicationVo;
-//import com.baidu.oped.apm.utils.Constaints;
+//import com.baidu.oped.apm.utils.Constraints;
 //import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.format.annotation.DateTimeFormat;
 //import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,12 +30,12 @@
 //
 //    @RequestMapping(method = RequestMethod.GET)
 //    public List<ApplicationVo> applications(
-//            @DateTimeFormat(pattern = Constaints.TIME_PATTERN) LocalDateTime from,
-//            @DateTimeFormat(pattern = Constaints.TIME_PATTERN) LocalDateTime to,
+//            @DateTimeFormat(pattern = Constraints.TIME_PATTERN) LocalDateTime from,
+//            @DateTimeFormat(pattern = Constraints.TIME_PATTERN) LocalDateTime to,
 //            @RequestParam(value = "simplify", required = false, defaultValue = "false") boolean simplify,
 //            @RequestParam(value = "orderBy") boolean orderBy,
-//            @RequestParam(value = "pageSize", required = false, defaultValue = Constaints.PAGE_SIZE) int pageSize,
-//            @RequestParam(value = "pageNumber", required = false, defaultValue = Constaints.PAGE_NUMBER) int pageNumber
+//            @RequestParam(value = "pageSize", required = false, defaultValue = Constraints.PAGE_SIZE) int pageSize,
+//            @RequestParam(value = "pageNumber", required = false, defaultValue = Constraints.PAGE_NUMBER) int pageNumber
 //    ) {
 //        return applicationService.selectApplications(from, to, simplify, orderBy, pageSize, pageNumber);
 //    }

@@ -1,7 +1,7 @@
 package com.baidu.oped.apm.utils;
 
-import static com.baidu.oped.apm.utils.NumberUtils.calculateRate;
-import static com.baidu.oped.apm.utils.NumberUtils.format;
+import static com.baidu.oped.apm.common.utils.NumberUtils.calculateRate;
+import static com.baidu.oped.apm.common.utils.NumberUtils.format;
 
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -18,6 +18,7 @@ import com.baidu.oped.apm.common.jpa.entity.Application;
 import com.baidu.oped.apm.common.jpa.entity.ApplicationStatistic;
 import com.baidu.oped.apm.common.jpa.entity.Instance;
 import com.baidu.oped.apm.common.jpa.entity.InstanceStatistic;
+import com.baidu.oped.apm.common.utils.ApdexUtils;
 import com.baidu.oped.apm.mvc.vo.ApplicationVo;
 import com.baidu.oped.apm.mvc.vo.InstanceVo;
 import com.baidu.oped.apm.mvc.vo.PageInfo;

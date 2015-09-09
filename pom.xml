@@ -25,7 +25,6 @@
         <module>rpc</module>
         <module>thrift</module>
         <module>agent</module>
-        <module>commons-jdbc</module>
         <module>commons-jpa</module>
         <module>testapp</module>
         <module>collector</module>

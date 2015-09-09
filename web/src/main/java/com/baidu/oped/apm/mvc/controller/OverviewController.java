@@ -1,14 +1,14 @@
 package com.baidu.oped.apm.mvc.controller;
 
-import static com.baidu.oped.apm.utils.Constaints.MetricName.APDEX;
-import static com.baidu.oped.apm.utils.Constaints.MetricName.CPM;
-import static com.baidu.oped.apm.utils.Constaints.MetricName.ERROR;
-import static com.baidu.oped.apm.utils.Constaints.MetricName.ERROR_RATE;
-import static com.baidu.oped.apm.utils.Constaints.MetricName.FRUSTRATED;
-import static com.baidu.oped.apm.utils.Constaints.MetricName.PV;
-import static com.baidu.oped.apm.utils.Constaints.MetricName.RESPONSE_TIME;
-import static com.baidu.oped.apm.utils.Constaints.MetricName.SATISFIED;
-import static com.baidu.oped.apm.utils.Constaints.MetricName.TOLERATED;
+import static com.baidu.oped.apm.common.utils.Constraints.MetricName.APDEX;
+import static com.baidu.oped.apm.common.utils.Constraints.MetricName.CPM;
+import static com.baidu.oped.apm.common.utils.Constraints.MetricName.ERROR;
+import static com.baidu.oped.apm.common.utils.Constraints.MetricName.ERROR_RATE;
+import static com.baidu.oped.apm.common.utils.Constraints.MetricName.FRUSTRATED;
+import static com.baidu.oped.apm.common.utils.Constraints.MetricName.PV;
+import static com.baidu.oped.apm.common.utils.Constraints.MetricName.RESPONSE_TIME;
+import static com.baidu.oped.apm.common.utils.Constraints.MetricName.SATISFIED;
+import static com.baidu.oped.apm.common.utils.Constraints.MetricName.TOLERATED;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,6 +25,7 @@ import com.baidu.oped.apm.common.jpa.entity.Application;
 import com.baidu.oped.apm.common.jpa.entity.Instance;
 import com.baidu.oped.apm.common.jpa.entity.InstanceStatistic;
 import com.baidu.oped.apm.common.jpa.entity.ServiceType;
+import com.baidu.oped.apm.common.utils.Constraints;
 import com.baidu.oped.apm.model.service.AutomaticService;
 import com.baidu.oped.apm.model.service.OverviewService;
 import com.baidu.oped.apm.mvc.vo.InstanceVo;
@@ -32,10 +33,9 @@ import com.baidu.oped.apm.mvc.vo.TimeRange;
 import com.baidu.oped.apm.mvc.vo.Transaction;
 import com.baidu.oped.apm.mvc.vo.TrendContext;
 import com.baidu.oped.apm.mvc.vo.TrendResponse;
-import com.baidu.oped.apm.utils.Constaints;
 import com.baidu.oped.apm.utils.InstanceUtils;
-import com.baidu.oped.apm.utils.TrendUtils;
 import com.baidu.oped.apm.utils.TimeUtils;
+import com.baidu.oped.apm.utils.TrendUtils;
 
 /**
  * Created by mason on 8/25/15.
@@ -66,9 +66,8 @@ public class OverviewController {
         Assert.notNull(period, "Period must be provided while retrieve application response time trend data.");
         Assert.state(period % 60 == 0, "Period must be 60 or the times of 60.");
 
-        final Constaints.MetricName[] metricName = new Constaints.MetricName[] {RESPONSE_TIME, PV, CPM};
-        final ServiceType[] serviceTypes =
-                new ServiceType[] {ServiceType.WEB, ServiceType.DB, ServiceType.EXTERNAL};
+        final Constraints.MetricName[] metricName = new Constraints.MetricName[] {RESPONSE_TIME, PV, CPM};
+        final ServiceType[] serviceTypes = new ServiceType[] {ServiceType.WEB, ServiceType.DB, ServiceType.EXTERNAL};
         List<TimeRange> timeRanges = TimeUtils.convertToRange(time);
         TrendContext metricDataOfApp = automaticService.getMetricDataOfApp(appId, timeRanges, period, serviceTypes);
 
@@ -85,16 +84,15 @@ public class OverviewController {
      * @return
      */
     @RequestMapping(value = {"trend/apdex"}, method = RequestMethod.GET)
-    public TrendResponse apdex(@RequestParam(value = "appId") Long appId,
-                               @RequestParam(value = "time[]") String[] time,
+    public TrendResponse apdex(@RequestParam(value = "appId") Long appId, @RequestParam(value = "time[]") String[] time,
                                @RequestParam(value = "period") Long period) {
         Assert.notNull(appId, "ApplicationId must not be null while retrieve application response time trend data.");
         Assert.notEmpty(time, "Time ranges must not be null while retrieve application response time trend data.");
         Assert.notNull(period, "Period must be provided while retrieve application response time trend data.");
         Assert.state(period % 60 == 0, "Period must be 60 or the times of 60.");
 
-        final Constaints.MetricName[] metricName =
-                new Constaints.MetricName[] {APDEX, SATISFIED, TOLERATED, FRUSTRATED};
+        final Constraints.MetricName[] metricName =
+                new Constraints.MetricName[] {APDEX, SATISFIED, TOLERATED, FRUSTRATED};
         final ServiceType[] serviceTypes = new ServiceType[] {ServiceType.WEB};
         List<TimeRange> timeRanges = TimeUtils.convertToRange(time);
         TrendContext metricDataOfApp = automaticService.getMetricDataOfApp(appId, timeRanges, period, serviceTypes);
@@ -119,7 +117,7 @@ public class OverviewController {
         Assert.notNull(period, "Period must be provided while retrieve application response time trend data.");
         Assert.state(period % 60 == 0, "Period must be 60 or the times of 60.");
 
-        final Constaints.MetricName[] metricName = new Constaints.MetricName[] {RESPONSE_TIME, PV, CPM};
+        final Constraints.MetricName[] metricName = new Constraints.MetricName[] {RESPONSE_TIME, PV, CPM};
         final ServiceType[] serviceTypes = new ServiceType[] {ServiceType.WEB, ServiceType.EXTERNAL};
         List<TimeRange> timeRanges = TimeUtils.convertToRange(time);
         TrendContext metricDataOfApp = automaticService.getMetricDataOfApp(appId, timeRanges, period, serviceTypes);
@@ -140,9 +138,9 @@ public class OverviewController {
     @RequestMapping(value = {"transactions"}, method = RequestMethod.GET)
     public List<Transaction> transaction(@RequestParam(value = "appId") Long appId,
                                          @RequestParam(value = "from", required = false)
-                                         @DateTimeFormat(pattern = Constaints.TIME_PATTERN) LocalDateTime from,
+                                         @DateTimeFormat(pattern = Constraints.TIME_PATTERN) LocalDateTime from,
                                          @RequestParam(value = "to", required = false)
-                                         @DateTimeFormat(pattern = Constaints.TIME_PATTERN) LocalDateTime to,
+                                         @DateTimeFormat(pattern = Constraints.TIME_PATTERN) LocalDateTime to,
                                          @RequestParam(value = "limit") Integer limit) {
         Assert.notNull(appId, "ApplicationId must not be null while retrieving top n transactions.");
         Assert.notNull(from, "Time range start must not be null while retrieving top n transactions.");
@@ -172,9 +170,8 @@ public class OverviewController {
         Assert.notNull(period, "Period must be provided while retrieve application response time trend data.");
         Assert.state(period % 60 == 0, "Period must be 60 or the times of 60.");
 
-        final Constaints.MetricName[] metricName = new Constaints.MetricName[] {ERROR_RATE, ERROR, PV};
-        final ServiceType[] serviceTypes =
-                new ServiceType[] {ServiceType.WEB, ServiceType.DB, ServiceType.EXTERNAL};
+        final Constraints.MetricName[] metricName = new Constraints.MetricName[] {ERROR_RATE, ERROR, PV};
+        final ServiceType[] serviceTypes = new ServiceType[] {ServiceType.WEB, ServiceType.DB, ServiceType.EXTERNAL};
         List<TimeRange> timeRanges = TimeUtils.convertToRange(time);
 
         TrendContext metricDataOfApp = automaticService.getMetricDataOfApp(appId, timeRanges, period, serviceTypes);
@@ -190,10 +187,9 @@ public class OverviewController {
      * @param to
      */
     @RequestMapping(value = {"alarm"}, method = RequestMethod.GET)
-    public void alarm(@RequestParam(value = "appId") Long appId,
-                      @RequestParam(value = "from", required = false) @DateTimeFormat(pattern = Constaints.TIME_PATTERN)
-                      LocalDateTime from,
-                      @RequestParam(value = "to", required = false) @DateTimeFormat(pattern = Constaints.TIME_PATTERN)
+    public void alarm(@RequestParam(value = "appId") Long appId, @RequestParam(value = "from", required = false)
+    @DateTimeFormat(pattern = Constraints.TIME_PATTERN) LocalDateTime from,
+                      @RequestParam(value = "to", required = false) @DateTimeFormat(pattern = Constraints.TIME_PATTERN)
                       LocalDateTime to) {
         //TODO: to be implemented
         throw new UnsupportedOperationException("not supported yet!");
@@ -211,9 +207,9 @@ public class OverviewController {
     @RequestMapping(value = {"instances"}, method = RequestMethod.GET)
     public List<InstanceVo> listInstance(@RequestParam(value = "appId") Long appId,
                                          @RequestParam(value = "from", required = false)
-                                         @DateTimeFormat(pattern = Constaints.TIME_PATTERN) LocalDateTime from,
+                                         @DateTimeFormat(pattern = Constraints.TIME_PATTERN) LocalDateTime from,
                                          @RequestParam(value = "to", required = false)
-                                         @DateTimeFormat(pattern = Constaints.TIME_PATTERN) LocalDateTime to) {
+                                         @DateTimeFormat(pattern = Constraints.TIME_PATTERN) LocalDateTime to) {
 
         TimeRange timeRange = TimeUtils.createTimeRange(from, to);
         Application application = overviewService.getApplication(appId);
@@ -242,7 +238,7 @@ public class OverviewController {
         Assert.notNull(period, "Period must be provided while retrieve application response time trend data.");
         Assert.state(period % 60 == 0, "Period must be 60 or the times of 60.");
 
-        final Constaints.MetricName[] metricName = new Constaints.MetricName[] {RESPONSE_TIME, PV, CPM};
+        final Constraints.MetricName[] metricName = new Constraints.MetricName[] {RESPONSE_TIME, PV, CPM};
         final ServiceType[] serviceTypes = new ServiceType[] {ServiceType.WEB, ServiceType.DB, ServiceType.EXTERNAL};
         List<TimeRange> timeRanges = TimeUtils.convertToRange(time);
 
@@ -273,10 +269,9 @@ public class OverviewController {
         Assert.notNull(period, "Period must be provided while retrieve application response time trend data.");
         Assert.state(period % 60 == 0, "Period must be 60 or the times of 60.");
 
-        final Constaints.MetricName[] metricName =
-                new Constaints.MetricName[] {APDEX, SATISFIED, TOLERATED, FRUSTRATED};
-        final ServiceType[] serviceTypes =
-                new ServiceType[] {ServiceType.WEB};
+        final Constraints.MetricName[] metricName =
+                new Constraints.MetricName[] {APDEX, SATISFIED, TOLERATED, FRUSTRATED};
+        final ServiceType[] serviceTypes = new ServiceType[] {ServiceType.WEB};
         List<TimeRange> timeRanges = TimeUtils.convertToRange(time);
 
         TrendContext metricDataOfInstance =
@@ -306,9 +301,8 @@ public class OverviewController {
         Assert.notNull(period, "Period must be provided while retrieve application response time trend data.");
         Assert.state(period % 60 == 0, "Period must be 60 or the times of 60.");
 
-        final Constaints.MetricName[] metricName = new Constaints.MetricName[] {RESPONSE_TIME, PV, CPM};
-        final ServiceType[] serviceTypes =
-                new ServiceType[] {ServiceType.WEB, ServiceType.EXTERNAL};
+        final Constraints.MetricName[] metricName = new Constraints.MetricName[] {RESPONSE_TIME, PV, CPM};
+        final ServiceType[] serviceTypes = new ServiceType[] {ServiceType.WEB, ServiceType.EXTERNAL};
         List<TimeRange> timeRanges = TimeUtils.convertToRange(time);
 
         TrendContext metricDataOfInstance =
@@ -331,9 +325,9 @@ public class OverviewController {
     public List<Transaction> instanceTransaction(@RequestParam(value = "appId") Long appId,
                                                  @RequestParam(value = "instanceId") Long instanceId,
                                                  @RequestParam(value = "from", required = false)
-                                                 @DateTimeFormat(pattern = Constaints.TIME_PATTERN) LocalDateTime from,
+                                                 @DateTimeFormat(pattern = Constraints.TIME_PATTERN) LocalDateTime from,
                                                  @RequestParam(value = "to", required = false)
-                                                 @DateTimeFormat(pattern = Constaints.TIME_PATTERN) LocalDateTime to,
+                                                 @DateTimeFormat(pattern = Constraints.TIME_PATTERN) LocalDateTime to,
                                                  @RequestParam(value = "limit") Integer limit) {
         Assert.notNull(appId, "ApplicationId must not be null while retrieving top n transactions.");
         Assert.notNull(instanceId, "InstanceId must not be null while retrieving top n transactions.");
@@ -365,11 +359,9 @@ public class OverviewController {
         Assert.notNull(period, "Period must be provided while retrieve application response time trend data.");
         Assert.state(period % 60 == 0, "Period must be 60 or the times of 60.");
 
-        final Constaints.MetricName[] metricName = new Constaints.MetricName[] {ERROR_RATE, ERROR, PV};
-        final ServiceType[] serviceTypes =
-                new ServiceType[] {ServiceType.WEB, ServiceType.DB, ServiceType.EXTERNAL};
+        final Constraints.MetricName[] metricName = new Constraints.MetricName[] {ERROR_RATE, ERROR, PV};
+        final ServiceType[] serviceTypes = new ServiceType[] {ServiceType.WEB, ServiceType.DB, ServiceType.EXTERNAL};
         List<TimeRange> timeRanges = TimeUtils.convertToRange(time);
-
 
         TrendContext metricDataOfInstance =
                 automaticService.getMetricDataOfInstance(instanceId, timeRanges, period, serviceTypes);
@@ -388,9 +380,9 @@ public class OverviewController {
     public void instanceAlarm(@RequestParam(value = "appId") Long appId,
                               @RequestParam(value = "instanceId") Long instanceId,
                               @RequestParam(value = "from", required = false)
-                              @DateTimeFormat(pattern = Constaints.TIME_PATTERN) LocalDateTime from,
+                              @DateTimeFormat(pattern = Constraints.TIME_PATTERN) LocalDateTime from,
                               @RequestParam(value = "to", required = false)
-                              @DateTimeFormat(pattern = Constaints.TIME_PATTERN) LocalDateTime to) {
+                              @DateTimeFormat(pattern = Constraints.TIME_PATTERN) LocalDateTime to) {
         //TODO: to be implemented
         throw new UnsupportedOperationException("not supported yet!");
     }

@@ -1,4 +1,4 @@
-package com.baidu.oped.apm.utils;
+package com.baidu.oped.apm.common.utils;
 
 import java.text.DecimalFormat;
 

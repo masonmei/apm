@@ -25,7 +25,7 @@ import com.baidu.oped.apm.statistics.collector.ExternalServiceCollector;
 import com.baidu.oped.apm.statistics.collector.StatCollector;
 import com.baidu.oped.apm.statistics.collector.TraceCollector;
 import com.baidu.oped.apm.statistics.config.StatisticsAutoConfigurationProperties;
-import com.baidu.oped.apm.statistics.utils.TimeUtil;
+import com.baidu.oped.apm.common.utils.TimeUtil;
 import com.mysema.query.types.expr.BooleanExpression;
 
 /**

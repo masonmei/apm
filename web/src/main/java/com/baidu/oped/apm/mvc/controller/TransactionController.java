@@ -1,8 +1,8 @@
 package com.baidu.oped.apm.mvc.controller;
 
-import static com.baidu.oped.apm.utils.Constaints.MetricName.CPM;
-import static com.baidu.oped.apm.utils.Constaints.MetricName.PV;
-import static com.baidu.oped.apm.utils.Constaints.MetricName.RESPONSE_TIME;
+import static com.baidu.oped.apm.common.utils.Constraints.MetricName.CPM;
+import static com.baidu.oped.apm.common.utils.Constraints.MetricName.PV;
+import static com.baidu.oped.apm.common.utils.Constraints.MetricName.RESPONSE_TIME;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -23,7 +23,7 @@ import com.baidu.oped.apm.mvc.vo.TimeRange;
 import com.baidu.oped.apm.mvc.vo.Transaction;
 import com.baidu.oped.apm.mvc.vo.TrendContext;
 import com.baidu.oped.apm.mvc.vo.TrendResponse;
-import com.baidu.oped.apm.utils.Constaints;
+import com.baidu.oped.apm.common.utils.Constraints;
 import com.baidu.oped.apm.utils.TimeUtils;
 import com.baidu.oped.apm.utils.TrendUtils;
 
@@ -55,9 +55,9 @@ public class TransactionController {
     @RequestMapping(method = RequestMethod.GET)
     public List<Transaction> transactions(@RequestParam(value = "appId") Long appId,
                                           @RequestParam(value = "from", required = false)
-                                          @DateTimeFormat(pattern = Constaints.TIME_PATTERN) LocalDateTime from,
+                                          @DateTimeFormat(pattern = Constraints.TIME_PATTERN) LocalDateTime from,
                                           @RequestParam(value = "to", required = false)
-                                          @DateTimeFormat(pattern = Constaints.TIME_PATTERN) LocalDateTime to,
+                                          @DateTimeFormat(pattern = Constraints.TIME_PATTERN) LocalDateTime to,
                                           @RequestParam(value = "limit") Integer limit) {
         Assert.notNull(appId, "ApplicationId must not be null while retrieving top n transactions.");
         Assert.notNull(from, "Time range start must not be null while retrieving top n transactions.");
@@ -91,7 +91,7 @@ public class TransactionController {
         Assert.state(limit > 0, "Limit must bigger that 0.");
 
         //TODO: adjust to use limit
-        final Constaints.MetricName[] metricName = new Constaints.MetricName[] {RESPONSE_TIME, PV, CPM};
+        final Constraints.MetricName[] metricName = new Constraints.MetricName[] {RESPONSE_TIME, PV, CPM};
         final ServiceType serviceType = ServiceType.WEB;
         List<TimeRange> timeRanges = TimeUtils.convertToRange(time);
 
@@ -115,8 +115,8 @@ public class TransactionController {
         Assert.notNull(period, "Period must be provided while retrieve application response time trend data.");
         Assert.state(period % 60 == 0, "Period must be 60 or the times of 60.");
 
-        final Constaints.MetricName[] metricName =
-                new Constaints.MetricName[] {RESPONSE_TIME, PV, CPM};
+        final Constraints.MetricName[] metricName =
+                new Constraints.MetricName[] {RESPONSE_TIME, PV, CPM};
         final ServiceType serviceType = ServiceType.WEB;
         List<TimeRange> timeRanges = TimeUtils.convertToRange(time);
 
@@ -161,9 +161,9 @@ public class TransactionController {
     public List<Transaction> instanceTransactions(@RequestParam(value = "appId") Long appId,
                                                   @RequestParam(value = "instanceId") Long instanceId,
                                                   @RequestParam(value = "from", required = false)
-                                                  @DateTimeFormat(pattern = Constaints.TIME_PATTERN) LocalDateTime from,
+                                                  @DateTimeFormat(pattern = Constraints.TIME_PATTERN) LocalDateTime from,
                                                   @RequestParam(value = "to", required = false)
-                                                  @DateTimeFormat(pattern = Constaints.TIME_PATTERN) LocalDateTime to,
+                                                  @DateTimeFormat(pattern = Constraints.TIME_PATTERN) LocalDateTime to,
                                                   @RequestParam(value = "limit") Integer limit) {
         Assert.notNull(appId, "ApplicationId must not be null while retrieving top n transactions.");
         Assert.notNull(instanceId, "InstanceId must not be null while retrieving top n transactions.");
@@ -201,7 +201,7 @@ public class TransactionController {
         Assert.state(period % 60 == 0, "Period must be 60 or the times of 60.");
         Assert.state(limit > 0, "Limit must bigger that 0.");
 
-        final Constaints.MetricName[] metricName = new Constaints.MetricName[] {RESPONSE_TIME, PV, CPM};
+        final Constraints.MetricName[] metricName = new Constraints.MetricName[] {RESPONSE_TIME, PV, CPM};
         final ServiceType serviceType = ServiceType.WEB;
         List<TimeRange> timeRanges = TimeUtils.convertToRange(time);
 
@@ -233,8 +233,8 @@ public class TransactionController {
         Assert.notNull(period, "Period must be provided while retrieve application response time trend data.");
         Assert.state(period % 60 == 0, "Period must be 60 or the times of 60.");
 
-        final Constaints.MetricName[] metricName =
-                new Constaints.MetricName[] {RESPONSE_TIME, PV, CPM};
+        final Constraints.MetricName[] metricName =
+                new Constraints.MetricName[] {RESPONSE_TIME, PV, CPM};
         final ServiceType serviceType = ServiceType.WEB;
         List<TimeRange> timeRanges = TimeUtils.convertToRange(time);
         TrendContext trendContext =
@@ -259,9 +259,9 @@ public class TransactionController {
     public List<Transaction> instanceSlowTransactions(@RequestParam(value = "appId") Long appId,
                                                       @RequestParam(value = "instanceId") Long instanceId,
                                                       @RequestParam(value = "from", required = false)
-                                                      @DateTimeFormat(pattern = Constaints.TIME_PATTERN)
+                                                      @DateTimeFormat(pattern = Constraints.TIME_PATTERN)
                                                       LocalDateTime from, @RequestParam(value = "to", required = false)
-                                                      @DateTimeFormat(pattern = Constaints.TIME_PATTERN)
+                                                      @DateTimeFormat(pattern = Constraints.TIME_PATTERN)
                                                       LocalDateTime to,
                                                       @RequestParam(value = "pageNumber", defaultValue = "1")
                                                       Integer pageCount,

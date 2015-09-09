@@ -4,8 +4,9 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 
+import com.baidu.oped.apm.common.utils.TimeUtil;
 import com.baidu.oped.apm.statistics.collector.BaseCollector;
-import com.baidu.oped.apm.statistics.utils.TimeUtil;
+
 
 /**
  * Created by mason on 9/6/15.

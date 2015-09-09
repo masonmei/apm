@@ -3,9 +3,23 @@ package com.baidu.oped.apm.common.utils;
 /**
  * Created by mason on 8/13/15.
  */
-public class ApdexUtils {
+public abstract class ApdexUtils {
     public static Double calculateApdex(Long satisfied, Long tolerated, Long frustrated) {
-        return null;
+        if(satisfied == null) {
+            satisfied = 0l;
+        }
+
+        if(tolerated == null){
+            tolerated = 0l;
+        }
+
+        if(frustrated == null){
+            frustrated = 0l;
+        }
+
+        long sat = 2 * satisfied + tolerated;
+        long all = (frustrated + tolerated + satisfied) * 2;
+        return NumberUtils.calculateRate(sat, all);
     }
 
     public enum Level {

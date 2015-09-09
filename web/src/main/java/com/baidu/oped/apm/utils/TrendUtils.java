@@ -1,15 +1,12 @@
 package com.baidu.oped.apm.utils;
 
-import static com.baidu.oped.apm.utils.NumberUtils.format;
+import static com.baidu.oped.apm.common.utils.NumberUtils.format;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import org.springframework.util.Assert;
 
@@ -17,6 +14,8 @@ import com.baidu.oped.apm.common.jpa.entity.CommonStatistic;
 import com.baidu.oped.apm.common.jpa.entity.HostStatistic;
 import com.baidu.oped.apm.common.jpa.entity.ServiceType;
 import com.baidu.oped.apm.common.jpa.entity.Statistic;
+import com.baidu.oped.apm.common.utils.ApdexUtils;
+import com.baidu.oped.apm.common.utils.Constraints;
 import com.baidu.oped.apm.mvc.vo.DataPoint;
 import com.baidu.oped.apm.mvc.vo.Metric;
 import com.baidu.oped.apm.mvc.vo.MetricData;
@@ -36,13 +35,13 @@ public abstract class TrendUtils {
      *
      * @return
      */
-    public static TrendResponse toTrendResponse(TrendContext context, Constaints.MetricName[] metricNames) {
+    public static TrendResponse toTrendResponse(TrendContext context, Constraints.MetricName[] metricNames) {
         Assert.notNull(metricNames, "MetricNames must not be null while convert to trendResponse.");
         Assert.notNull(context, "MetricData must not be null while convert to trendResponse.");
 
         TrendResponse trendResponse = new TrendResponse();
         List<Metric> metrics = new ArrayList<>();
-        for (Constaints.MetricName metricName : metricNames) {
+        for (Constraints.MetricName metricName : metricNames) {
             Metric metric = new Metric();
             metric.setDescription(metricName.getDescription());
             metric.setName(metricName.getFieldName());
@@ -65,8 +64,7 @@ public abstract class TrendUtils {
                             dataPoint.setTimestamp(applicationStatistic.getTimestamp());
                             dataPoint.setItems(readValuesFromStatistic(applicationStatistic, metricNames));
                             return dataPoint;
-                        }).sorted(Comparator.comparingLong(DataPoint::getTimestamp))
-                                .collect(Collectors.toList());
+                        }).sorted(Comparator.comparingLong(DataPoint::getTimestamp)).collect(Collectors.toList());
                 metricData.setData(dataPoints);
 
                 values.add(metricData);
@@ -85,7 +83,7 @@ public abstract class TrendUtils {
      *
      * @return
      */
-    private static List<Double> readValuesFromStatistic(Statistic statistic, Constaints.MetricName[] names) {
+    private static List<Double> readValuesFromStatistic(Statistic statistic, Constraints.MetricName[] names) {
         Assert.notNull(statistic, "Cannot read values from a null CommonStatistic Object.");
         Assert.notNull(names, "MetricNames must not be null for read value from CommonStatistic.");
 
@@ -102,7 +100,7 @@ public abstract class TrendUtils {
             hostStatistic = (HostStatistic) statistic;
         }
 
-        for (Constaints.MetricName name : names) {
+        for (Constraints.MetricName name : names) {
             Double value;
             switch (name) {
                 case RESPONSE_TIME:
@@ -241,7 +239,7 @@ public abstract class TrendUtils {
      */
     private static Double calculateCpm(Long pv, Long period) {
         Assert.notNull(period, "Period must not be null while calculate cpm");
-        return calculateDouble(pv, period * Constaints.PERIOD_TO_MINUTE_FACTOR);
+        return calculateDouble(pv, period * Constraints.PERIOD_TO_MINUTE_FACTOR);
     }
 
 }

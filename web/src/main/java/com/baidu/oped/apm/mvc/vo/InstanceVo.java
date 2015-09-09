@@ -1,6 +1,6 @@
 package com.baidu.oped.apm.mvc.vo;
 
-import com.baidu.oped.apm.utils.NumberUtils;
+import com.baidu.oped.apm.common.utils.NumberUtils;
 
 /**
  * Created by mason on 8/12/15.

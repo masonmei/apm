@@ -10,6 +10,7 @@ import java.util.List;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
+import com.baidu.oped.apm.common.utils.Constraints;
 import com.baidu.oped.apm.mvc.vo.TimeRange;
 
 /**
@@ -53,11 +54,11 @@ public abstract class TimeUtils {
 
     public static LocalDateTime readFromString(String stringTime) {
         Assert.hasLength(stringTime, "cannot convert an empty string to LocalDateTime");
-        return LocalDateTime.parse(stringTime, DateTimeFormatter.ofPattern(Constaints.TIME_PATTERN));
+        return LocalDateTime.parse(stringTime, DateTimeFormatter.ofPattern(Constraints.TIME_PATTERN));
     }
 
     public static String writeToString(LocalDateTime localDateTime) {
-        return localDateTime.format(DateTimeFormatter.ofPattern(Constaints.TIME_PATTERN));
+        return localDateTime.format(DateTimeFormatter.ofPattern(Constraints.TIME_PATTERN));
     }
 
     public static long toMillSecond(LocalDateTime localDateTime) {

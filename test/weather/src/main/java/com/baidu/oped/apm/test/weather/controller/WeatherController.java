@@ -39,9 +39,6 @@ public class WeatherController {
     @Autowired
     private WeatherRepository weatherRepository;
 
-    // http://api.k780.com:88/?app=weather.city&&appkey=15198&sign=3c009bbf405331a22f377757771431a7&format=json
-    // http://api.k780.com:88/?app=weather.today&weaid=4&&appkey=15198&sign=3c009bbf405331a22f377757771431a7&format=json
-
     @RequestMapping("city/sync")
     public boolean syncCity() {
         cityRepository.deleteAll();

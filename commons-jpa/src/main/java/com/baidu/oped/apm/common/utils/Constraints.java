@@ -1,9 +1,9 @@
-package com.baidu.oped.apm.utils;
+package com.baidu.oped.apm.common.utils;
 
 /**
  * Created by mason on 8/26/15.
  */
-public abstract class Constaints {
+public abstract class Constraints {
     public static final String TIME_PATTERN = "yyyy-MM-dd'T'HH:mm:ss";
     public static final Double PERIOD_TO_MINUTE_FACTOR = 1.0 / (60 * 1000);
     public static final String PAGE_SIZE = "20";

@@ -2,7 +2,7 @@
 package com.baidu.oped.apm.mvc.vo;
 
 import com.baidu.oped.apm.common.util.TransactionIdUtils;
-import com.baidu.oped.apm.utils.ApdexUtils;
+import com.baidu.oped.apm.common.utils.ApdexUtils;
 
 import java.util.ArrayList;
 import java.util.List;
