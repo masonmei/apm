@@ -24,7 +24,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-tomcat</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-jasper</artifactId>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>jstl</artifactId>
@@ -85,12 +89,12 @@
                         <version>1.2.3.RELEASE</version>
                     </dependency>
                 </dependencies>
-                <!--<configuration>-->
-                <!--<jvmArguments>-->
-                <!--&#45;&#45;javaagent:${project.basedir}/../agent/java-agent/target/pinpoint-agent/bootstrap-1.1.0.jar-->
-                <!--&#45;&#45;Dpinpoint.agentId=${pom.build.finalName} -Dpinpoint.applicationName=TESTAPP-->
-                <!--</jvmArguments>-->
-                <!--</configuration>-->
+                <configuration>
+                    <jvmArguments>
+                        -javaagent:${project.basedir}/../agent/java-agent/target/pinpoint-agent/bootstrap-1.1.0.jar
+                        -Dpinpoint.agentId=${pom.build.finalName} -Dpinpoint.applicationName=TESTAPP
+                    </jvmArguments>
+                </configuration>
             </plugin>
 
         </plugins>
