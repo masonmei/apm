@@ -13,7 +13,7 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
  */
 @Entity
 @Table(name = "apm_application", indexes = {
-        @Index(name = "app_unique", columnList = "app_name,app_type,userId", unique = true)
+        @Index(name = "app_unique", columnList = "app_name,app_type,user_id", unique = true)
 })
 public class Application extends AbstractPersistable<Long> {
 
