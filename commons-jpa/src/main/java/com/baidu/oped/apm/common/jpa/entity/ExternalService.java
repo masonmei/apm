@@ -5,6 +5,7 @@ import java.io.Serializable;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Index;
 import javax.persistence.Table;
 
 import org.springframework.data.jpa.domain.AbstractPersistable;
@@ -13,7 +14,9 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
  * Created by mason on 8/27/15.
  */
 @Entity
-@Table(name = "apm_external_service")
+@Table(name = "apm_external_service", indexes = {
+        @Index(name = "external_service_unique", columnList = "app_id,instance_id,destination_id", unique = true)
+})
 public class ExternalService extends AbstractPersistable<Long> implements Serializable {
 
     @Basic

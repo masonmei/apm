@@ -3,6 +3,7 @@ package com.baidu.oped.apm.common.jpa.entity;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Index;
 import javax.persistence.Table;
 
 import org.springframework.data.jpa.domain.AbstractPersistable;
@@ -11,7 +12,9 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
  * Created by mason on 9/2/15.
  */
 @Entity
-@Table(name = "apm_instance_stat")
+@Table(name = "apm_instance_stat", indexes = {
+        @Index(name = "instance_stat_unique", columnList = "app_id,instance_id,timestamp", unique = true)
+})
 public class InstanceStat extends AbstractPersistable<Long> {
     @Basic
     @Column(name = "app_id", nullable = false, insertable = true, updatable = true)
