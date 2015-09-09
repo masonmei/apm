@@ -54,6 +54,7 @@ public class ClassPathResolver {
     }
 
     public static String getClassPathFromSystemProperty() {
+        System.out.println(System.getProperty("java.class.path"));
         return System.getProperty("java.class.path");
     }
 

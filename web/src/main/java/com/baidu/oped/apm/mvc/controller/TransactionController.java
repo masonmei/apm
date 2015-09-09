@@ -6,6 +6,7 @@ import static com.baidu.oped.apm.common.utils.Constraints.MetricName.RESPONSE_TI
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.baidu.oped.apm.common.jpa.entity.ServiceType;
+import com.baidu.oped.apm.common.jpa.entity.WebTransactionStatistic;
 import com.baidu.oped.apm.model.service.AutomaticService;
 import com.baidu.oped.apm.model.service.OverviewService;
 import com.baidu.oped.apm.model.service.TransactionService;
@@ -94,6 +96,9 @@ public class TransactionController {
         final Constraints.MetricName[] metricName = new Constraints.MetricName[] {RESPONSE_TIME, PV, CPM};
         final ServiceType serviceType = ServiceType.WEB;
         List<TimeRange> timeRanges = TimeUtils.convertToRange(time);
+
+        Map<TimeRange, Iterable<WebTransactionStatistic>> webTransactionMetricDataOfApp =
+                automaticService.getWebTransactionMetricDataOfApp(appId, timeRanges, period);
 
         TrendContext trendContext = automaticService.getMetricDataOfApp(appId, timeRanges, period, serviceType);
 
