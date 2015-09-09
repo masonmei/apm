@@ -51,6 +51,7 @@
         </dependency>
     </dependencies>
     <build>
+        <finalName>weather</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -71,53 +72,6 @@
                     </jvmArguments>
                 </configuration>
             </plugin>
-            <!--<plugin>-->
-            <!--<groupId>org.apache.cxf</groupId>-->
-            <!--<artifactId>cxf-codegen-plugin</artifactId>-->
-            <!--<version>${cxf.version}</version>-->
-            <!--<executions>-->
-            <!--<execution>-->
-            <!--<id>generate-sources</id>-->
-            <!--<phase>generate-sources</phase>-->
-            <!--<configuration>-->
-            <!--<sourceRoot>${project.build.directory}/generated/cxf</sourceRoot>-->
-            <!--<wsdlOptions>-->
-            <!--<wsdlOption>-->
-            <!--<wsdl>http://wsf.cdyne.com/WeatherWS/Weather.asmx?WSDL</wsdl>-->
-            <!--</wsdlOption>-->
-            <!--</wsdlOptions>-->
-            <!--</configuration>-->
-            <!--<goals>-->
-            <!--<goal>wsdl2java</goal>-->
-            <!--</goals>-->
-            <!--</execution>-->
-            <!--</executions>-->
-            <!--</plugin>-->
-            <!--<plugin>-->
-            <!--<groupId>org.codehaus.mojo</groupId>-->
-            <!--<artifactId>exec-maven-plugin</artifactId>-->
-            <!--<executions>-->
-            <!--<execution>-->
-            <!--<phase>test</phase>-->
-            <!--<goals>-->
-            <!--<goal>java</goal>-->
-            <!--</goals>-->
-            <!--</execution>-->
-            <!--</executions>-->
-            <!--<configuration>-->
-            <!--<includeProjectDependencies>false</includeProjectDependencies>-->
-            <!--<includePluginDependencies>true</includePluginDependencies>-->
-            <!--<executableDependency>-->
-            <!--<groupId>org.hsqldb</groupId>-->
-            <!--<artifactId>hsqldb</artifactId>-->
-            <!--</executableDependency>-->
-            <!--<mainClass>org.hsqldb.server.Server</mainClass>-->
-            <!--<arguments>-->
-            <!--<argument>-database.0</argument>-->
-            <!--<argument>file:db/mydatabase</argument>-->
-            <!--</arguments>-->
-            <!--</configuration>-->
-            <!--</plugin>-->
         </plugins>
     </build>
 

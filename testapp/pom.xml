@@ -23,13 +23,8 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-tomcat</artifactId>
-            <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.apache.tomcat.embed</groupId>
-            <artifactId>tomcat-embed-jasper</artifactId>
-            <scope>provided</scope>
-        </dependency>
+
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>jstl</artifactId>
@@ -70,7 +65,16 @@
     </dependencies>
 
     <build>
+        <finalName>test-app</finalName>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
@@ -81,12 +85,12 @@
                         <version>1.2.3.RELEASE</version>
                     </dependency>
                 </dependencies>
-                <configuration>
-                    <jvmArguments>
-                        -javaagent:${project.basedir}/../agent/java-agent/target/pinpoint-agent/bootstrap-1.1.0.jar
-                        -Dpinpoint.agentId=${pom.build.finalName} -Dpinpoint.applicationName=TESTAPP
-                    </jvmArguments>
-                </configuration>
+                <!--<configuration>-->
+                <!--<jvmArguments>-->
+                <!--&#45;&#45;javaagent:${project.basedir}/../agent/java-agent/target/pinpoint-agent/bootstrap-1.1.0.jar-->
+                <!--&#45;&#45;Dpinpoint.agentId=${pom.build.finalName} -Dpinpoint.applicationName=TESTAPP-->
+                <!--</jvmArguments>-->
+                <!--</configuration>-->
             </plugin>
 
         </plugins>
