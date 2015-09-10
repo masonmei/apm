@@ -31,14 +31,14 @@ import com.baidu.oped.apm.mvc.vo.TimeRange;
 public abstract class QueryUtils {
 
     /**
-     *
      * @param page
      * @param applicationStatistics
      * @param timeRange
+     *
      * @return
      */
-    public static QueryResponse<ApplicationVo> toApplicationResponse(
-            Page<Application> page, Iterable<ApplicationStatistic> applicationStatistics, TimeRange timeRange) {
+    public static QueryResponse<ApplicationVo> toApplicationResponse(Page<Application> page,
+            Iterable<ApplicationStatistic> applicationStatistics, TimeRange timeRange) {
 
         PageInfo pageInfo = new PageInfo();
         List<ApplicationVo> data = new ArrayList<>(page.getSize());
@@ -70,8 +70,8 @@ public abstract class QueryUtils {
 
             ApplicationVo vo = new ApplicationVo();
             vo.setAppId(aLong);
-            vo.setResponseTime(format(calculateRate(sumResponseSummaryStatistics.getSum(),
-                                                           pvSummaryStatistics.getSum())));
+            vo.setResponseTime(
+                    format(calculateRate(sumResponseSummaryStatistics.getSum(), pvSummaryStatistics.getSum())));
             vo.setCpm(format(calculateRate(pvSummaryStatistics.getSum(), timeRange.getDuration(ChronoUnit.MINUTES))));
             vo.setErrorRate(format(calculateRate(errorSummaryStatistics.getSum(), pvSummaryStatistics.getSum())));
             vo.setAppName(appIdNameMap.get(aLong));
@@ -82,15 +82,15 @@ public abstract class QueryUtils {
     }
 
     /**
-     *
      * @param appId
      * @param page
      * @param instanceStatistics
      * @param timeRange
+     *
      * @return
      */
-    public static QueryResponse<InstanceVo> toInstanceResponse(
-            long appId, Page<Instance> page, Iterable<InstanceStatistic> instanceStatistics, TimeRange timeRange) {
+    public static QueryResponse<InstanceVo> toInstanceResponse(long appId, Page<Instance> page,
+            Iterable<InstanceStatistic> instanceStatistics, TimeRange timeRange) {
 
         PageInfo pageInfo = new PageInfo();
         List<InstanceVo> data = new ArrayList<>(page.getSize());
@@ -145,14 +145,14 @@ public abstract class QueryUtils {
             InstanceVo vo = new InstanceVo();
             vo.setInstanceId(aLong);
             vo.setAppId(appId);
-            vo.setResponseTime(format(calculateRate(sumResponseSummaryStatistics.getSum(),
-                                                           pvSummaryStatistics.getCount())));
+            vo.setResponseTime(
+                    format(calculateRate(sumResponseSummaryStatistics.getSum(), pvSummaryStatistics.getCount())));
             vo.setCpm(format(calculateRate(pvSummaryStatistics.getSum(), timeRange.getDuration(ChronoUnit.MINUTES))));
             vo.setErrorRate(format(calculateRate(errorSummaryStatistics.getSum(), pvSummaryStatistics.getSum())));
             vo.setInstanceName(instanceIdNameMap.get(aLong));
             vo.setApdex(ApdexUtils.calculateApdex(satisfiedSummaryStatistics.getSum(),
-                                                         toleratedSummaryStatistics.getSum(),
-                                                         frustratedSummaryStatistics.getSum()));
+                                                  toleratedSummaryStatistics.getSum(),
+                                                  frustratedSummaryStatistics.getSum()));
             vo.setCpuUsage(format(cpuUsageSummaryStatistics.getAverage()));
             vo.setMemoryUsage(format(memoryUsageSummaryStatistics.getAverage()));
             data.add(vo);

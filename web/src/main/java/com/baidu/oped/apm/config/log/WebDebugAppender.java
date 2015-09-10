@@ -11,11 +11,10 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.AppenderBase;
 
 /**
- * class WebDebugAppender 
+ * class WebDebugAppender
  *
  * @author meidongxu@baidu.com
  */
-
 
 public class WebDebugAppender extends AppenderBase<ILoggingEvent> {
 

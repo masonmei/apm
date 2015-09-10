@@ -41,7 +41,8 @@
 //    public List<ApplicationVo> selectAllApplicationNames() {
 //        Scan scan = new Scan();
 //        scan.setCaching(30);
-//        List<List<ApplicationVo>> results = hbaseOperations2.find(HBaseTables.APPLICATION_INDEX, scan, applicationNameMapper);
+//        List<List<ApplicationVo>> results = hbaseOperations2.find(HBaseTables.APPLICATION_INDEX, scan,
+// applicationNameMapper);
 //        List<ApplicationVo> applications = new ArrayList<ApplicationVo>();
 //        for (List<ApplicationVo> result : results) {
 //            applications.addAll(result);

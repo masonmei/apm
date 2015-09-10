@@ -19,8 +19,8 @@ public class InstanceVo {
     public InstanceVo() {
     }
 
-    public InstanceVo(long appId, long instanceId, String instanceName, Long pv, Long satisfied, Double rt,
-                      Long error, long period, double cpuUsage, double memoryUsage) {
+    public InstanceVo(long appId, long instanceId, String instanceName, Long pv, Long satisfied, Double rt, Long error,
+            long period, double cpuUsage, double memoryUsage) {
         this.appId = appId;
         this.instanceId = instanceId;
         this.instanceName = instanceName;

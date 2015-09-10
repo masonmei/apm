@@ -1,11 +1,10 @@
 package com.baidu.oped.apm.config.exception;
 
 /**
- * class SystemException 
+ * class SystemException
  *
  * @author meidongxu@baidu.com
  */
-
 
 public class SystemException extends RuntimeException {
 

@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import com.baidu.oped.apm.common.jpa.entity.ExternalServiceStatistic;
 import com.baidu.oped.apm.common.jpa.entity.ServiceType;
@@ -20,10 +19,10 @@ import com.baidu.oped.apm.model.entity.DummyStatistic;
 /**
  * Created by mason on 9/6/15.
  */
-public class TrendContext {
-    private final Map<TimeRange, Map<ServiceType, Iterable<? extends Statistic>>> rangeServiceStatisticMap =
+public class TrendContext<T> {
+    private final Map<TimeRange, Map<T, Iterable<? extends Statistic>>> rangeServiceStatisticMap =
             new HashMap<>();
-    private final Set<ServiceType> serviceTypes = new HashSet<>();
+    private final Set<T> serviceTypes = new HashSet<>();
     private final Set<TimeRange> timeRanges = new HashSet<>();
     private final Long periodInMillis;
 
@@ -32,27 +31,24 @@ public class TrendContext {
         this.periodInMillis = periodInMillis;
     }
 
-    public void addWebTransactionData(ServiceType serviceType,
-                                      Map<TimeRange, Iterable<WebTransactionStatistic>> serviceStatistics) {
-        serviceTypes.add(serviceType);
+    public void addWebTransactionData(T serviceType,
+            Map<TimeRange, Iterable<WebTransactionStatistic>> serviceStatistics) {
         serviceStatistics.forEach((timeRange, statistics) -> addStatistics(serviceType, timeRange, statistics));
     }
 
-    public void addDatabaseServiceData(ServiceType serviceType,
-                                       Map<TimeRange, Iterable<SqlTransactionStatistic>> serviceStatistics) {
-        serviceTypes.add(serviceType);
+    public void addDatabaseServiceData(T serviceType,
+            Map<TimeRange, Iterable<SqlTransactionStatistic>> serviceStatistics) {
         serviceStatistics.forEach((timeRange, statistics) -> addStatistics(serviceType, timeRange, statistics));
     }
 
-    public void addExternalServiceData(ServiceType serviceType,
-                                       Map<TimeRange, Iterable<ExternalServiceStatistic>> serviceStatistics) {
-        serviceTypes.add(serviceType);
+    public void addExternalServiceData(T serviceType,
+            Map<TimeRange, Iterable<ExternalServiceStatistic>> serviceStatistics) {
         serviceStatistics.forEach((timeRange, statistics) -> addStatistics(serviceType, timeRange, statistics));
     }
 
-    private void addStatistics(ServiceType serviceType, TimeRange timeRange, Iterable<? extends Statistic> statistics) {
-        Map<ServiceType, Iterable<? extends Statistic>> serviceTypeStatisticMap =
-                rangeServiceStatisticMap.get(timeRange);
+    public void addStatistics(T serviceType, TimeRange timeRange, Iterable<? extends Statistic> statistics) {
+        serviceTypes.add(serviceType);
+        Map<T, Iterable<? extends Statistic>> serviceTypeStatisticMap = rangeServiceStatisticMap.get(timeRange);
         if (serviceTypeStatisticMap == null) {
             rangeServiceStatisticMap.put(timeRange, new HashMap<>());
             serviceTypeStatisticMap = rangeServiceStatisticMap.get(timeRange);
@@ -64,11 +60,11 @@ public class TrendContext {
         return timeRanges;
     }
 
-    public Set<ServiceType> getServiceTypes() {
+    public Set<T> getServiceTypes() {
         return serviceTypes;
     }
 
-    public List<Statistic> getStatistic(TimeRange timeRange, ServiceType serviceType) {
+    public List<Statistic> getStatistic(TimeRange timeRange, T serviceType) {
         Iterable<? extends Statistic> statistics = rangeServiceStatisticMap.get(timeRange).get(serviceType);
         Map<Long, Statistic> timestampStatisticMap = new HashMap<>();
         statistics.forEach(statistic -> timestampStatisticMap.put(statistic.getTimestamp(), statistic));

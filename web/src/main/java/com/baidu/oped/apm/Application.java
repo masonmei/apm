@@ -10,12 +10,12 @@ import org.springframework.web.filter.HiddenHttpMethodFilter;
  */
 @SpringBootApplication
 public class Application {
-    @Bean
-    public HiddenHttpMethodFilter httpMethodFilter(){
-        return new HiddenHttpMethodFilter();
-    }
-
     public static void main(String[] args) {
         new SpringApplicationBuilder(Application.class).build().run(args);
+    }
+
+    @Bean
+    public HiddenHttpMethodFilter httpMethodFilter() {
+        return new HiddenHttpMethodFilter();
     }
 }

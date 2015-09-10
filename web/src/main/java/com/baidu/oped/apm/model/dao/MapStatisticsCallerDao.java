@@ -11,5 +11,6 @@
 //public interface MapStatisticsCallerDao {
 ////    LinkDataMap selectCaller(ApplicationVo callerApplication, Range range);
 ////
-////    List<LinkDataMap> selectCallerStatistics(ApplicationVo callerApplication, ApplicationVo calleeApplication, Range range);
+////    List<LinkDataMap> selectCallerStatistics(ApplicationVo callerApplication, ApplicationVo calleeApplication,
+// Range range);
 //}

@@ -18,7 +18,6 @@ import com.baidu.oped.apm.common.jpa.entity.QInstanceStatistic;
 import com.baidu.oped.apm.common.jpa.entity.WebTransaction;
 import com.baidu.oped.apm.common.jpa.entity.WebTransactionStatistic;
 import com.baidu.oped.apm.common.jpa.repository.ApplicationRepository;
-import com.baidu.oped.apm.common.jpa.repository.ApplicationStatisticRepository;
 import com.baidu.oped.apm.common.jpa.repository.InstanceRepository;
 import com.baidu.oped.apm.common.jpa.repository.InstanceStatisticRepository;
 import com.baidu.oped.apm.mvc.vo.TimeRange;
@@ -49,6 +48,7 @@ public class OverviewService {
      *
      * @param instances instances
      * @param timeRange timeRange
+     *
      * @return
      */
     public Iterable<InstanceStatistic> getExistInstanceStatistics(Iterable<Instance> instances, TimeRange timeRange) {
@@ -56,13 +56,12 @@ public class OverviewService {
         Assert.notNull(timeRange, "TimeRange must not be null while retrieving instances of.");
 
         List<Long> instanceIds = StreamSupport.stream(instances.spliterator(), false).map(instance -> instance.getId())
-                                         .collect(Collectors.toList());
+                .collect(Collectors.toList());
 
         QInstanceStatistic qInstanceStatistic = QInstanceStatistic.instanceStatistic;
         BooleanExpression instanceIdCondition = qInstanceStatistic.instanceId.in(instanceIds);
-        BooleanExpression timestampCondition = qInstanceStatistic.timestamp.between(toMillSecond(timeRange.getFrom()),
-                                                                                           toMillSecond(timeRange
-                                                                                                                .getTo()));
+        BooleanExpression timestampCondition = qInstanceStatistic.timestamp
+                .between(toMillSecond(timeRange.getFrom()), toMillSecond(timeRange.getTo()));
         BooleanExpression whereCondition = instanceIdCondition.and(timestampCondition);
         return instanceStatisticRepository.findAll(whereCondition);
     }
@@ -71,6 +70,7 @@ public class OverviewService {
      * Get the instance of the given app.
      *
      * @param appId the application database id
+     *
      * @return
      */
     public Iterable<Instance> getApplicationInstances(Long appId) {
@@ -85,6 +85,7 @@ public class OverviewService {
      * Get Application with id
      *
      * @param appId app database id
+     *
      * @return
      */
     public Application getApplication(Long appId) {
@@ -95,19 +96,20 @@ public class OverviewService {
     /**
      * Get top n transactions of the given app.
      *
-     * @param appId app database id.
+     * @param appId     app database id.
      * @param timeRange time range
-     * @param limit limit
+     * @param limit     limit
+     *
      * @return
      */
-    public List<Transaction> getWebTransactionStatisticOfApp(Long appId, TimeRange timeRange, Integer limit){
+    public List<Transaction> getWebTransactionStatisticOfApp(Long appId, TimeRange timeRange, Integer limit) {
         final long period = 60l;
 
-        Iterable<WebTransaction> webTransactionsForApp = automaticService.findWebTransactionsWithAppId(appId);
+        Iterable<WebTransaction> webTransactionsForApp = automaticService.getWebTransactionsWithAppId(appId);
         Iterable<WebTransactionStatistic> webTransactionStatistics =
-                automaticService.getStatisticsOfWebTransactions(webTransactionsForApp, timeRange, period);
-        return WebTransactionUtils.topByAvgResponseTime(webTransactionStatistics, webTransactionsForApp, timeRange,
-                                                               limit);
+                automaticService.getWebTransactionsStatistic(webTransactionsForApp, timeRange, period);
+        return WebTransactionUtils
+                .topByAvgResponseTime(webTransactionStatistics, webTransactionsForApp, timeRange, limit);
     }
 
     /**
@@ -116,15 +118,16 @@ public class OverviewService {
      * @param instanceId
      * @param timeRange
      * @param limit
+     *
      * @return
      */
     public List<Transaction> getWebTransactionStatisticOfInstance(Long instanceId, TimeRange timeRange, Integer limit) {
         final long period = 60l;
 
-        Iterable<WebTransaction> webTransactionsForApp = automaticService.findWebTransactionsWithInstanceId(instanceId);
+        Iterable<WebTransaction> webTransactionsForApp = automaticService.getWebTransactionsWithInstanceId(instanceId);
         Iterable<WebTransactionStatistic> webTransactionStatistics =
-                automaticService.getStatisticsOfWebTransactions(webTransactionsForApp, timeRange, period);
-        return WebTransactionUtils.topByAvgResponseTime(webTransactionStatistics, webTransactionsForApp, timeRange,
-                                                               limit);
+                automaticService.getWebTransactionsStatistic(webTransactionsForApp, timeRange, period);
+        return WebTransactionUtils
+                .topByAvgResponseTime(webTransactionStatistics, webTransactionsForApp, timeRange, limit);
     }
 }

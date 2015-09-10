@@ -16,24 +16,23 @@ import com.baidu.oped.apm.mvc.vo.InstanceVo;
  */
 public abstract class InstanceUtils {
     public static List<InstanceVo> toInstanceVo(Application application, Iterable<Instance> appInstances,
-                                                Iterable<InstanceStatistic> instanceStatistics) {
+            Iterable<InstanceStatistic> instanceStatistics) {
         Assert.notNull(application);
         Assert.notNull(appInstances);
         Assert.notNull(instanceStatistics);
-        List<InstanceVo> instances = StreamSupport.stream(appInstances.spliterator(), false)
-                                             .map(instance -> {
-                                                 InstanceVo instanceVo = new InstanceVo();
-                                                 instanceVo.setInstanceId(instance.getId());
-                                                 instanceVo.setInstanceName(buildName(instance, application));
-                                                 return instanceVo;
-                                             }).collect(Collectors.toList());
+        List<InstanceVo> instances = StreamSupport.stream(appInstances.spliterator(), false).map(instance -> {
+            InstanceVo instanceVo = new InstanceVo();
+            instanceVo.setInstanceId(instance.getId());
+            instanceVo.setInstanceName(buildName(instance, application));
+            return instanceVo;
+        }).collect(Collectors.toList());
         calculateMetricData(instances, instanceStatistics);
         return instances;
     }
 
     //TODO calculateMetricData
     private static void calculateMetricData(List<InstanceVo> instances,
-                                            Iterable<InstanceStatistic> instanceStatistics) {
+            Iterable<InstanceStatistic> instanceStatistics) {
 
     }
 
@@ -42,6 +41,6 @@ public abstract class InstanceUtils {
         Assert.notNull(application, "Application must not be null while building instance name.");
 
         return String.format("%s:%s:%s(%s)", application.getAppType(), instance.getHost(), instance.getPort(),
-                                    application.getAppName());
+                             application.getAppName());
     }
 }

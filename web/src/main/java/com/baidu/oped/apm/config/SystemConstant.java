@@ -1,11 +1,10 @@
 package com.baidu.oped.apm.config;
 
 /**
- * class SystemConstant 
+ * class SystemConstant
  *
  * @author meidongxu@baidu.com
  */
-
 
 public final class SystemConstant {
     public static final String X_BCE_REQUEST_ID = "x-bce-request-id";

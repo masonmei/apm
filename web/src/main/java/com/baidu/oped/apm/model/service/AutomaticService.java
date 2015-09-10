@@ -71,9 +71,9 @@ public class AutomaticService {
      * @return
      */
     public TrendContext getMetricDataOfApp(Long appId, List<TimeRange> timeRanges, Long period,
-                                           ServiceType... serviceTypes) {
-        TrendContext trendContext =
-                new TrendContext(period * 1000, timeRanges.toArray(new TimeRange[timeRanges.size()]));
+            ServiceType... serviceTypes) {
+        TrendContext<ServiceType> trendContext =
+                new TrendContext<>(period * 1000, timeRanges.toArray(new TimeRange[timeRanges.size()]));
         Arrays.stream(serviceTypes).forEach(serviceType -> {
             switch (serviceType) {
                 case WEB:
@@ -110,25 +110,25 @@ public class AutomaticService {
      *
      * @return
      */
-    public TrendContext getMetricDataOfInstance(Long instanceId, List<TimeRange> timeRanges, Long period,
-                                                ServiceType... serviceTypes) {
-        TrendContext trendContext =
-                new TrendContext(period * 1000, timeRanges.toArray(new TimeRange[timeRanges.size()]));
+    public TrendContext<ServiceType> getMetricDataOfInstance(Long instanceId, List<TimeRange> timeRanges, Long period,
+            ServiceType... serviceTypes) {
+        TrendContext<ServiceType> trendContext =
+                new TrendContext<>(period * 1000, timeRanges.toArray(new TimeRange[timeRanges.size()]));
         Arrays.stream(serviceTypes).forEach(serviceType -> {
             switch (serviceType) {
                 case WEB:
                     Map<TimeRange, Iterable<WebTransactionStatistic>> webTransactionMetricDataOfApp =
-                            getWebTransactionMetricDataOfInstance(instanceId, timeRanges, period);
+                            getWebTransactionStatisticOfInstance(instanceId, timeRanges, period);
                     trendContext.addWebTransactionData(serviceType, webTransactionMetricDataOfApp);
                     break;
                 case DB:
                     Map<TimeRange, Iterable<SqlTransactionStatistic>> sqlTransactionMetricDataOfApp =
-                            getSqlTransactionMetricDataOfInstance(instanceId, timeRanges, period);
+                            getSqlTransactionStatisticOfInstance(instanceId, timeRanges, period);
                     trendContext.addDatabaseServiceData(serviceType, sqlTransactionMetricDataOfApp);
                     break;
                 case EXTERNAL:
                     Map<TimeRange, Iterable<ExternalServiceStatistic>> externalServiceMetricDataOfApp =
-                            getExternalServiceMetricDataOfInstance(instanceId, timeRanges, period);
+                            getExternalServiceStatisticOfInstance(instanceId, timeRanges, period);
                     trendContext.addExternalServiceData(serviceType, externalServiceMetricDataOfApp);
                     break;
                 case CACHE:
@@ -150,19 +150,34 @@ public class AutomaticService {
      * @return
      */
     public Map<TimeRange, Iterable<WebTransactionStatistic>> getWebTransactionMetricDataOfApp(Long appId,
-                                                                                              List<TimeRange>
-                                                                                                      timeRanges,
-                                                                                              Long period) {
+            List<TimeRange> timeRanges, Long period) {
         Assert.notNull(appId);
         Assert.notEmpty(timeRanges);
         Assert.notNull(period);
 
-        Iterable<WebTransaction> webTransactions = findWebTransactionsWithAppId(appId);
+        Iterable<WebTransaction> webTransactions = getWebTransactionsWithAppId(appId);
 
         Map<TimeRange, Iterable<WebTransactionStatistic>> result = new HashMap<>();
         timeRanges.stream().forEach(timeRange -> {
             Iterable<WebTransactionStatistic> currentRangeResult =
-                    getStatisticsOfWebTransactions(webTransactions, timeRange, period);
+                    getWebTransactionsStatistic(webTransactions, timeRange, period);
+            result.put(timeRange, currentRangeResult);
+        });
+
+        return result;
+    }
+
+    public Map<TimeRange, Iterable<WebTransactionStatistic>> getWebTransactionsStatistic(
+            Iterable<WebTransaction> transactions, List<TimeRange> timeRanges, Long period) {
+        Assert.notNull(transactions, "Transactions must not be null while getting web transaction statistics.");
+        Assert.notNull(timeRanges, "TimeRanges must not be null while getting transaction statistics.");
+        Assert.notNull(period, "Period must be null while getting transaction statistics.");
+        Assert.state(period % 60 == 0, "Period must be 60 or the times of 60.");
+
+        Map<TimeRange, Iterable<WebTransactionStatistic>> result = new HashMap<>();
+        timeRanges.stream().forEach(timeRange -> {
+            Iterable<WebTransactionStatistic> currentRangeResult =
+                    getWebTransactionsStatistic(transactions, timeRange, period);
             result.put(timeRange, currentRangeResult);
         });
 
@@ -178,8 +193,8 @@ public class AutomaticService {
      *
      * @return
      */
-    public Iterable<WebTransactionStatistic> getStatisticsOfWebTransactions(Iterable<WebTransaction> webTransactions,
-                                                                            TimeRange timeRange, Long period) {
+    public Iterable<WebTransactionStatistic> getWebTransactionsStatistic(Iterable<WebTransaction> webTransactions,
+            TimeRange timeRange, Long period) {
         final Long periodInMillis = period * 1000;
 
         List<Long> webTransactionIds =
@@ -190,8 +205,7 @@ public class AutomaticService {
         BooleanExpression appIdCondition = qWebTransactionStatistic.transactionId.in(webTransactionIds);
         BooleanExpression periodCondition = qWebTransactionStatistic.period.eq(periodInMillis);
         BooleanExpression timestampCondition = qWebTransactionStatistic.timestamp
-                                                       .between(toMillSecond(timeRange.getFrom()),
-                                                                       toMillSecond(timeRange.getTo()));
+                .between(toMillSecond(timeRange.getFrom()), toMillSecond(timeRange.getTo()));
 
         BooleanExpression whereCondition = appIdCondition.and(periodCondition).and(timestampCondition);
         return webTransactionStatisticRepository.findAll(whereCondition);
@@ -206,17 +220,15 @@ public class AutomaticService {
      *
      * @return
      */
-    public Map<TimeRange, Iterable<WebTransactionStatistic>> getWebTransactionMetricDataOfInstance(Long instanceId,
-                                                                                                   List<TimeRange>
-                                                                                                           timeRanges,
-                                                                                                   Long period) {
+    public Map<TimeRange, Iterable<WebTransactionStatistic>> getWebTransactionStatisticOfInstance(Long instanceId,
+            List<TimeRange> timeRanges, Long period) {
         Assert.notNull(instanceId);
         Assert.notEmpty(timeRanges);
         Assert.notNull(period);
 
         final long periodInMillis = period * 1000;
 
-        Iterable<WebTransaction> webTransactions = findWebTransactionsWithInstanceId(instanceId);
+        Iterable<WebTransaction> webTransactions = getWebTransactionsWithInstanceId(instanceId);
         List<Long> webTransactionIds =
                 StreamSupport.stream(webTransactions.spliterator(), false).map(WebTransaction::getId)
                         .collect(Collectors.toList());
@@ -228,8 +240,7 @@ public class AutomaticService {
         Map<TimeRange, Iterable<WebTransactionStatistic>> result = new HashMap<>();
         timeRanges.stream().forEach(timeRange -> {
             BooleanExpression timestampCondition = qWebTransactionStatistic.timestamp
-                                                           .between(toMillSecond(timeRange.getFrom()),
-                                                                           toMillSecond(timeRange.getTo()));
+                    .between(toMillSecond(timeRange.getFrom()), toMillSecond(timeRange.getTo()));
 
             BooleanExpression whereCondition = appIdCondition.and(periodCondition).and(timestampCondition);
             Iterable<WebTransactionStatistic> currentRangeResult =
@@ -249,15 +260,13 @@ public class AutomaticService {
      * @return
      */
     public Map<TimeRange, Iterable<SqlTransactionStatistic>> getSqlTransactionMetricDataOfApp(Long appId,
-                                                                                              List<TimeRange>
-                                                                                                      timeRanges,
-                                                                                              Long period) {
+            List<TimeRange> timeRanges, Long period) {
         Assert.notNull(appId);
         Assert.notEmpty(timeRanges);
         Assert.notNull(period);
         final long periodInMillis = period * 1000;
 
-        Iterable<SqlTransaction> sqlTransactions = findSqlTransactionsWithAppId(appId);
+        Iterable<SqlTransaction> sqlTransactions = getSqlTransactionsWithAppId(appId);
         List<Long> sqlTransactionIds =
                 StreamSupport.stream(sqlTransactions.spliterator(), false).map(SqlTransaction::getId)
                         .collect(Collectors.toList());
@@ -269,8 +278,7 @@ public class AutomaticService {
         Map<TimeRange, Iterable<SqlTransactionStatistic>> result = new HashMap<>();
         timeRanges.stream().forEach(timeRange -> {
             BooleanExpression timestampCondition = qSqlTransactionStatistic.timestamp
-                                                           .between(toMillSecond(timeRange.getFrom()),
-                                                                           toMillSecond(timeRange.getTo()));
+                    .between(toMillSecond(timeRange.getFrom()), toMillSecond(timeRange.getTo()));
 
             BooleanExpression whereCondition = appIdCondition.and(periodCondition).and(timestampCondition);
             Iterable<SqlTransactionStatistic> currentRangeResult =
@@ -290,17 +298,15 @@ public class AutomaticService {
      *
      * @return
      */
-    public Map<TimeRange, Iterable<SqlTransactionStatistic>> getSqlTransactionMetricDataOfInstance(Long instanceId,
-                                                                                                   List<TimeRange>
-                                                                                                           timeRanges,
-                                                                                                   Long period) {
+    public Map<TimeRange, Iterable<SqlTransactionStatistic>> getSqlTransactionStatisticOfInstance(Long instanceId,
+            List<TimeRange> timeRanges, Long period) {
         Assert.notNull(instanceId);
         Assert.notEmpty(timeRanges);
         Assert.notNull(period);
 
         final long periodInMillis = period * 1000;
 
-        Iterable<SqlTransaction> webTransactions = findSqlTransactionsWithInstanceId(instanceId);
+        Iterable<SqlTransaction> webTransactions = getSqlTransactionsWithInstanceId(instanceId);
         List<Long> sqlTransactionIds =
                 StreamSupport.stream(webTransactions.spliterator(), false).map(SqlTransaction::getId)
                         .collect(Collectors.toList());
@@ -312,8 +318,7 @@ public class AutomaticService {
         Map<TimeRange, Iterable<SqlTransactionStatistic>> result = new HashMap<>();
         timeRanges.stream().forEach(timeRange -> {
             BooleanExpression timestampCondition = qSqlTransactionStatistic.timestamp
-                                                           .between(toMillSecond(timeRange.getFrom()),
-                                                                           toMillSecond(timeRange.getTo()));
+                    .between(toMillSecond(timeRange.getFrom()), toMillSecond(timeRange.getTo()));
 
             BooleanExpression whereCondition = appIdCondition.and(periodCondition).and(timestampCondition);
             Iterable<SqlTransactionStatistic> currentRangeResult =
@@ -333,16 +338,14 @@ public class AutomaticService {
      * @return
      */
     public Map<TimeRange, Iterable<ExternalServiceStatistic>> getExternalServiceMetricDataOfApp(Long appId,
-                                                                                                List<TimeRange>
-                                                                                                        timeRanges,
-                                                                                                Long period) {
+            List<TimeRange> timeRanges, Long period) {
         Assert.notNull(appId);
         Assert.notEmpty(timeRanges);
         Assert.notNull(period);
 
         final long periodInMillis = period * 1000;
 
-        Iterable<ExternalService> externalServices = findExternalServicesWithAppId(appId);
+        Iterable<ExternalService> externalServices = getExternalServicesWithAppId(appId);
         List<Long> externalServiceIds =
                 StreamSupport.stream(externalServices.spliterator(), false).map(ExternalService::getId)
                         .collect(Collectors.toList());
@@ -354,8 +357,7 @@ public class AutomaticService {
         Map<TimeRange, Iterable<ExternalServiceStatistic>> result = new HashMap<>();
         timeRanges.stream().forEach(timeRange -> {
             BooleanExpression timestampCondition = qExternalServiceStatistic.timestamp
-                                                           .between(toMillSecond(timeRange.getFrom()),
-                                                                           toMillSecond(timeRange.getTo()));
+                    .between(toMillSecond(timeRange.getFrom()), toMillSecond(timeRange.getTo()));
 
             BooleanExpression whereCondition = serviceIdsCondition.and(periodCondition).and(timestampCondition);
             Iterable<ExternalServiceStatistic> currentRangeResult =
@@ -375,16 +377,14 @@ public class AutomaticService {
      *
      * @return
      */
-    public Map<TimeRange, Iterable<ExternalServiceStatistic>> getExternalServiceMetricDataOfInstance(Long instanceId,
-                                                                                                     List<TimeRange>
-                                                                                                             timeRanges,
-                                                                                                     Long period) {
+    public Map<TimeRange, Iterable<ExternalServiceStatistic>> getExternalServiceStatisticOfInstance(Long instanceId,
+            List<TimeRange> timeRanges, Long period) {
         Assert.notNull(instanceId);
         Assert.notEmpty(timeRanges);
         Assert.notNull(period);
         final long periodInMillis = period * 1000;
 
-        Iterable<ExternalService> externalServices = findExternalServicesWithInstanceId(instanceId);
+        Iterable<ExternalService> externalServices = getExternalServicesWithInstanceId(instanceId);
         List<Long> externalServiceIds =
                 StreamSupport.stream(externalServices.spliterator(), false).map(ExternalService::getId)
                         .collect(Collectors.toList());
@@ -397,8 +397,7 @@ public class AutomaticService {
         Map<TimeRange, Iterable<ExternalServiceStatistic>> result = new HashMap<>();
         timeRanges.stream().forEach(timeRange -> {
             BooleanExpression timestampCondition = qExternalServiceStatistic.timestamp
-                                                           .between(toMillSecond(timeRange.getFrom()),
-                                                                           toMillSecond(timeRange.getTo()));
+                    .between(toMillSecond(timeRange.getFrom()), toMillSecond(timeRange.getTo()));
 
             BooleanExpression whereCondition = externalServiceIdsCondition.and(periodCondition).and(timestampCondition);
             Iterable<ExternalServiceStatistic> currentRangeResult =
@@ -408,42 +407,42 @@ public class AutomaticService {
         return result;
     }
 
-    public Iterable<ExternalService> findExternalServicesWithAppId(Long appId) {
+    public Iterable<ExternalService> getExternalServicesWithAppId(Long appId) {
         Assert.notNull(appId, "cannot find ExternalServices with empty appId");
         QExternalService qExternalService = QExternalService.externalService;
         BooleanExpression appIdCondition = qExternalService.appId.eq(appId);
         return externalTransactionRepository.findAll(appIdCondition);
     }
 
-    public Iterable<ExternalService> findExternalServicesWithInstanceId(Long instanceId) {
+    public Iterable<ExternalService> getExternalServicesWithInstanceId(Long instanceId) {
         Assert.notNull(instanceId, "cannot find ExternalServices with empty appId");
         QExternalService qExternalService = QExternalService.externalService;
         BooleanExpression instanceIdCondition = qExternalService.instanceId.eq(instanceId);
         return externalTransactionRepository.findAll(instanceIdCondition);
     }
 
-    public Iterable<SqlTransaction> findSqlTransactionsWithAppId(Long appId) {
+    public Iterable<SqlTransaction> getSqlTransactionsWithAppId(Long appId) {
         Assert.notNull(appId, "cannot find SqlTransactions with empty appId");
         QSqlTransaction qSqlTransaction = QSqlTransaction.sqlTransaction;
         BooleanExpression appIdCondition = qSqlTransaction.appId.eq(appId);
         return sqlTransactionRepository.findAll(appIdCondition);
     }
 
-    public Iterable<SqlTransaction> findSqlTransactionsWithInstanceId(Long instanceId) {
+    public Iterable<SqlTransaction> getSqlTransactionsWithInstanceId(Long instanceId) {
         Assert.notNull(instanceId, "cannot find SqlTransactions with empty appId");
         QSqlTransaction qSqlTransaction = QSqlTransaction.sqlTransaction;
         BooleanExpression instanceIdCondition = qSqlTransaction.instanceId.eq(instanceId);
         return sqlTransactionRepository.findAll(instanceIdCondition);
     }
 
-    public Iterable<WebTransaction> findWebTransactionsWithAppId(Long appId) {
+    public Iterable<WebTransaction> getWebTransactionsWithAppId(Long appId) {
         Assert.notNull(appId, "cannot find WebTransactions with empty appId");
         QWebTransaction qWebTransaction = QWebTransaction.webTransaction;
         BooleanExpression appIdCondition = qWebTransaction.appId.eq(appId);
         return webTransactionRepository.findAll(appIdCondition);
     }
 
-    public Iterable<WebTransaction> findWebTransactionsWithInstanceId(Long instanceId) {
+    public Iterable<WebTransaction> getWebTransactionsWithInstanceId(Long instanceId) {
         Assert.notNull(instanceId, "cannot find WebTransactions with empty appId");
         QWebTransaction qWebTransaction = QWebTransaction.webTransaction;
         BooleanExpression instanceIdCondition = qWebTransaction.instanceId.eq(instanceId);

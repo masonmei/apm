@@ -33,14 +33,14 @@ public class TransactionService {
     @Autowired
     private WebTransactionStatisticRepository webTransactionStatisticRepository;
 
-    public Map<TimeRange, Iterable<WebTransactionStatistic>> getApplicationLevelTransactionMetricData(
-            Long appId, List<TimeRange> timeRanges, Long period) {
+    public Map<TimeRange, Iterable<WebTransactionStatistic>> getApplicationLevelTransactionMetricData(Long appId,
+            List<TimeRange> timeRanges, Long period) {
         Assert.notNull(appId);
         Assert.notNull(period);
 
         Iterable<WebTransaction> transactions = findTransactionWithAppId(appId);
-        List<Long> transactionIds = StreamSupport.stream(transactions.spliterator(), false)
-                        .map(AbstractPersistable::getId)
+        List<Long> transactionIds =
+                StreamSupport.stream(transactions.spliterator(), false).map(AbstractPersistable::getId)
                         .collect(Collectors.toList());
 
         QWebTransactionStatistic applicationStatistic = QWebTransactionStatistic.webTransactionStatistic;
@@ -50,29 +50,27 @@ public class TransactionService {
         Map<TimeRange, Iterable<WebTransactionStatistic>> result = new HashMap<>();
         timeRanges.stream().forEach(timeRange -> {
             BooleanExpression timestampCondition = applicationStatistic.timestamp
-                                                           .between(toMillSecond(timeRange.getFrom()),
-                                                                           toMillSecond(timeRange.getTo()));
+                    .between(toMillSecond(timeRange.getFrom()), toMillSecond(timeRange.getTo()));
 
-            BooleanExpression whereCondition =
-                    transactionIdCondition.and(periodCondition).and(timestampCondition);
-            Iterable<WebTransactionStatistic> currentRangeResult = webTransactionStatisticRepository.findAll(whereCondition);
+            BooleanExpression whereCondition = transactionIdCondition.and(periodCondition).and(timestampCondition);
+            Iterable<WebTransactionStatistic> currentRangeResult =
+                    webTransactionStatisticRepository.findAll(whereCondition);
             result.put(timeRange, currentRangeResult);
         });
-
 
         return result;
     }
 
-    public Map<TimeRange, Iterable<WebTransactionStatistic>> getInstanceLevelTransactionMetricData(
-            Long instanceId, List<TimeRange> timeRanges, Long period) {
+    public Map<TimeRange, Iterable<WebTransactionStatistic>> getInstanceLevelTransactionMetricData(Long instanceId,
+            List<TimeRange> timeRanges, Long period) {
 
         Assert.notNull(instanceId);
         Assert.notNull(period);
 
         Iterable<WebTransaction> transactions = findTransactionWithInstanceId(instanceId);
-        List<Long> transactionIds = StreamSupport.stream(transactions.spliterator(), false)
-                                            .map(AbstractPersistable::getId)
-                                            .collect(Collectors.toList());
+        List<Long> transactionIds =
+                StreamSupport.stream(transactions.spliterator(), false).map(AbstractPersistable::getId)
+                        .collect(Collectors.toList());
 
         QWebTransactionStatistic applicationStatistic = QWebTransactionStatistic.webTransactionStatistic;
         BooleanExpression transactionIdCondition = applicationStatistic.transactionId.in(transactionIds);
@@ -81,27 +79,25 @@ public class TransactionService {
         Map<TimeRange, Iterable<WebTransactionStatistic>> result = new HashMap<>();
         timeRanges.stream().forEach(timeRange -> {
             BooleanExpression timestampCondition = applicationStatistic.timestamp
-                                                           .between(toMillSecond(timeRange.getFrom()),
-                                                                           toMillSecond(timeRange.getTo()));
+                    .between(toMillSecond(timeRange.getFrom()), toMillSecond(timeRange.getTo()));
 
-            BooleanExpression whereCondition =
-                    transactionIdCondition.and(periodCondition).and(timestampCondition);
-            Iterable<WebTransactionStatistic> currentRangeResult = webTransactionStatisticRepository.findAll(whereCondition);
+            BooleanExpression whereCondition = transactionIdCondition.and(periodCondition).and(timestampCondition);
+            Iterable<WebTransactionStatistic> currentRangeResult =
+                    webTransactionStatisticRepository.findAll(whereCondition);
             result.put(timeRange, currentRangeResult);
         });
-
 
         return result;
     }
 
-    public Iterable<WebTransaction> findTransactionWithAppId(Long appId){
+    public Iterable<WebTransaction> findTransactionWithAppId(Long appId) {
         Assert.notNull(appId, "ApplicationId must not be null while retrieving transactions with appId");
         QWebTransaction qWebTransaction = QWebTransaction.webTransaction;
         BooleanExpression appIdCondition = qWebTransaction.appId.eq(appId);
         return webTransactionRepository.findAll(appIdCondition);
     }
 
-    public Iterable<WebTransaction> findTransactionWithInstanceId(Long instanceId){
+    public Iterable<WebTransaction> findTransactionWithInstanceId(Long instanceId) {
         Assert.notNull(instanceId, "ApplicationId must not be null while retrieving transactions with appId");
         QWebTransaction qWebTransaction = QWebTransaction.webTransaction;
         BooleanExpression instanceIdCondition = qWebTransaction.instanceId.eq(instanceId);

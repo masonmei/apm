@@ -15,5 +15,6 @@
 ////    LinkDataMap selectCallee(ApplicationVo calleeApplication, Range range);
 ////
 ////    @Deprecated
-////    List<LinkDataMap> selectCalleeStatistics(ApplicationVo callerApplication, ApplicationVo calleeApplication, Range range);
+////    List<LinkDataMap> selectCalleeStatistics(ApplicationVo callerApplication, ApplicationVo calleeApplication,
+// Range range);
 //}

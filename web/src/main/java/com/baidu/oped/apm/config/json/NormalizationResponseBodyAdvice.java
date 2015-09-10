@@ -25,10 +25,9 @@ public class NormalizationResponseBodyAdvice implements ResponseBodyAdvice {
 
     @Override
     public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType,
-                                  Class selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
-        String requestId =
-                RequestUtils.getRequestId(((ServletServerHttpRequest) request).getServletRequest(),
-                                                 ((ServletServerHttpResponse) response).getServletResponse());
+            Class selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
+        String requestId = RequestUtils.getRequestId(((ServletServerHttpRequest) request).getServletRequest(),
+                                                     ((ServletServerHttpResponse) response).getServletResponse());
         return BasicResponse.builder().requestId(requestId).result(body).build();
     }
 }

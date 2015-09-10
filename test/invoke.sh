@@ -14,5 +14,8 @@ do
   sleep 2
   wget -T 5 --tries=1 -q http://localhost:28080/getCurrentTimestamp.pinpoint
   sleep 2
+  rm -f sync*
+  rm -f index.*
+  rm -f *.pinpoint*
 done
 

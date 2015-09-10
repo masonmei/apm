@@ -7,11 +7,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
 /**
- * class UTF8EncodingConfiguration 
+ * class UTF8EncodingConfiguration
  *
  * @author meidongxu@baidu.com
  */
-
 
 @Configuration
 public class UTF8EncodingConfiguration {

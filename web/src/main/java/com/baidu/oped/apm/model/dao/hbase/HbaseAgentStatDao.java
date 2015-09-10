@@ -67,7 +67,8 @@
 //
 //        Scan scan = createScan(agentId, range);
 //
-//        List<List<InstanceStat>> intermediate = hbaseOperations2.find(HBaseTables.AGENT_STAT, scan, rowKeyDistributor, agentStatMapper);
+//        List<List<InstanceStat>> intermediate = hbaseOperations2.find(HBaseTables.AGENT_STAT, scan,
+// rowKeyDistributor, agentStatMapper);
 //
 //        int expectedSize = (int)(range.getRange() / 5000); // data for 5 seconds
 //        List<InstanceStat> merged = new ArrayList<InstanceStat>(expectedSize);
@@ -88,7 +89,8 @@
 //            throw new IllegalArgumentException("agentId must not null");
 //        }
 //        byte[] bAgentId = BytesUtils.toBytes(agentId);
-//        return RowKeyUtils.concatFixedByteAndLong(bAgentId, AGENT_NAME_MAX_LEN, TimeUtils.reverseTimeMillis(timestamp));
+//        return RowKeyUtils.concatFixedByteAndLong(bAgentId, AGENT_NAME_MAX_LEN, TimeUtils.reverseTimeMillis
+// (timestamp));
 //    }
 //
 //    private Scan createScan(String agentId, Range range) {
@@ -117,7 +119,8 @@
 //    //        }
 //    //        Scan scan = createScan(agentId, start, end);
 //    //
-//    //        List<InstanceStat> list = hbaseOperations2.find(HBaseTables.AGENT_STAT, scan, rowKeyDistributor, new ResultsExtractor<List<InstanceStat>>() {
+//    //        List<InstanceStat> list = hbaseOperations2.find(HBaseTables.AGENT_STAT, scan, rowKeyDistributor, new
+// ResultsExtractor<List<InstanceStat>>() {
 //    //            @Override
 //    //            public List<InstanceStat> extractData(ResultScanner results) throws Exception {
 //    //                TDeserializer deserializer = new TDeserializer();

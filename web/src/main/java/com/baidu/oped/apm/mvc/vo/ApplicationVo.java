@@ -1,4 +1,3 @@
-
 package com.baidu.oped.apm.mvc.vo;
 
 import com.baidu.oped.apm.common.utils.NumberUtils;

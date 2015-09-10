@@ -8,11 +8,10 @@ import javax.servlet.ServletContextListener;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * class UTCTimeZoneConfiguration 
+ * class UTCTimeZoneConfiguration
  *
  * @author meidongxu@baidu.com
  */
-
 
 @Configuration
 public class UTCTimeZoneConfiguration implements ServletContextListener {
@@ -22,6 +21,7 @@ public class UTCTimeZoneConfiguration implements ServletContextListener {
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
     }
 
-    public void contextDestroyed(ServletContextEvent event) {}
+    public void contextDestroyed(ServletContextEvent event) {
+    }
 
 }

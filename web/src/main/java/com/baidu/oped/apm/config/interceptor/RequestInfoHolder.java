@@ -1,12 +1,10 @@
 package com.baidu.oped.apm.config.interceptor;
 
 /**
- * class RequestInfoHolder 
+ * class RequestInfoHolder
  *
  * @author meidongxu@baidu.com
  */
-
-
 
 public class RequestInfoHolder {
 

@@ -26,8 +26,7 @@ import com.baidu.oped.apm.mvc.vo.Transaction;
 public abstract class WebTransactionUtils {
 
     public static List<Transaction> topByAvgResponseTime(Iterable<WebTransactionStatistic> statistics,
-                                                         Iterable<WebTransaction> transactions, TimeRange timeRange,
-                                                         Integer limit) {
+            Iterable<WebTransaction> transactions, TimeRange timeRange, Integer limit) {
         Map<Long, WebTransaction> rpcTransactionMap = new HashMap<>();
 
         StreamSupport.stream(transactions.spliterator(), false)
@@ -80,8 +79,8 @@ public abstract class WebTransactionUtils {
             // TODO: add instance id and transaction id.
 
             transaction.setPv(pvSummaryStatistics.getSum());
-            transaction.setCpm(format(calculateRate(pvSummaryStatistics.getSum(),
-                                                           timeRange.getDuration(ChronoUnit.MINUTES))));
+            transaction.setCpm(format(
+                    calculateRate(pvSummaryStatistics.getSum(), timeRange.getDuration(ChronoUnit.MINUTES))));
             transaction
                     .setErrorRate(format(calculateRate(errorSummaryStatistics.getSum(), pvSummaryStatistics.getSum())));
             transaction.setFrustrated(frustratedSummaryStatistics.getSum());
@@ -89,17 +88,16 @@ public abstract class WebTransactionUtils {
             transaction.setSatisfied(satisfiedSummaryStatistics.getSum());
             transaction.setMaxResponseTime(format(maxSummaryStatistics.getMax()));
             transaction.setMinResponseTime(format(minSummaryStatistics.getMin()));
-            transaction.setResponseTime(format(calculateRate(responseSummaryStatistics.getSum(),
-                                                                    pvSummaryStatistics.getSum())));
+            transaction.setResponseTime(
+                    format(calculateRate(responseSummaryStatistics.getSum(), pvSummaryStatistics.getSum()))
+            );
 
             result.add(transaction);
         });
 
         return result.stream().sorted(Comparator.comparing(Transaction::getResponseTime)).limit(limit)
-                       .collect(Collectors.toList());
+                .collect(Collectors.toList());
     }
-
-
 
     static class WebTransactionGroup {
         private Long appId;

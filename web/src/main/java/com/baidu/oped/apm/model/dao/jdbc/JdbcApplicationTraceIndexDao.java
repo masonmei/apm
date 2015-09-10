@@ -19,7 +19,8 @@
 // * Created by mason on 8/16/15.
 // */
 //@Repository
-//public class JdbcApplicationTraceIndexDao extends BaseRepository<ApplicationTraceIndex> implements ApplicationTraceIndexDao {
+//public class JdbcApplicationTraceIndexDao extends BaseRepository<ApplicationTraceIndex> implements
+// ApplicationTraceIndexDao {
 //
 //
 //    @Override

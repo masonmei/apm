@@ -13,7 +13,7 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 import com.baidu.oped.apm.config.SystemConstant;
 
 /**
- * class RequestIdInterceptor 
+ * class RequestIdInterceptor
  *
  * @author meidongxu@baidu.com
  */
@@ -44,8 +44,8 @@ public class RequestIdInterceptor extends HandlerInterceptorAdapter {
     }
 
     @Override
-    public void afterCompletion(HttpServletRequest request, HttpServletResponse response,
-            Object handler, Exception ex) throws Exception {
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
+            throws Exception {
         RequestInfoHolder.removeThreadRequestId();
 
         String requestId = threadLocalRequestId.get();
@@ -56,8 +56,8 @@ public class RequestIdInterceptor extends HandlerInterceptorAdapter {
         response.setHeader(SystemConstant.X_BCE_REQUEST_ID, requestId);
 
         long timeUsed = System.currentTimeMillis() - beginTime.get();
-        log.info("request afterCompletion,method:{},url:{},status:{},time:{}ms",
-                request.getMethod(), request.getRequestURI(), response.getStatus(), timeUsed);
+        log.info("request afterCompletion,method:{},url:{},status:{},time:{}ms", request.getMethod(),
+                 request.getRequestURI(), response.getStatus(), timeUsed);
         MDC.remove("requestId");
     }
 }

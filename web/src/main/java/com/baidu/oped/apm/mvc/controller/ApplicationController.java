@@ -20,7 +20,6 @@ import com.baidu.oped.apm.mvc.vo.ApplicationVo;
 import com.baidu.oped.apm.mvc.vo.InstanceVo;
 import com.baidu.oped.apm.mvc.vo.QueryResponse;
 import com.baidu.oped.apm.mvc.vo.TimeRange;
-
 import com.baidu.oped.apm.utils.QueryUtils;
 import com.baidu.oped.apm.utils.TimeUtils;
 
@@ -47,16 +46,12 @@ public class ApplicationController {
      */
     @RequestMapping(method = RequestMethod.GET)
     public QueryResponse<ApplicationVo> applications(
-            @RequestParam(value = "from", required = false)
-            @DateTimeFormat(pattern = Constraints.TIME_PATTERN)
+            @RequestParam(value = "from", required = false) @DateTimeFormat(pattern = Constraints.TIME_PATTERN)
             LocalDateTime from,
-            @RequestParam(value = "to", required = false)
-            @DateTimeFormat(pattern = Constraints.TIME_PATTERN)
+            @RequestParam(value = "to", required = false) @DateTimeFormat(pattern = Constraints.TIME_PATTERN)
             LocalDateTime to,
-            @RequestParam(value = "orderBy", required = false, defaultValue = Constraints.ORDER_DESC_ID)
-            String orderBy,
-            @RequestParam(value = "pageSize", required = false, defaultValue = Constraints.PAGE_SIZE)
-            int pageSize,
+            @RequestParam(value = "orderBy", required = false, defaultValue = Constraints.ORDER_DESC_ID) String orderBy,
+            @RequestParam(value = "pageSize", required = false, defaultValue = Constraints.PAGE_SIZE) int pageSize,
             @RequestParam(value = "pageNumber", required = false, defaultValue = Constraints.PAGE_NUMBER)
             int pageNumber) {
 
@@ -67,8 +62,6 @@ public class ApplicationController {
 
         Iterable<ApplicationStatistic> appStatistics =
                 applicationService.selectApplicationStatistics(timeRange, apps, period);
-
-
 
         return QueryUtils.toApplicationResponse(apps, appStatistics, timeRange);
     }
@@ -86,19 +79,13 @@ public class ApplicationController {
      * @return
      */
     @RequestMapping(value = {"instances"}, method = RequestMethod.GET)
-    public QueryResponse<InstanceVo> findApplicationInstance(
-            @RequestParam("appId")
-            long appId,
-            @RequestParam(value = "from", required = false)
-            @DateTimeFormat(pattern = Constraints.TIME_PATTERN)
+    public QueryResponse<InstanceVo> findApplicationInstance(@RequestParam("appId") long appId,
+            @RequestParam(value = "from", required = false) @DateTimeFormat(pattern = Constraints.TIME_PATTERN)
             LocalDateTime from,
-            @RequestParam(value = "to", required = false)
-            @DateTimeFormat(pattern = Constraints.TIME_PATTERN)
+            @RequestParam(value = "to", required = false) @DateTimeFormat(pattern = Constraints.TIME_PATTERN)
             LocalDateTime to,
-            @RequestParam(value = "orderBy", required = false, defaultValue = Constraints.ORDER_DESC_ID)
-            String orderBy,
-            @RequestParam(value = "pageSize", required = false, defaultValue = Constraints.PAGE_SIZE)
-            int pageSize,
+            @RequestParam(value = "orderBy", required = false, defaultValue = Constraints.ORDER_DESC_ID) String orderBy,
+            @RequestParam(value = "pageSize", required = false, defaultValue = Constraints.PAGE_SIZE) int pageSize,
             @RequestParam(value = "pageNumber", required = false, defaultValue = Constraints.PAGE_NUMBER)
             int pageNumber) {
         final Long period = 60l;

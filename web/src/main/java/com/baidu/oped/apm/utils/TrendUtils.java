@@ -27,6 +27,7 @@ import com.baidu.oped.apm.mvc.vo.TrendResponse;
  * Created by mason on 8/27/15.
  */
 public abstract class TrendUtils {
+
     /**
      * Convert application metric to standard output.
      *
@@ -35,28 +36,37 @@ public abstract class TrendUtils {
      *
      * @return
      */
-    public static TrendResponse toTrendResponse(TrendContext context, Constraints.MetricName[] metricNames) {
+    public static <T> TrendResponse toTrendResponse(TrendContext<T> context, Constraints.MetricName[] metricNames) {
         Assert.notNull(metricNames, "MetricNames must not be null while convert to trendResponse.");
         Assert.notNull(context, "MetricData must not be null while convert to trendResponse.");
 
         TrendResponse trendResponse = new TrendResponse();
-        List<Metric> metrics = new ArrayList<>();
-        for (Constraints.MetricName metricName : metricNames) {
-            Metric metric = new Metric();
-            metric.setDescription(metricName.getDescription());
-            metric.setName(metricName.getFieldName());
-            metric.setUnit(metricName.getUnit());
-            metrics.add(metric);
-        }
+
+        List<Metric> metrics = buildMetrics(metricNames);
         trendResponse.setMetrics(metrics);
 
-        List<MetricData> values = new ArrayList<>();
+        List<MetricData> values = buildMetricData(context, metricNames);
+        trendResponse.setValues(values);
 
+        return trendResponse;
+    }
+
+    /**
+     * Build metric data with the context values.
+     *
+     * @param context
+     * @param metricNames
+     * @param <T>
+     *
+     * @return
+     */
+    private static <T> List<MetricData> buildMetricData(TrendContext<T> context, Constraints.MetricName[] metricNames) {
+        List<MetricData> values = new ArrayList<>();
         for (TimeRange timeRange : context.getTimeRanges()) {
-            for (ServiceType serviceType : context.getServiceTypes()) {
+            for (T serviceType : context.getServiceTypes()) {
                 MetricData metricData = new MetricData();
                 metricData.setTime(timeRange.toString());
-                metricData.setLegend(serviceType.getDescription());
+                metricData.setLegend(calculateLegend(serviceType));
 
                 List<DataPoint> dataPoints =
                         context.getStatistic(timeRange, serviceType).stream().map(applicationStatistic -> {
@@ -70,9 +80,48 @@ public abstract class TrendUtils {
                 values.add(metricData);
             }
         }
+        return values;
+    }
 
-        trendResponse.setValues(values);
-        return trendResponse;
+    /**
+     * Build the legend data.
+     *
+     * @param element
+     * @param <T>
+     *
+     * @return
+     */
+    private static <T> String calculateLegend(T element) {
+        Assert.notNull(element, "cannot build legend with empty object.");
+        if (element instanceof String) {
+            return (String) element;
+        }
+        if (element instanceof Number) {
+            return element.toString();
+        }
+        if (element instanceof ServiceType) {
+            return ((ServiceType) element).getDescription();
+        }
+        throw new UnsupportedOperationException("Not support yet!");
+    }
+
+    /**
+     * Build Metrics from MetricName
+     *
+     * @param metricNames metricNames to build from
+     *
+     * @return
+     */
+    private static List<Metric> buildMetrics(Constraints.MetricName[] metricNames) {
+        List<Metric> metrics = new ArrayList<>();
+        for (Constraints.MetricName metricName : metricNames) {
+            Metric metric = new Metric();
+            metric.setDescription(metricName.getDescription());
+            metric.setName(metricName.getFieldName());
+            metric.setUnit(metricName.getUnit());
+            metrics.add(metric);
+        }
+        return metrics;
     }
 
     /**
@@ -179,8 +228,8 @@ public abstract class TrendUtils {
                 case APDEX:
                     if (commonStatistic != null) {
                         value = format(ApdexUtils.calculateApdex(commonStatistic.getSatisfied(),
-                                                                        commonStatistic.getTolerated(),
-                                                                        commonStatistic.getFrustrated()));
+                                                                 commonStatistic.getTolerated(),
+                                                                 commonStatistic.getFrustrated()));
                     } else {
                         value = null;
                     }

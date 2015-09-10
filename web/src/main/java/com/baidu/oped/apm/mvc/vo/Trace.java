@@ -1,8 +1,7 @@
-
 package com.baidu.oped.apm.mvc.vo;
 
 /**
- * class Trace 
+ * class Trace
  *
  * @author meidongxu@baidu.com
  */

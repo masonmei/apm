@@ -2,13 +2,7 @@ package com.baidu.oped.apm.model.service;
 
 import static com.baidu.oped.apm.utils.TimeUtils.toMillSecond;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -31,10 +25,6 @@ import com.baidu.oped.apm.common.jpa.repository.ApplicationRepository;
 import com.baidu.oped.apm.common.jpa.repository.ApplicationStatisticRepository;
 import com.baidu.oped.apm.common.jpa.repository.InstanceRepository;
 import com.baidu.oped.apm.common.jpa.repository.InstanceStatisticRepository;
-import com.baidu.oped.apm.mvc.vo.ApplicationVo;
-import com.baidu.oped.apm.mvc.vo.InstanceVo;
-import com.baidu.oped.apm.mvc.vo.PageInfo;
-import com.baidu.oped.apm.mvc.vo.QueryResponse;
 import com.baidu.oped.apm.mvc.vo.TimeRange;
 import com.baidu.oped.apm.utils.PageUtils;
 import com.mysema.query.types.expr.BooleanExpression;
@@ -67,14 +57,14 @@ public class ApplicationService {
     }
 
     /**
-     *
      * @param timeRange
      * @param apps
-     * @param period in Second
+     * @param period    in Second
+     *
      * @return
      */
     public Iterable<ApplicationStatistic> selectApplicationStatistics(TimeRange timeRange, Iterable<Application> apps,
-                                                                      Long period) {
+            Long period) {
         final long periodInMillis = period * 1000;
         List<Long> appIds =
                 StreamSupport.stream(apps.spliterator(), false).map(Application::getId).collect(Collectors.toList());
@@ -98,14 +88,14 @@ public class ApplicationService {
     }
 
     /**
-     *
      * @param timeRange
      * @param instances
-     * @param period in Second
+     * @param period    in Second
+     *
      * @return
      */
     public Iterable<InstanceStatistic> selectInstanceStatistics(TimeRange timeRange, List<Instance> instances,
-                                                                Long period) {
+            Long period) {
         final long periodInMillis = period * 1000;
 
         List<Long> instanceIds =

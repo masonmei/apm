@@ -84,7 +84,8 @@
 //        List<List<TransactionId>> traceIndexList;
 //
 //        if (limit <= 0) {
-//            traceIndexList = hbaseOperations2.find(HBaseTables.APPLICATION_TRACE_INDEX, scan, traceIdRowKeyDistributor,
+//            traceIndexList = hbaseOperations2.find(HBaseTables.APPLICATION_TRACE_INDEX, scan,
+// traceIdRowKeyDistributor,
 //                                                          traceIndexMapper);
 //        } else {
 //            traceIndexList = hbaseOperations2
@@ -136,7 +137,8 @@
 //    //            }
 //    //        } else {
 //    //            if (logger.isDebugEnabled()) {
-//    //                logger.debug("scanner start lastTime:{}", DateUtils.longToDateStr(area.getTimeRange().getFrom()));
+//    //                logger.debug("scanner start lastTime:{}", DateUtils.longToDateStr(area.getTimeRange().getFrom
+// ()));
 //    //            }
 //    //            limitedScanResult.setLimitedTime(area.getTimeRange().getFrom());
 //    //        }
@@ -278,7 +280,8 @@
 //     *
 //     * @return
 //     */
-//    //    private Filter makeResponseTimeFilter(final SelectedScatterArea area, final TransactionId offsetTransactionId,
+//    //    private Filter makeResponseTimeFilter(final SelectedScatterArea area, final TransactionId
+// offsetTransactionId,
 //    //                                          int offsetTransactionElapsed) {
 //    //        // filter by response time
 //    //        ResponseTimeRange responseTimeRange = area.getResponseTimeRange();
@@ -299,7 +302,8 @@
 //    //            buffer.putVar(offsetTransactionId.getTransactionSequence());
 //    //            byte[] qualifierOffset = buffer.getBuffer();
 //    //
-//    //            filterList.addFilter(new QualifierFilter(CompareOp.GREATER, new BinaryPrefixComparator(qualifierOffset)));
+//    //            filterList.addFilter(new QualifierFilter(CompareOp.GREATER, new BinaryPrefixComparator
+// (qualifierOffset)));
 //    //        }
 //    //        return filterList;
 //    //    }

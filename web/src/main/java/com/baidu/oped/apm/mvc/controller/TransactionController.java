@@ -6,7 +6,6 @@ import static com.baidu.oped.apm.common.utils.Constraints.MetricName.RESPONSE_TI
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -17,16 +16,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.baidu.oped.apm.common.jpa.entity.ServiceType;
+import com.baidu.oped.apm.common.jpa.entity.WebTransaction;
 import com.baidu.oped.apm.common.jpa.entity.WebTransactionStatistic;
+import com.baidu.oped.apm.common.utils.Constraints;
 import com.baidu.oped.apm.model.service.AutomaticService;
 import com.baidu.oped.apm.model.service.OverviewService;
-import com.baidu.oped.apm.model.service.TransactionService;
 import com.baidu.oped.apm.mvc.vo.TimeRange;
 import com.baidu.oped.apm.mvc.vo.Transaction;
 import com.baidu.oped.apm.mvc.vo.TrendContext;
 import com.baidu.oped.apm.mvc.vo.TrendResponse;
-import com.baidu.oped.apm.common.utils.Constraints;
 import com.baidu.oped.apm.utils.TimeUtils;
+import com.baidu.oped.apm.utils.TrendContextUtils;
 import com.baidu.oped.apm.utils.TrendUtils;
 
 /**
@@ -35,8 +35,6 @@ import com.baidu.oped.apm.utils.TrendUtils;
 @RestController
 @RequestMapping("transactions/applications")
 public class TransactionController {
-    @Autowired
-    private TransactionService transactionService;
 
     @Autowired
     private AutomaticService automaticService;
@@ -47,20 +45,19 @@ public class TransactionController {
     /**
      * List Given application transactions.
      *
-     * @param appId
-     * @param from
-     * @param to
-     * @param limit
+     * @param appId the application identification
+     * @param from  time range begin
+     * @param to    time range end
+     * @param limit top n limit
      *
      * @return
      */
     @RequestMapping(method = RequestMethod.GET)
     public List<Transaction> transactions(@RequestParam(value = "appId") Long appId,
-                                          @RequestParam(value = "from", required = false)
-                                          @DateTimeFormat(pattern = Constraints.TIME_PATTERN) LocalDateTime from,
-                                          @RequestParam(value = "to", required = false)
-                                          @DateTimeFormat(pattern = Constraints.TIME_PATTERN) LocalDateTime to,
-                                          @RequestParam(value = "limit") Integer limit) {
+            @RequestParam(value = "from", required = false) @DateTimeFormat(pattern = Constraints.TIME_PATTERN)
+            LocalDateTime from,
+            @RequestParam(value = "to", required = false) @DateTimeFormat(pattern = Constraints.TIME_PATTERN)
+            LocalDateTime to, @RequestParam(value = "limit") Integer limit) {
         Assert.notNull(appId, "ApplicationId must not be null while retrieving top n transactions.");
         Assert.notNull(from, "Time range start must not be null while retrieving top n transactions.");
         Assert.notNull(to, "Time range end must not be null while retrieving top n transactions.");
@@ -74,35 +71,36 @@ public class TransactionController {
     /**
      * Get top n transaction response time trend data.
      *
-     * @param appId
-     * @param time
-     * @param period
-     * @param limit
+     * @param appId  the application identification
+     * @param time   time range, only one
+     * @param period period in second
+     * @param limit  top n limit
      *
      * @return
      */
     @RequestMapping(value = {"trend/rt"})
     public TrendResponse responseTime(@RequestParam(value = "appId") Long appId,
-                                      @RequestParam(value = "time[]") String[] time,
-                                      @RequestParam(value = "period") Long period,
-                                      @RequestParam(value = "limit", defaultValue = "5") Integer limit) {
+            @RequestParam(value = "time[]") String[] time, @RequestParam(value = "period") Long period,
+            @RequestParam(value = "limit", defaultValue = "5") Integer limit) {
         Assert.notNull(appId, "ApplicationId must not be null while retrieve web transaction response time trend data");
         Assert.notEmpty(time, "Time ranges must not be null while retrieve application response time trend data.");
         Assert.notNull(period, "Period must be provided while retrieve application response time trend data.");
         Assert.state(period % 60 == 0, "Period must be 60 or the times of 60.");
         Assert.state(limit > 0, "Limit must bigger that 0.");
 
-        //TODO: adjust to use limit
         final Constraints.MetricName[] metricName = new Constraints.MetricName[] {RESPONSE_TIME, PV, CPM};
-        final ServiceType serviceType = ServiceType.WEB;
         List<TimeRange> timeRanges = TimeUtils.convertToRange(time);
+        Assert.state(timeRanges.size() == 1, "Time param must be only one range.");
 
-        Map<TimeRange, Iterable<WebTransactionStatistic>> webTransactionMetricDataOfApp =
-                automaticService.getWebTransactionMetricDataOfApp(appId, timeRanges, period);
+        final TimeRange timeRange = timeRanges.get(0);
 
+        Iterable<WebTransaction> transactions = automaticService.getWebTransactionsWithAppId(appId);
 
+        Iterable<WebTransactionStatistic> transactionsStatistic =
+                automaticService.getWebTransactionsStatistic(transactions, timeRange, period);
 
-        TrendContext trendContext = automaticService.getMetricDataOfApp(appId, timeRanges, period, serviceType);
+        TrendContext<String> trendContext =
+                TrendContextUtils.topByAvgResponseTime(period, limit, timeRange, transactions, transactionsStatistic);
 
         return TrendUtils.toTrendResponse(trendContext, metricName);
     }
@@ -110,20 +108,19 @@ public class TransactionController {
     /**
      * Get all transaction cpm of the application.
      *
-     * @param appId
-     * @param time
-     * @param period
+     * @param appId  the application identification
+     * @param time   time range, only one
+     * @param period period in second
      */
     @RequestMapping(value = {"trend/cpm"})
     public TrendResponse cpm(@RequestParam(value = "appId") Long appId, @RequestParam(value = "time[]") String[] time,
-                             @RequestParam(value = "period") Long period) {
+            @RequestParam(value = "period") Long period) {
         Assert.notNull(appId, "ApplicationId must not be null while retrieve web transaction response time trend data");
         Assert.notEmpty(time, "Time ranges must not be null while retrieve application response time trend data.");
         Assert.notNull(period, "Period must be provided while retrieve application response time trend data.");
         Assert.state(period % 60 == 0, "Period must be 60 or the times of 60.");
 
-        final Constraints.MetricName[] metricName =
-                new Constraints.MetricName[] {RESPONSE_TIME, PV, CPM};
+        final Constraints.MetricName[] metricName = new Constraints.MetricName[] {RESPONSE_TIME, PV, CPM};
         final ServiceType serviceType = ServiceType.WEB;
         List<TimeRange> timeRanges = TimeUtils.convertToRange(time);
 
@@ -145,10 +142,10 @@ public class TransactionController {
      */
     @RequestMapping(value = {"traces"})
     public List<Transaction> slowTransactions(@RequestParam(value = "appId") Long appId,
-                                              @RequestParam(value = "time[]") String[] time,
-                                              @RequestParam(value = "pageNumber", defaultValue = "1") Integer pageCount,
-                                              @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
-                                              @RequestParam(value = "orderBy", required = false) String orderby) {
+            @RequestParam(value = "time[]") String[] time,
+            @RequestParam(value = "pageNumber", defaultValue = "1") Integer pageCount,
+            @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
+            @RequestParam(value = "orderBy", required = false) String orderby) {
 
         return null;
     }
@@ -156,22 +153,21 @@ public class TransactionController {
     /**
      * List transactions of given instance.
      *
-     * @param appId
-     * @param instanceId
-     * @param from
-     * @param to
-     * @param limit
+     * @param appId      the application identification
+     * @param instanceId the instance identification, need to check relation with app
+     * @param from       time range begin
+     * @param to         time range end
+     * @param limit      top n limit
      *
      * @return
      */
     @RequestMapping(value = {"instances"}, method = RequestMethod.GET)
     public List<Transaction> instanceTransactions(@RequestParam(value = "appId") Long appId,
-                                                  @RequestParam(value = "instanceId") Long instanceId,
-                                                  @RequestParam(value = "from", required = false)
-                                                  @DateTimeFormat(pattern = Constraints.TIME_PATTERN) LocalDateTime from,
-                                                  @RequestParam(value = "to", required = false)
-                                                  @DateTimeFormat(pattern = Constraints.TIME_PATTERN) LocalDateTime to,
-                                                  @RequestParam(value = "limit") Integer limit) {
+            @RequestParam(value = "instanceId") Long instanceId,
+            @RequestParam(value = "from", required = false) @DateTimeFormat(pattern = Constraints.TIME_PATTERN)
+            LocalDateTime from,
+            @RequestParam(value = "to", required = false) @DateTimeFormat(pattern = Constraints.TIME_PATTERN)
+            LocalDateTime to, @RequestParam(value = "limit") Integer limit) {
         Assert.notNull(appId, "ApplicationId must not be null while retrieving top n transactions.");
         Assert.notNull(instanceId, "InstanceId must not be null while retrieving top n transactions.");
         Assert.notNull(from, "Time range start must not be null while retrieving top n transactions.");
@@ -186,34 +182,39 @@ public class TransactionController {
     /**
      * Get top n transaction response time trend data of given instance.
      *
-     * @param appId
-     * @param instanceId
-     * @param time
-     * @param period
-     * @param limit
+     * @param appId      the application identification
+     * @param instanceId the instance identification, need to check relation with app
+     * @param time       time range, only one
+     * @param period     period in second
+     * @param limit      top n limit
      *
      * @return
      */
     @RequestMapping(value = {"instances/trend/rt"})
     public TrendResponse instanceResponseTime(@RequestParam(value = "appId") Long appId,
-                                              @RequestParam(value = "instanceId") Long instanceId,
-                                              @RequestParam(value = "time[]") String[] time,
-                                              @RequestParam(value = "period") Long period,
-                                              @RequestParam(value = "limit") Integer limit) {
+            @RequestParam(value = "instanceId") Long instanceId, @RequestParam(value = "time[]") String[] time,
+            @RequestParam(value = "period") Long period, @RequestParam(value = "limit") Integer limit) {
         Assert.notNull(appId, "ApplicationId must not be null while retrieve web transaction response time trend data");
-        Assert.notNull(instanceId, "InstanceId must not be null while retireving web transaction response time trend"
-                                           + " data.");
+        Assert.notNull(instanceId,
+                       "InstanceId must not be null while retireving web transaction response time trend" + " data.");
         Assert.notEmpty(time, "Time ranges must not be null while retrieve application response time trend data.");
         Assert.notNull(period, "Period must be provided while retrieve application response time trend data.");
         Assert.state(period % 60 == 0, "Period must be 60 or the times of 60.");
         Assert.state(limit > 0, "Limit must bigger that 0.");
 
         final Constraints.MetricName[] metricName = new Constraints.MetricName[] {RESPONSE_TIME, PV, CPM};
-        final ServiceType serviceType = ServiceType.WEB;
         List<TimeRange> timeRanges = TimeUtils.convertToRange(time);
+        Assert.state(timeRanges.size() == 1, "Time param must be only one range.");
 
-        TrendContext trendContext =
-                automaticService.getMetricDataOfInstance(instanceId, timeRanges, period, serviceType);
+        final TimeRange timeRange = timeRanges.get(0);
+
+        Iterable<WebTransaction> transactions = automaticService.getWebTransactionsWithInstanceId(instanceId);
+
+        Iterable<WebTransactionStatistic> transactionsStatistic =
+                automaticService.getWebTransactionsStatistic(transactions, timeRange, period);
+
+        TrendContext<String> trendContext =
+                TrendContextUtils.topByAvgResponseTime(period, limit, timeRange, transactions, transactionsStatistic);
 
         return TrendUtils.toTrendResponse(trendContext, metricName);
     }
@@ -221,27 +222,25 @@ public class TransactionController {
     /**
      * Get all transaction cpm of given instance.
      *
-     * @param appId
-     * @param instanceId
-     * @param time
-     * @param period
+     * @param appId      the application identification
+     * @param instanceId the instance identification, need to check relation with app
+     * @param time       time range, only one
+     * @param period     period in second
      *
      * @return
      */
     @RequestMapping(value = {"instances/trend/cpm"})
     public TrendResponse instanceCpm(@RequestParam(value = "appId") Long appId,
-                                     @RequestParam(value = "instanceId") Long instanceId,
-                                     @RequestParam(value = "time[]") String[] time,
-                                     @RequestParam(value = "period") Long period) {
+            @RequestParam(value = "instanceId") Long instanceId, @RequestParam(value = "time[]") String[] time,
+            @RequestParam(value = "period") Long period) {
         Assert.notNull(appId, "ApplicationId must not be null while retrieve web transaction response time trend data");
-        Assert.notNull(instanceId, "InstanceId must not be null while retireving web transaction response time trend"
-                                           + " data.");
+        Assert.notNull(instanceId,
+                       "InstanceId must not be null while retireving web transaction response time trend" + " data.");
         Assert.notEmpty(time, "Time ranges must not be null while retrieve application response time trend data.");
         Assert.notNull(period, "Period must be provided while retrieve application response time trend data.");
         Assert.state(period % 60 == 0, "Period must be 60 or the times of 60.");
 
-        final Constraints.MetricName[] metricName =
-                new Constraints.MetricName[] {RESPONSE_TIME, PV, CPM};
+        final Constraints.MetricName[] metricName = new Constraints.MetricName[] {RESPONSE_TIME, PV, CPM};
         final ServiceType serviceType = ServiceType.WEB;
         List<TimeRange> timeRanges = TimeUtils.convertToRange(time);
         TrendContext trendContext =
@@ -264,18 +263,13 @@ public class TransactionController {
      */
     @RequestMapping(value = {"instances/traces"})
     public List<Transaction> instanceSlowTransactions(@RequestParam(value = "appId") Long appId,
-                                                      @RequestParam(value = "instanceId") Long instanceId,
-                                                      @RequestParam(value = "from", required = false)
-                                                      @DateTimeFormat(pattern = Constraints.TIME_PATTERN)
-                                                      LocalDateTime from, @RequestParam(value = "to", required = false)
-                                                      @DateTimeFormat(pattern = Constraints.TIME_PATTERN)
-                                                      LocalDateTime to,
-                                                      @RequestParam(value = "pageNumber", defaultValue = "1")
-                                                      Integer pageCount,
-                                                      @RequestParam(value = "pageSize", defaultValue = "20")
-                                                      Integer pageSize,
-                                                      @RequestParam(value = "orderBy", required = false)
-                                                      String orderBy) {
+            @RequestParam(value = "instanceId") Long instanceId,
+            @RequestParam(value = "from", required = false) @DateTimeFormat(pattern = Constraints.TIME_PATTERN)
+            LocalDateTime from,
+            @RequestParam(value = "to", required = false) @DateTimeFormat(pattern = Constraints.TIME_PATTERN)
+            LocalDateTime to, @RequestParam(value = "pageNumber", defaultValue = "1") Integer pageCount,
+            @RequestParam(value = "pageSize", defaultValue = "20") Integer pageSize,
+            @RequestParam(value = "orderBy", required = false) String orderBy) {
 
         return null;
     }
