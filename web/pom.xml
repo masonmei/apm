@@ -3,17 +3,14 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>com.baidu.oped.apm</groupId>
-    <artifactId>web</artifactId>
-    <version>1.1.0</version>
-
     <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>1.2.5.RELEASE</version>
-        <relativePath/>
+        <groupId>com.baidu.oped.apm</groupId>
+        <artifactId>apm</artifactId>
+        <version>1.1.1</version>
     </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>web</artifactId>
 
     <properties>
         <version.jackson>2.5.4</version.jackson>
@@ -53,35 +50,17 @@
 
         <dependency>
             <groupId>com.baidu.oped.apm</groupId>
-            <artifactId>commons</artifactId>
-            <version>1.1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.baidu.oped.apm</groupId>
-            <artifactId>rpc</artifactId>
-            <version>1.1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.baidu.oped.apm</groupId>
-            <artifactId>thrift</artifactId>
-            <version>1.1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.baidu.oped.apm</groupId>
             <artifactId>commons-jpa</artifactId>
-            <version>1.1.0</version>
         </dependency>
 
         <dependency>
             <groupId>commons-beanutils</groupId>
             <artifactId>commons-beanutils</artifactId>
-            <version>1.9.2</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.thrift</groupId>
             <artifactId>libthrift</artifactId>
-            <version>0.9.2</version>
         </dependency>
 
         <!-- swagger begin -->
@@ -111,11 +90,6 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
             <version>${version.jackson}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>12.0.1</version>
         </dependency>
     </dependencies>
 

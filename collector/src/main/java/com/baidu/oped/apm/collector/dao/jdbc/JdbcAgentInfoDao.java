@@ -10,7 +10,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 import com.baidu.oped.apm.collector.dao.AgentInfoDao;
-import com.baidu.oped.apm.common.ApplicationType;
+import com.baidu.oped.apm.common.types.ApplicationType;
 import com.baidu.oped.apm.common.jpa.entity.AgentInstanceMap;
 import com.baidu.oped.apm.common.jpa.entity.Application;
 import com.baidu.oped.apm.common.jpa.entity.Instance;

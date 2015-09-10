@@ -2,10 +2,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
     <parent>
-        <artifactId>pom</artifactId>
         <groupId>com.baidu.oped.apm</groupId>
-        <version>1.1.0</version>
+        <artifactId>apm</artifactId>
+        <version>1.1.1</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -27,44 +28,10 @@
             <artifactId>spring-boot-configuration-processor</artifactId>
             <optional>true</optional>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>org.springframework.boot</groupId>-->
-            <!--<artifactId>spring-boot-starter-jdbc</artifactId>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>mysql</groupId>-->
-            <!--<artifactId>mysql-connector-java</artifactId>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>org.springframework</groupId>-->
-            <!--<artifactId>spring-core</artifactId>-->
-            <!--<version>4.1.7.RELEASE</version>-->
-            <!--<exclusions>-->
-                <!--<exclusion>-->
-                    <!--<groupId>commons-logging</groupId>-->
-                    <!--<artifactId>commons-logging</artifactId>-->
-                <!--</exclusion>-->
-            <!--</exclusions>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>org.springframework</groupId>-->
-            <!--<artifactId>spring-beans</artifactId>-->
-            <!--<version>4.1.7.RELEASE</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>org.springframework</groupId>-->
-            <!--<artifactId>spring-context</artifactId>-->
-            <!--<version>4.1.7.RELEASE</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>org.springframework</groupId>-->
-            <!--<artifactId>spring-orm</artifactId>-->
-            <!--<version>4.1.7.RELEASE</version>-->
-        <!--</dependency>-->
 
         <dependency>
             <groupId>com.baidu.oped.apm</groupId>
-            <artifactId>commons</artifactId>
+            <artifactId>pinpoint-commons</artifactId>
         </dependency>
         <dependency>
             <groupId>com.baidu.oped.apm</groupId>
@@ -72,11 +39,11 @@
         </dependency>
         <dependency>
             <groupId>com.baidu.oped.apm</groupId>
-            <artifactId>rpc</artifactId>
+            <artifactId>pinpoint-rpc</artifactId>
         </dependency>
         <dependency>
             <groupId>com.baidu.oped.apm</groupId>
-            <artifactId>thrift</artifactId>
+            <artifactId>pinpoint-thrift</artifactId>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
