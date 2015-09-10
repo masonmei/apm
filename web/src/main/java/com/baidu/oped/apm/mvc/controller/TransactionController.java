@@ -100,6 +100,8 @@ public class TransactionController {
         Map<TimeRange, Iterable<WebTransactionStatistic>> webTransactionMetricDataOfApp =
                 automaticService.getWebTransactionMetricDataOfApp(appId, timeRanges, period);
 
+
+
         TrendContext trendContext = automaticService.getMetricDataOfApp(appId, timeRanges, period, serviceType);
 
         return TrendUtils.toTrendResponse(trendContext, metricName);
