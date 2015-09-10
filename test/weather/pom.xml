@@ -78,7 +78,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                     <jvmArguments>
-                        -javaagent:${project.basedir}/../../agent/java-agent/target/pinpoint-agent/bootstrap-1.1.0.jar
+                        -javaagent:${project.basedir}/../../agent/java-agent/agent/target/pinpoint-agent/bootstrap-1.1.0.jar
                         -Dpinpoint.agentId=${pom.build.finalName} -Dpinpoint.applicationName=weather
                     </jvmArguments>
                 </configuration>
