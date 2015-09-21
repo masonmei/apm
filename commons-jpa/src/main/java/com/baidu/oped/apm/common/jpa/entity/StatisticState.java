@@ -15,8 +15,7 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
  */
 @Entity
 @Table(name = "apm_statistic_state", indexes = {
-       @Index(name = "statistic_state_unique", columnList = "statistic_type,period", unique = true)
-})
+        @Index(name = "statistic_state_unique", columnList = "statistic_type,period", unique = true)})
 public class StatisticState extends AbstractPersistable<Long> {
 
     @Basic

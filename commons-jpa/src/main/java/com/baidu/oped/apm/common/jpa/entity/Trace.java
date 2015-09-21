@@ -13,22 +13,12 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
  */
 @Entity
 @Table(name = "apm_span", indexes = {
-        @Index(name = "trace_instance_unique",
-               columnList = "app_id,instance_id,agent_start_time,span_id", unique = true)
-})
-public class Trace extends AbstractPersistable<Long> {
+        @Index(name = "trace_instance_unique", columnList = "agent_id,span_id", unique = true)})
+public class Trace extends AbstractPersistable<Long> implements ClearableAgentInfo {
 
     @Basic
-    @Column(name = "app_id", nullable = false, insertable = true, updatable = true)
-    private Long appId;
-
-    @Basic
-    @Column(name = "instance_id", nullable = false, insertable = true, updatable = true)
-    private Long instanceId;
-
-    @Basic
-    @Column(name = "agent_start_time", nullable = false, insertable = true, updatable = true)
-    private Long agentStartTime;
+    @Column(name = "agent_id", nullable = true, insertable = true, updatable = true)
+    private Long agentId;
 
     @Column(name = "span_id", nullable = false, insertable = true, updatable = true)
     private long spanId;
@@ -94,31 +84,14 @@ public class Trace extends AbstractPersistable<Long> {
     @Column(name = "version", nullable = true, insertable = true, updatable = true)
     private int version;
 
-    public Trace() {
+    @Override
+    public Long getAgentId() {
+        return agentId;
     }
 
-    public Long getAppId() {
-        return appId;
-    }
-
-    public void setAppId(Long appId) {
-        this.appId = appId;
-    }
-
-    public Long getInstanceId() {
-        return instanceId;
-    }
-
-    public void setInstanceId(Long instanceId) {
-        this.instanceId = instanceId;
-    }
-
-    public Long getAgentStartTime() {
-        return agentStartTime;
-    }
-
-    public void setAgentStartTime(Long agentStartTime) {
-        this.agentStartTime = agentStartTime;
+    @Override
+    public void setAgentId(Long agentId) {
+        this.agentId = agentId;
     }
 
     public Long getApiId() {

@@ -78,7 +78,7 @@ public class JdbcTraceDao extends BaseService implements TracesDao {
         trace.setEndPoint(span.getEndPoint());
         trace.setFlag(span.getFlag());
 
-        ApiMetaData apiMetaData = findApiMetaData(trace.getInstanceId(), span.getStartTime(), span.getApiId());
+        ApiMetaData apiMetaData = findApiMetaData(trace.getAgentId(), span.getApiId());
         trace.setApiId(apiMetaData.getId());
 
         trace.setErrCode(span.getErr());
@@ -124,8 +124,7 @@ public class JdbcTraceDao extends BaseService implements TracesDao {
         long acceptedTime = acceptedTimeService.getAcceptedTime();
         spanChunk.getSpanEventList().stream().forEach(spanEvent -> {
             TraceEvent event = new TraceEvent();
-            event.setAppId(trace.getAppId());
-            event.setInstanceId(trace.getInstanceId());
+            event.setAgentId(trace.getAgentId());
             event.setTraceId(trace.getId());
 
             event.setTraceAgentId(transactionId.getAgentId());
@@ -149,7 +148,7 @@ public class JdbcTraceDao extends BaseService implements TracesDao {
 
             event.setEndPoint(spanEvent.getEndPoint());
 
-            ApiMetaData apiMetaData = findApiMetaData(trace.getInstanceId(), trace.getStartTime(), spanEvent.getApiId());
+            ApiMetaData apiMetaData = findApiMetaData(trace.getAgentId(), spanEvent.getApiId());
             event.setApiId(apiMetaData.getId());
 
             if (spanEvent.isSetDepth()) {
@@ -202,8 +201,7 @@ public class JdbcTraceDao extends BaseService implements TracesDao {
         spanEventBoList.stream().filter(spanEvent -> spanEvent != null).forEach(spanEvent -> {
             TraceEvent event = new TraceEvent();
 
-            event.setAppId(trace.getAppId());
-            event.setInstanceId(trace.getInstanceId());
+            event.setAgentId(trace.getAgentId());
             event.setTraceId(trace.getId());
 
             final TransactionId transactionId = TransactionIdUtils.parseTransactionId(span.getTransactionId());
@@ -226,7 +224,7 @@ public class JdbcTraceDao extends BaseService implements TracesDao {
             event.setDestinationId(spanEvent.getDestinationId());
 
             event.setEndPoint(spanEvent.getEndPoint());
-            ApiMetaData apiMetaData = findApiMetaData(trace.getInstanceId(), trace.getStartTime(), spanEvent.getApiId());
+            ApiMetaData apiMetaData = findApiMetaData(trace.getAgentId(), spanEvent.getApiId());
             event.setApiId(apiMetaData.getId());
 
             if (spanEvent.isSetDepth()) {

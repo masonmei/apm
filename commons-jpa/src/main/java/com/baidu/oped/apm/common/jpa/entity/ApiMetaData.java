@@ -1,7 +1,5 @@
 package com.baidu.oped.apm.common.jpa.entity;
 
-import java.io.Serializable;
-
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -15,13 +13,12 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
  */
 @Entity
 @Table(name = "apm_api_meta_data", indexes = {
-        @Index(name = "api_meta_unique", columnList = "instance_id,start_time,api_id", unique = true)
-})
-public class ApiMetaData extends AbstractPersistable<Long> implements Serializable {
+        @Index(name = "api_meta_unique", columnList = "instance_id,start_time,api_id", unique = true)})
+public class ApiMetaData extends AbstractPersistable<Long> implements ClearableAgentInfo {
 
     @Basic
-    @Column(name = "instance_id", nullable = false, insertable = true, updatable = true)
-    private Long instanceId;
+    @Column(name = "agent_id", nullable = true, insertable = true, updatable = true)
+    private Long agentId;
 
     @Basic
     @Column(name = "start_time", nullable = false, insertable = true, updatable = true)
@@ -39,15 +36,14 @@ public class ApiMetaData extends AbstractPersistable<Long> implements Serializab
     @Column(name = "line_number", nullable = true, insertable = true, updatable = true)
     private int lineNumber;
 
-    public ApiMetaData() {
+    @Override
+    public Long getAgentId() {
+        return agentId;
     }
 
-    public Long getInstanceId() {
-        return instanceId;
-    }
-
-    public void setInstanceId(Long instanceId) {
-        this.instanceId = instanceId;
+    @Override
+    public void setAgentId(Long agentId) {
+        this.agentId = agentId;
     }
 
     public int getApiId() {

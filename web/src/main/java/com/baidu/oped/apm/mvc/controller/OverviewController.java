@@ -116,7 +116,7 @@ public class OverviewController {
         Assert.notNull(period, "Period must be provided while retrieve application response time trend data.");
         Assert.state(period % 60 == 0, "Period must be 60 or the times of 60.");
 
-        final Constraints.MetricName[] metricName = new Constraints.MetricName[] {RESPONSE_TIME, PV, CPM};
+        final Constraints.MetricName[] metricName = new Constraints.MetricName[] {CPM, RESPONSE_TIME, PV};
         final ServiceType[] serviceTypes = new ServiceType[] {ServiceType.WEB, ServiceType.EXTERNAL};
         List<TimeRange> timeRanges = TimeUtils.convertToRange(time);
         TrendContext metricDataOfApp = automaticService.getMetricDataOfApp(appId, timeRanges, period, serviceTypes);
@@ -296,7 +296,7 @@ public class OverviewController {
         Assert.notNull(period, "Period must be provided while retrieve application response time trend data.");
         Assert.state(period % 60 == 0, "Period must be 60 or the times of 60.");
 
-        final Constraints.MetricName[] metricName = new Constraints.MetricName[] {RESPONSE_TIME, PV, CPM};
+        final Constraints.MetricName[] metricName = new Constraints.MetricName[] {CPM, RESPONSE_TIME, PV};
         final ServiceType[] serviceTypes = new ServiceType[] {ServiceType.WEB, ServiceType.EXTERNAL};
         List<TimeRange> timeRanges = TimeUtils.convertToRange(time);
 

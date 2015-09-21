@@ -13,9 +13,8 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
  */
 @Entity
 @Table(name = "apm_external_service_statistic", indexes = {
-    @Index(name = "ext_service_statistic_point_unique", columnList = "external_service_id,period,timestamp",
-           unique = true)
-})
+        @Index(name = "ext_service_statistic_point_unique", columnList = "external_service_id,period,timestamp",
+               unique = true)})
 public class ExternalServiceStatistic extends AbstractPersistable<Long> implements CommonStatistic {
     @Basic
     @Column(name = "external_service_id", nullable = false, insertable = true, updatable = true)

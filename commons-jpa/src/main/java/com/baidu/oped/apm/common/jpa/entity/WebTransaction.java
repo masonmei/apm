@@ -13,8 +13,7 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
  */
 @Entity
 @Table(name = "apm_web_transaction", indexes = {
-        @Index(name = "web_tran_unique", columnList = "app_id,instance_id,rpc", unique = true)
-})
+        @Index(name = "web_tran_unique", columnList = "app_id,instance_id,rpc", unique = true)})
 public class WebTransaction extends AbstractPersistable<Long> {
 
     @Basic

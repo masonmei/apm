@@ -44,8 +44,7 @@ public class AgentStatMemoryGcDao extends BaseService implements AgentStatDao {
         }
 
         InstanceStat stat = new InstanceStat();
-        stat.setAppId(map.getAppId());
-        stat.setInstanceId(map.getInstanceId());
+        stat.setAgentId(map.getId());
 
         buildStat(stat, agentStat);
 

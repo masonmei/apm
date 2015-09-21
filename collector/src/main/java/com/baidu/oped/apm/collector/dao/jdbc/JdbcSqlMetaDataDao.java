@@ -33,11 +33,10 @@ public class JdbcSqlMetaDataDao extends BaseService implements SqlMetaDataDao {
         AgentInstanceMap map = findAgentInstanceMap(sqlMetaData.getAgentId(), sqlMetaData.getAgentStartTime());
         if (map == null) {
             LOG.warn("AgentInstanceMap not found for agentId {} and startTime {}, this stat data will be ignored",
-                            sqlMetaData.getAgentId(), sqlMetaData.getAgentStartTime());
+                     sqlMetaData.getAgentId(), sqlMetaData.getAgentStartTime());
             return;
         }
-        SqlMetaData metaData =
-                findSqlMetaData(map.getInstanceId(), sqlMetaData.getAgentStartTime(), sqlMetaData.getSqlId());
+        SqlMetaData metaData = findSqlMetaData(map.getId(), sqlMetaData.getSqlId());
 
         metaData.setSql(sqlMetaData.getSql());
         sqlMetaDataRepository.saveAndFlush(metaData);

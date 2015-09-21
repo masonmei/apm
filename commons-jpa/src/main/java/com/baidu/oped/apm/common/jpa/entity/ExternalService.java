@@ -15,8 +15,7 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
  */
 @Entity
 @Table(name = "apm_external_service", indexes = {
-        @Index(name = "external_service_unique", columnList = "app_id,instance_id,destination_id", unique = true)
-})
+        @Index(name = "external_service_unique", columnList = "app_id,instance_id,destination_id", unique = true)})
 public class ExternalService extends AbstractPersistable<Long> implements Serializable {
 
     @Basic

@@ -1,5 +1,6 @@
 package com.baidu.oped.apm.common.jpa.entity;
 
+import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Index;
@@ -12,12 +13,12 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
  */
 @Entity
 @Table(name = "apm_sql_meta_data", indexes = {
-        @Index(name = "sql_meta_unique", columnList = "instance_id,start_time,sql_id", unique = true)
-})
-public class SqlMetaData extends AbstractPersistable<Long> {
+        @Index(name = "sql_meta_unique", columnList = "instance_id,start_time,sql_id", unique = true)})
+public class SqlMetaData extends AbstractPersistable<Long> implements ClearableAgentInfo {
 
-    @Column(name = "instance_id", nullable = false, insertable = true, updatable = true)
-    private Long instanceId;
+    @Basic
+    @Column(name = "agent_id", nullable = true, insertable = true, updatable = true)
+    private Long agentId;
 
     @Column(name = "start_time", nullable = false, insertable = true, updatable = true)
     private long startTime;
@@ -31,12 +32,14 @@ public class SqlMetaData extends AbstractPersistable<Long> {
     public SqlMetaData() {
     }
 
-    public Long getInstanceId() {
-        return instanceId;
+    @Override
+    public Long getAgentId() {
+        return agentId;
     }
 
-    public void setInstanceId(Long instanceId) {
-        this.instanceId = instanceId;
+    @Override
+    public void setAgentId(Long agentId) {
+        this.agentId = agentId;
     }
 
     public int getSqlId() {

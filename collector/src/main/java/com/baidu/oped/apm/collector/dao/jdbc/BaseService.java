@@ -5,8 +5,6 @@ import org.springframework.dao.DataAccessException;
 
 import com.baidu.oped.apm.common.jpa.entity.AgentInstanceMap;
 import com.baidu.oped.apm.common.jpa.entity.ApiMetaData;
-import com.baidu.oped.apm.common.jpa.entity.Application;
-import com.baidu.oped.apm.common.jpa.entity.Instance;
 import com.baidu.oped.apm.common.jpa.entity.QAgentInstanceMap;
 import com.baidu.oped.apm.common.jpa.entity.QApiMetaData;
 import com.baidu.oped.apm.common.jpa.entity.QSqlMetaData;
@@ -25,11 +23,12 @@ import com.baidu.oped.apm.common.jpa.repository.TraceRepository;
 import com.mysema.query.types.expr.BooleanExpression;
 
 /**
- * Created by mason on 8/27/15.
+ * Base Service for all operations.
+ *
+ * @author meidongxu@baidu.com
  */
 public abstract class BaseService {
 
-    private final Object locker = new Object();
     @Autowired
     protected AgentInstanceMapRepository agentInstanceMapRepository;
     @Autowired
@@ -49,19 +48,14 @@ public abstract class BaseService {
         AgentInstanceMap map = findAgentInstanceMap(agentId, startTimestamp);
         QTrace qTrace = QTrace.trace;
         BooleanExpression spanIdCondition = qTrace.spanId.eq(spanId);
-        BooleanExpression agentStartTimeCondition = qTrace.agentStartTime.eq(startTimestamp);
-        BooleanExpression appIdCondition = qTrace.appId.eq(map.getAppId());
-        BooleanExpression instanceIdCondition = qTrace.instanceId.eq(map.getInstanceId());
+        BooleanExpression agentIdCondition = qTrace.agentId.eq(map.getId());
 
-        BooleanExpression whereCondition =
-                spanIdCondition.and(agentStartTimeCondition).and(appIdCondition).and(instanceIdCondition);
+        BooleanExpression whereCondition = spanIdCondition.and(agentIdCondition);
 
         Trace one = traceRepository.findOne(whereCondition);
         if (one == null) {
             Trace trace = new Trace();
-            trace.setAppId(map.getAppId());
-            trace.setInstanceId(map.getInstanceId());
-            trace.setAgentStartTime(startTimestamp);
+            trace.setAgentId(map.getId());
             trace.setSpanId(spanId);
             try {
                 one = traceRepository.save(trace);
@@ -89,39 +83,36 @@ public abstract class BaseService {
                 one = agentInstanceMapRepository.findOne(whereCondition);
             }
         }
-
-        if (one.getAppId() == null || one.getInstanceId() == null) {
-            synchronized(locker) {
-                one = agentInstanceMapRepository.findOne(whereCondition);
-                if (one.getAppId() == null || one.getInstanceId() == null) {
-                    Application app = applicationRepository.saveAndFlush(new Application());
-                    one.setAppId(app.getId());
-
-                    Instance entity = new Instance();
-                    entity.setAppId(app.getId());
-                    entity.setStartTime(startTimestamp);
-                    Instance instance = instanceRepository.saveAndFlush(entity);
-                    one.setInstanceId(instance.getId());
-                    one = agentInstanceMapRepository.saveAndFlush(one);
-                }
-            }
-        }
+//        if (one.getAppId() == null || one.getInstanceId() == null) {
+//            synchronized(locker) {
+//                one = agentInstanceMapRepository.findOne(whereCondition);
+//                if (one.getAppId() == null || one.getInstanceId() == null) {
+//                    Application app = applicationRepository.saveAndFlush(new Application());
+//                    one.setAppId(app.getId());
+//
+//                    Instance entity = new Instance();
+//                    entity.setAppId(app.getId());
+//                    entity.setStartTime(startTimestamp);
+//                    Instance instance = instanceRepository.saveAndFlush(entity);
+//                    one.setInstanceId(instance.getId());
+//                    one = agentInstanceMapRepository.saveAndFlush(one);
+//                }
+//            }
+//        }
 
         return one;
     }
 
-    protected ApiMetaData findApiMetaData(Long instanceId, long startTime, int id) {
+    protected ApiMetaData findApiMetaData(Long agentId, int apiId) {
         QApiMetaData qApiMetaData = QApiMetaData.apiMetaData;
-        BooleanExpression instanceIdCondition = qApiMetaData.instanceId.eq(instanceId);
-        BooleanExpression startTimeCondition = qApiMetaData.startTime.eq(startTime);
-        BooleanExpression apiIdCondition = qApiMetaData.apiId.eq(id);
-        BooleanExpression whereCondition = instanceIdCondition.and(startTimeCondition).and(apiIdCondition);
+        BooleanExpression agentIdCondition = qApiMetaData.agentId.eq(agentId);
+        BooleanExpression apiIdCondition = qApiMetaData.apiId.eq(apiId);
+        BooleanExpression whereCondition = agentIdCondition.and(apiIdCondition);
         ApiMetaData one = apiMetaDataRepository.findOne(whereCondition);
         if (one == null) {
             ApiMetaData metaData = new ApiMetaData();
-            metaData.setInstanceId(instanceId);
-            metaData.setStartTime(startTime);
-            metaData.setApiId(id);
+            metaData.setAgentId(agentId);
+            metaData.setApiId(apiId);
             try {
                 one = apiMetaDataRepository.saveAndFlush(metaData);
             } catch (DataAccessException exception) {
@@ -131,18 +122,16 @@ public abstract class BaseService {
         return one;
     }
 
-    protected SqlMetaData findSqlMetaData(Long instanceId, long startTime, int id) {
+    protected SqlMetaData findSqlMetaData(Long agentId, int sqlId) {
         QSqlMetaData qSqlMetaData = QSqlMetaData.sqlMetaData;
-        BooleanExpression instanceIdCondition = qSqlMetaData.instanceId.eq(instanceId);
-        BooleanExpression startTimeCondition = qSqlMetaData.startTime.eq(startTime);
-        BooleanExpression apiIdCondition = qSqlMetaData.sqlId.eq(id);
-        BooleanExpression whereCondition = instanceIdCondition.and(startTimeCondition).and(apiIdCondition);
+        BooleanExpression agentIdCondition = qSqlMetaData.agentId.eq(agentId);
+        BooleanExpression apiIdCondition = qSqlMetaData.sqlId.eq(sqlId);
+        BooleanExpression whereCondition = agentIdCondition.and(apiIdCondition);
         SqlMetaData one = sqlMetaDataRepository.findOne(whereCondition);
         if (one == null) {
             SqlMetaData metaData = new SqlMetaData();
-            metaData.setInstanceId(instanceId);
-            metaData.setStartTime(startTime);
-            metaData.setSqlId(id);
+            metaData.setAgentId(agentId);
+            metaData.setSqlId(sqlId);
             try {
                 one = sqlMetaDataRepository.saveAndFlush(metaData);
             } catch (DataAccessException exception) {
@@ -152,17 +141,15 @@ public abstract class BaseService {
         return one;
     }
 
-    protected StringMetaData findStringMetaData(Long instanceId, long startTime, int id) {
+    protected StringMetaData findStringMetaData(Long agentId, int id) {
         QStringMetaData qStringMetaData = QStringMetaData.stringMetaData;
-        BooleanExpression instanceIdCondition = qStringMetaData.instanceId.eq(instanceId);
-        BooleanExpression startTimeCondition = qStringMetaData.startTime.eq(startTime);
+        BooleanExpression agentIdCondition = qStringMetaData.agentId.eq(agentId);
         BooleanExpression apiIdCondition = qStringMetaData.stringId.eq(id);
-        BooleanExpression whereCondition = instanceIdCondition.and(startTimeCondition).and(apiIdCondition);
+        BooleanExpression whereCondition = agentIdCondition.and(apiIdCondition);
         StringMetaData one = stringMetaDataRepository.findOne(whereCondition);
         if (one == null) {
             StringMetaData metaData = new StringMetaData();
-            metaData.setInstanceId(instanceId);
-            metaData.setStartTime(startTime);
+            metaData.setAgentId(agentId);
             metaData.setStringId(id);
             try {
                 one = stringMetaDataRepository.saveAndFlush(metaData);

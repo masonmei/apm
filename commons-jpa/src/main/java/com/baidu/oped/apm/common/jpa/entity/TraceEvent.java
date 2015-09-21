@@ -1,7 +1,5 @@
 package com.baidu.oped.apm.common.jpa.entity;
 
-import java.io.Serializable;
-
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,20 +12,18 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
  */
 @Entity
 @Table(name = "apm_span_event")
-public class TraceEvent extends AbstractPersistable<Long> implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class TraceEvent extends AbstractPersistable<Long> implements ClearableAgentInfo {
 
     @Basic
-    @Column(name = "app_id", nullable = false, insertable = true, updatable = true)
-    private Long appId;
+    @Column(name = "agent_id", nullable = true, insertable = true, updatable = true)
+    private Long agentId;
 
     @Basic
-    @Column(name = "instance_id", nullable = false, insertable = true, updatable = true)
-    private Long instanceId;
-
     @Column(name = "trace_id", nullable = false, insertable = true, updatable = true)
     private Long traceId;
 
+    @Basic
+    @Column(name = "sequence", nullable = false, insertable = true, updatable = true)
     private short sequence;
 
     // api meta data unique id
@@ -71,7 +67,6 @@ public class TraceEvent extends AbstractPersistable<Long> implements Serializabl
     @Column(name = "service_type")
     private int serviceType;
 
-
     @Column(name = "start_elapsed")
     private int startElapsed;
 
@@ -88,30 +83,21 @@ public class TraceEvent extends AbstractPersistable<Long> implements Serializabl
     @Column(name = "version", nullable = true, insertable = true, updatable = true)
     private int version;
 
-    public TraceEvent() {
+    @Override
+    public Long getAgentId() {
+        return agentId;
     }
 
-    public Long getAppId() {
-        return appId;
+    @Override
+    public void setAgentId(Long agentId) {
+        this.agentId = agentId;
     }
 
-    public void setAppId(Long appId) {
-        this.appId = appId;
-    }
-
-    public Long getInstanceId() {
-        return instanceId;
-    }
-
-    public void setInstanceId(Long instanceId) {
-        this.instanceId = instanceId;
-    }
-
-    public long getTraceId() {
+    public Long getTraceId() {
         return traceId;
     }
 
-    public void setTraceId(long traceId) {
+    public void setTraceId(Long traceId) {
         this.traceId = traceId;
     }
 

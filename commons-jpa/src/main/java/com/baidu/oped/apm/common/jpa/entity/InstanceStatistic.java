@@ -13,8 +13,7 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
  */
 @Entity
 @Table(name = "apm_instance_statistic", schema = "", catalog = "apm", indexes = {
-        @Index(name = "instance_statistic_point_unique", columnList = "instance_id,period,timestamp", unique = true)
-})
+        @Index(name = "instance_statistic_point_unique", columnList = "instance_id,period,timestamp", unique = true)})
 public class InstanceStatistic extends AbstractPersistable<Long> implements CommonStatistic, HostStatistic {
 
     @Basic

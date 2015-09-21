@@ -7,11 +7,9 @@ import org.springframework.stereotype.Component;
 
 import com.baidu.oped.apm.collector.dao.StringMetaDataDao;
 import com.baidu.oped.apm.common.jpa.entity.AgentInstanceMap;
-import com.baidu.oped.apm.common.jpa.entity.QStringMetaData;
 import com.baidu.oped.apm.common.jpa.entity.StringMetaData;
 import com.baidu.oped.apm.common.jpa.repository.StringMetaDataRepository;
 import com.baidu.oped.apm.thrift.dto.TStringMetaData;
-import com.mysema.query.types.expr.BooleanExpression;
 
 /**
  * Created by mason on 8/17/15.
@@ -22,6 +20,7 @@ public class JdbcStringMetaDataDao extends BaseService implements StringMetaData
 
     @Autowired
     private StringMetaDataRepository stringMetaDataRepository;
+
     @Override
     public void insert(TStringMetaData stringMetaData) {
         if (stringMetaData == null) {
@@ -31,16 +30,14 @@ public class JdbcStringMetaDataDao extends BaseService implements StringMetaData
             LOG.debug("insert:{}", stringMetaData);
         }
 
-        AgentInstanceMap map =
-                findAgentInstanceMap(stringMetaData.getAgentId(), stringMetaData.getAgentStartTime());
+        AgentInstanceMap map = findAgentInstanceMap(stringMetaData.getAgentId(), stringMetaData.getAgentStartTime());
         if (map == null) {
             LOG.warn("AgentInstanceMap not found for agendId {} and startTime {}, this stat data will be ignored",
-                            stringMetaData.getAgentId(), stringMetaData.getAgentStartTime());
+                     stringMetaData.getAgentId(), stringMetaData.getAgentStartTime());
             return;
         }
 
-        StringMetaData metaData = findStringMetaData(map.getInstanceId(), stringMetaData.getAgentStartTime(),
-                                                                   stringMetaData.getStringId());
+        StringMetaData metaData = findStringMetaData(map.getId(), stringMetaData.getStringId());
         metaData.setStringValue(stringMetaData.getStringValue());
 
         stringMetaDataRepository.saveAndFlush(metaData);

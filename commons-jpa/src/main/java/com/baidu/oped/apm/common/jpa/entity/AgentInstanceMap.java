@@ -13,8 +13,7 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
  */
 @Entity
 @Table(name = "apm_agent_instance_map", indexes = {
-        @Index(name = "agent_instance_unique", columnList = "agent_id,agent_start_time", unique = true)
-})
+        @Index(name = "agent_instance_unique", columnList = "agent_id,agent_start_time", unique = true)})
 public class AgentInstanceMap extends AbstractPersistable<Long> {
 
     @Basic

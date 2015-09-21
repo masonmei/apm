@@ -13,8 +13,8 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
  */
 @Entity
 @Table(name = "apm_transaction_statistic", indexes = {
-        @Index(name = "web_tran_statistic_point_unique", columnList = "transaction_id,period,timestamp", unique = true)
-})
+        @Index(name = "web_tran_statistic_point_unique", columnList = "transaction_id,period,timestamp", unique =
+                true)})
 public class WebTransactionStatistic extends AbstractPersistable<Long> implements CommonStatistic {
 
     @Basic

@@ -8,10 +8,8 @@ import org.springframework.stereotype.Component;
 import com.baidu.oped.apm.collector.dao.ApiMetaDataDao;
 import com.baidu.oped.apm.common.jpa.entity.AgentInstanceMap;
 import com.baidu.oped.apm.common.jpa.entity.ApiMetaData;
-import com.baidu.oped.apm.common.jpa.entity.QApiMetaData;
 import com.baidu.oped.apm.common.jpa.repository.ApiMetaDataRepository;
 import com.baidu.oped.apm.thrift.dto.TApiMetaData;
-import com.mysema.query.types.expr.BooleanExpression;
 
 /**
  * Created by mason on 8/17/15.
@@ -33,16 +31,14 @@ public class JdbcApiMetaDataDao extends BaseService implements ApiMetaDataDao {
             LOG.debug("insert:{}", apiMetaData);
         }
 
-        AgentInstanceMap map =
-                findAgentInstanceMap(apiMetaData.getAgentId(), apiMetaData.getAgentStartTime());
+        AgentInstanceMap map = findAgentInstanceMap(apiMetaData.getAgentId(), apiMetaData.getAgentStartTime());
         if (map == null) {
             LOG.warn("AgentInstanceMap not found for agendId {} and startTime {}, this stat data will be ignored",
-                            apiMetaData.getAgentId(), apiMetaData.getAgentStartTime());
+                     apiMetaData.getAgentId(), apiMetaData.getAgentStartTime());
             return;
         }
 
-        ApiMetaData metaData =
-                findApiMetaData(map.getInstanceId(), apiMetaData.getAgentStartTime(), apiMetaData.getApiId());
+        ApiMetaData metaData = findApiMetaData(map.getId(), apiMetaData.getApiId());
 
         if (apiMetaData.isSetLine()) {
             metaData.setLineNumber(apiMetaData.getLine());

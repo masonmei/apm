@@ -44,17 +44,18 @@ public class JdbcAgentInfoDao extends BaseService implements AgentInfoDao {
 
         AgentInstanceMap map = findAgentInstanceMap(agentInfo.getAgentId(), agentInfo.getStartTimestamp());
 
-        Application existApplication = applicationRepository.findOne(map.getAppId());
-        if (existApplication != null) {
-            mergeApplication(existApplication, agentInfo);
-            applicationRepository.saveAndFlush(existApplication);
-        }
+        Application application = new Application();
+        mergeApplication(application, agentInfo);
+        applicationRepository.save(application);
 
-        Instance existInstance = instanceRepository.findOne(map.getInstanceId());
-        if (existInstance != null) {
-            mergeInstance(existInstance, agentInfo);
-            instanceRepository.saveAndFlush(existInstance);
-        }
+        Instance instance = new Instance();
+        instance.setAppId(application.getId());
+        mergeInstance(instance, agentInfo);
+        instanceRepository.save(instance);
+
+        map.setAppId(application.getId());
+        map.setInstanceId(instance.getId());
+        agentInstanceMapRepository.saveAndFlush(map);
     }
 
     private void mergeInstance(Instance existInstance, TAgentInfo agentInfo) {

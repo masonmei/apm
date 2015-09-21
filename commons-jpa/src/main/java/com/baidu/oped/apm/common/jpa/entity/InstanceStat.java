@@ -13,16 +13,12 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
  */
 @Entity
 @Table(name = "apm_instance_stat", indexes = {
-        @Index(name = "instance_stat_unique", columnList = "app_id,instance_id,timestamp", unique = true)
-})
-public class InstanceStat extends AbstractPersistable<Long> {
-    @Basic
-    @Column(name = "app_id", nullable = false, insertable = true, updatable = true)
-    private Long appId;
+        @Index(name = "instance_stat_unique", columnList = "app_id,instance_id,timestamp", unique = true)})
+public class InstanceStat extends AbstractPersistable<Long> implements ClearableAgentInfo {
 
     @Basic
-    @Column(name = "instance_id", nullable = false, insertable = true, updatable = true)
-    private Long instanceId;
+    @Column(name = "agent_id", nullable = true, insertable = true, updatable = true)
+    private Long agentId;
 
     @Column(name = "timestamp", nullable = false, updatable = true)
     private Long timestamp;
@@ -54,20 +50,14 @@ public class InstanceStat extends AbstractPersistable<Long> {
     @Column(name = "jvm_memory_non_heap_used", nullable = true, insertable = true, updatable = true)
     private long jvmMemoryNonHeapUsed;
 
-    public Long getAppId() {
-        return appId;
+    @Override
+    public Long getAgentId() {
+        return agentId;
     }
 
-    public void setAppId(Long appId) {
-        this.appId = appId;
-    }
-
-    public Long getInstanceId() {
-        return instanceId;
-    }
-
-    public void setInstanceId(Long instanceId) {
-        this.instanceId = instanceId;
+    @Override
+    public void setAgentId(Long agentId) {
+        this.agentId = agentId;
     }
 
     public Long getTimestamp() {
