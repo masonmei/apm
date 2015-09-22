@@ -13,15 +13,12 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
  */
 @Entity
 @Table(name = "apm_string_meta_data", indexes = {
-        @Index(name = "string_meta_unique", columnList = "instance_id,start_time,string_id", unique = true)})
+        @Index(name = "string_meta_unique", columnList = "agent_id,string_id", unique = true)})
 public class StringMetaData extends AbstractPersistable<Long> implements ClearableAgentInfo {
 
     @Basic
     @Column(name = "agent_id", nullable = true, insertable = true, updatable = true)
     private Long agentId;
-
-    @Column(name = "start_time", nullable = false, insertable = true, updatable = true)
-    private long startTime;
 
     @Column(name = "string_id", nullable = false, insertable = true, updatable = true)
     private int stringId;
@@ -37,14 +34,6 @@ public class StringMetaData extends AbstractPersistable<Long> implements Clearab
     @Override
     public void setAgentId(Long agentId) {
         this.agentId = agentId;
-    }
-
-    public long getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(long startTime) {
-        this.startTime = startTime;
     }
 
     public int getStringId() {

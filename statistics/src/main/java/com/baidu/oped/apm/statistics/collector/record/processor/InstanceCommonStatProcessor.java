@@ -3,12 +3,14 @@ package com.baidu.oped.apm.statistics.collector.record.processor;
 import java.util.DoubleSummaryStatistics;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.baidu.oped.apm.common.jpa.entity.AgentInstanceMap;
 import com.baidu.oped.apm.common.jpa.entity.ApplicationStatistic;
 import com.baidu.oped.apm.common.jpa.entity.InstanceStatistic;
 import com.baidu.oped.apm.common.jpa.entity.Trace;
@@ -29,7 +31,15 @@ public class InstanceCommonStatProcessor extends CommonStatProcessor<InstanceSta
 
     @Override
     protected Map<Long, List<Trace>> group(Iterable<Trace> items) {
-        return StreamSupport.stream(items.spliterator(), false).collect(Collectors.groupingBy(Trace::getAppId));
+        final Map<Long, AgentInstanceMap> maps = getAgentInstanceMaps(items);
+        return StreamSupport.stream(items.spliterator(), false)
+                .collect(Collectors.groupingBy(new Function<Trace, Long>() {
+                    @Override
+                    public Long apply(Trace t) {
+                        AgentInstanceMap map = maps.get(t.getAgentId());
+                        return map.getInstanceId();
+                    }
+                }));
     }
 
     @Override

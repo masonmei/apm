@@ -10,6 +10,7 @@ import java.util.stream.StreamSupport;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.baidu.oped.apm.common.jpa.entity.AgentInstanceMap;
 import com.baidu.oped.apm.common.jpa.entity.CommonStatistic;
 import com.baidu.oped.apm.common.jpa.entity.Trace;
 import com.baidu.oped.apm.statistics.collector.ApdexDecider;
@@ -29,13 +30,15 @@ public abstract class BaseTraceProcessor<T extends CommonStatistic> extends Base
     @Override
     public Iterable<T> process(Iterable<Trace> items) {
         List<T> statistics = new ArrayList<>();
+        final Map<Long, AgentInstanceMap> maps = getAgentInstanceMaps(items);
         Map<WebTransactionGroup, List<Trace>> grouped = StreamSupport.stream(items.spliterator(), false)
                                                  .collect(Collectors.groupingBy(new Function<Trace, WebTransactionGroup>() {
                                                      @Override
                                                      public WebTransactionGroup apply(Trace t) {
                                                          WebTransactionGroup group = new WebTransactionGroup();
-                                                         group.setAppId(t.getAppId());
-                                                         group.setInstanceId(t.getInstanceId());
+                                                         AgentInstanceMap map = maps.get(t.getAgentId());
+                                                         group.setAppId(map.getAppId());
+                                                         group.setInstanceId(map.getInstanceId());
                                                          group.setRpc(t.getRpc());
                                                          return group;
                                                      }

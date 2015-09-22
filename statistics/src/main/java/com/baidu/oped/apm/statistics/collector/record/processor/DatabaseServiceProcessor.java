@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Component;
 
+import com.baidu.oped.apm.common.jpa.entity.AgentInstanceMap;
 import com.baidu.oped.apm.common.jpa.entity.QSqlTransaction;
 import com.baidu.oped.apm.common.jpa.entity.SqlTransaction;
 import com.baidu.oped.apm.common.jpa.entity.SqlTransactionStatistic;
@@ -59,13 +60,15 @@ public class DatabaseServiceProcessor extends BaseTraceEventProcessor<SqlTransac
 
     @Override
     protected Map<EventGroup, List<TraceEvent>> groupEvents(Iterable<TraceEvent> items) {
+        final Map<Long, AgentInstanceMap> maps = getAgentInstanceMaps(items);
         return StreamSupport.stream(items.spliterator(), false)
                        .collect(Collectors.groupingBy(new Function<TraceEvent, DatabaseServiceEventGroup>() {
                            @Override
                            public DatabaseServiceEventGroup apply(TraceEvent t) {
                                DatabaseServiceEventGroup group = new DatabaseServiceEventGroup();
-                               group.setAppId(t.getAppId());
-                               group.setInstanceId(t.getInstanceId());
+                               AgentInstanceMap map = maps.get(t.getAgentId());
+                               group.setAppId(map.getAppId());
+                               group.setInstanceId(map.getInstanceId());
                                group.setEndPoint(t.getEndPoint());
                                return group;
                            }

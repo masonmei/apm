@@ -21,7 +21,7 @@ import com.baidu.oped.apm.common.jpa.repository.ApplicationRepository;
 import com.baidu.oped.apm.common.jpa.repository.InstanceRepository;
 import com.baidu.oped.apm.common.jpa.repository.InstanceStatisticRepository;
 import com.baidu.oped.apm.mvc.vo.TimeRange;
-import com.baidu.oped.apm.mvc.vo.Transaction;
+import com.baidu.oped.apm.mvc.vo.TransactionVo;
 import com.baidu.oped.apm.utils.WebTransactionUtils;
 import com.mysema.query.types.expr.BooleanExpression;
 
@@ -102,7 +102,7 @@ public class OverviewService {
      *
      * @return
      */
-    public List<Transaction> getWebTransactionStatisticOfApp(Long appId, TimeRange timeRange, Integer limit) {
+    public List<TransactionVo> getWebTransactionStatisticOfApp(Long appId, TimeRange timeRange, Integer limit) {
         final long period = 60l;
 
         Iterable<WebTransaction> webTransactionsForApp = automaticService.getWebTransactionsWithAppId(appId);
@@ -121,7 +121,8 @@ public class OverviewService {
      *
      * @return
      */
-    public List<Transaction> getWebTransactionStatisticOfInstance(Long instanceId, TimeRange timeRange, Integer limit) {
+    public List<TransactionVo> getWebTransactionStatisticOfInstance(Long instanceId, TimeRange timeRange,
+            Integer limit) {
         final long period = 60l;
 
         Iterable<WebTransaction> webTransactionsForApp = automaticService.getWebTransactionsWithInstanceId(instanceId);

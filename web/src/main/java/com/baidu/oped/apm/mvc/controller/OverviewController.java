@@ -30,7 +30,7 @@ import com.baidu.oped.apm.model.service.AutomaticService;
 import com.baidu.oped.apm.model.service.OverviewService;
 import com.baidu.oped.apm.mvc.vo.InstanceVo;
 import com.baidu.oped.apm.mvc.vo.TimeRange;
-import com.baidu.oped.apm.mvc.vo.Transaction;
+import com.baidu.oped.apm.mvc.vo.TransactionVo;
 import com.baidu.oped.apm.mvc.vo.TrendContext;
 import com.baidu.oped.apm.mvc.vo.TrendResponse;
 import com.baidu.oped.apm.utils.InstanceUtils;
@@ -135,7 +135,7 @@ public class OverviewController {
      * @return
      */
     @RequestMapping(value = {"transactions"}, method = RequestMethod.GET)
-    public List<Transaction> transaction(@RequestParam(value = "appId") Long appId,
+    public List<TransactionVo> transaction(@RequestParam(value = "appId") Long appId,
             @RequestParam(value = "from", required = false) @DateTimeFormat(pattern = Constraints.TIME_PATTERN)
             LocalDateTime from,
             @RequestParam(value = "to", required = false) @DateTimeFormat(pattern = Constraints.TIME_PATTERN)
@@ -317,7 +317,7 @@ public class OverviewController {
      * @return
      */
     @RequestMapping(value = {"instances/transactions"}, method = RequestMethod.GET)
-    public List<Transaction> instanceTransaction(@RequestParam(value = "appId") Long appId,
+    public List<TransactionVo> instanceTransaction(@RequestParam(value = "appId") Long appId,
             @RequestParam(value = "instanceId") Long instanceId,
             @RequestParam(value = "from", required = false) @DateTimeFormat(pattern = Constraints.TIME_PATTERN)
             LocalDateTime from,

@@ -32,8 +32,8 @@ public class WebTransactionProcessorTest {
 
         trace.setRpc("/city/sync");
         trace.setStartTime(10000l);
-        trace.setAppId(100L);
-        trace.setInstanceId(1000L);
+//        trace.setAppId(100L);
+//        trace.setInstanceId(1000L);
         trace.setElapsed(1000);
         trace.setErrCode(1);
 
@@ -42,8 +42,8 @@ public class WebTransactionProcessorTest {
 
         trace1.setRpc("/city/sync");
         trace1.setStartTime(10000l);
-        trace.setAppId(100L);
-        trace.setInstanceId(1000L);
+//        trace.setAppId(100L);
+//        trace.setInstanceId(1000L);
         trace1.setElapsed(300);
         trace1.setErrCode(1);
 
@@ -52,8 +52,8 @@ public class WebTransactionProcessorTest {
         Trace trace2 = new Trace();
         trace2.setRpc("/city/sync1");
         trace2.setStartTime(10000l);
-        trace.setAppId(100L);
-        trace.setInstanceId(1000L);
+//        trace.setAppId(100L);
+//        trace.setInstanceId(1000L);
         trace2.setElapsed(2500);
         trace2.setErrCode(1);
         items.add(trace2);

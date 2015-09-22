@@ -13,7 +13,7 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
  */
 @Entity
 @Table(name = "apm_instance_stat", indexes = {
-        @Index(name = "instance_stat_unique", columnList = "app_id,instance_id,timestamp", unique = true)})
+        @Index(name = "instance_stat_unique", columnList = "agent_id,timestamp", unique = true)})
 public class InstanceStat extends AbstractPersistable<Long> implements ClearableAgentInfo {
 
     @Basic

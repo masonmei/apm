@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Component;
 
+import com.baidu.oped.apm.common.jpa.entity.AgentInstanceMap;
 import com.baidu.oped.apm.common.jpa.entity.ExternalService;
 import com.baidu.oped.apm.common.jpa.entity.ExternalServiceStatistic;
 import com.baidu.oped.apm.common.jpa.entity.QExternalService;
@@ -59,13 +60,15 @@ public class ExternalServiceProcessor extends BaseTraceEventProcessor<ExternalSe
 
     @Override
     protected Map<EventGroup, List<TraceEvent>> groupEvents(Iterable<TraceEvent> items) {
+        final Map<Long, AgentInstanceMap> maps = getAgentInstanceMaps(items);
         return StreamSupport.stream(items.spliterator(), false)
                        .collect(Collectors.groupingBy(new Function<TraceEvent, ExternalServiceEventGroup>() {
                            @Override
                            public ExternalServiceEventGroup apply(TraceEvent t) {
                                ExternalServiceEventGroup group = new ExternalServiceEventGroup();
-                               group.setAppId(t.getAppId());
-                               group.setInstanceId(t.getInstanceId());
+                               AgentInstanceMap map = maps.get(t.getAgentId());
+                               group.setAppId(map.getAppId());
+                               group.setInstanceId(map.getInstanceId());
                                group.setDestinationId(t.getDestinationId());
                                return group;
                            }

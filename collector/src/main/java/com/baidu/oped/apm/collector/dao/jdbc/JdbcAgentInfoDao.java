@@ -10,12 +10,12 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 import com.baidu.oped.apm.collector.dao.AgentInfoDao;
-import com.baidu.oped.apm.common.types.ApplicationType;
 import com.baidu.oped.apm.common.jpa.entity.AgentInstanceMap;
 import com.baidu.oped.apm.common.jpa.entity.Application;
 import com.baidu.oped.apm.common.jpa.entity.Instance;
 import com.baidu.oped.apm.common.jpa.repository.ApplicationRepository;
 import com.baidu.oped.apm.common.jpa.repository.InstanceRepository;
+import com.baidu.oped.apm.common.types.ApplicationType;
 import com.baidu.oped.apm.thrift.dto.TAgentInfo;
 
 /**
@@ -25,12 +25,6 @@ import com.baidu.oped.apm.thrift.dto.TAgentInfo;
 public class JdbcAgentInfoDao extends BaseService implements AgentInfoDao {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
-
-    @Autowired
-    private ApplicationRepository applicationRepository;
-
-    @Autowired
-    private InstanceRepository instanceRepository;
 
     @Override
     public void insert(TAgentInfo agentInfo) {
@@ -44,14 +38,12 @@ public class JdbcAgentInfoDao extends BaseService implements AgentInfoDao {
 
         AgentInstanceMap map = findAgentInstanceMap(agentInfo.getAgentId(), agentInfo.getStartTimestamp());
 
-        Application application = new Application();
-        mergeApplication(application, agentInfo);
-        applicationRepository.save(application);
+        Application application = findOrCreateApplication(agentInfo);
 
-        Instance instance = new Instance();
-        instance.setAppId(application.getId());
+        Instance instance = findOrCreateInstance(application.getId(), agentInfo);
+
         mergeInstance(instance, agentInfo);
-        instanceRepository.save(instance);
+        instanceRepository.saveAndFlush(instance);
 
         map.setAppId(application.getId());
         map.setInstanceId(instance.getId());
@@ -62,31 +54,33 @@ public class JdbcAgentInfoDao extends BaseService implements AgentInfoDao {
         Assert.notNull(agentInfo, "cannot merge null agentInfo to an instance");
         Assert.notNull(existInstance, "cannot merge information to a not exist instance");
         existInstance.setHost(agentInfo.getHostname());
-        int serviceType = agentInfo.getServiceType();
-        existInstance.setInstanceType(serviceType);
         existInstance.setPid(agentInfo.getPid());
-        existInstance.setIp(agentInfo.getIp());
-
-        String ports = agentInfo.getPorts();
-        if (!StringUtils.isEmpty(ports)) {
-            Integer port = Integer.parseInt(ports);
-            existInstance.setPort(port);
-        } else {
-            existInstance.setPort(-1);
-        }
         existInstance.setStartTime(agentInfo.getStartTimestamp());
-
         if (agentInfo.getServerMetaData() != null) {
             final List<String> vmArgs = agentInfo.getServerMetaData().getVmArgs();
             existInstance.setArgs(String.join(",", vmArgs));
         }
     }
 
-    private void mergeApplication(final Application existApplication, final TAgentInfo agentInfo) {
+    private Application findOrCreateApplication(final TAgentInfo agentInfo) {
         Assert.notNull(agentInfo, "cannot merge null agentInfo to instance");
-        Assert.notNull(existApplication, "cannot merge information to unExistApplication");
-        existApplication.setAppName(agentInfo.getApplicationName());
-        existApplication.setAppType(ApplicationType.JAVA.name());
-        existApplication.setUserId("testuser");
+        return findApplication(agentInfo.getApplicationName(), ApplicationType.JAVA.name(), "testuser");
     }
+
+    private Instance findOrCreateInstance(final Long appId, final TAgentInfo agentInfo) {
+        Assert.notNull(agentInfo, "cannot merge null agentInfo to an instance");
+        Integer port;
+
+        String ports = agentInfo.getPorts();
+        if (!StringUtils.isEmpty(ports)) {
+            port = Integer.parseInt(ports);
+        } else {
+            port = -1;
+        }
+
+        int instanceType = agentInfo.getServiceType();
+        return findInstance(appId, agentInfo.getIp(), port, instanceType);
+    }
+
+
 }

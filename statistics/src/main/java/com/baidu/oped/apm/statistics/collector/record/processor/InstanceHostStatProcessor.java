@@ -3,11 +3,13 @@ package com.baidu.oped.apm.statistics.collector.record.processor;
 import java.util.List;
 import java.util.Map;
 import java.util.OptionalDouble;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import org.springframework.stereotype.Component;
 
+import com.baidu.oped.apm.common.jpa.entity.AgentInstanceMap;
 import com.baidu.oped.apm.common.jpa.entity.InstanceStat;
 import com.baidu.oped.apm.common.jpa.entity.InstanceStatistic;
 
@@ -19,8 +21,16 @@ public class InstanceHostStatProcessor extends HostStatProcessor<InstanceStatist
 
     @Override
     protected Map<Long, List<InstanceStat>> group(Iterable<InstanceStat> items) {
+        final Map<Long, AgentInstanceMap> maps = getAgentInstanceMaps(items);
+
         return StreamSupport.stream(items.spliterator(), false)
-                       .collect(Collectors.groupingBy(InstanceStat::getInstanceId));
+                .collect(Collectors.groupingBy(new Function<InstanceStat, Long>() {
+                    @Override
+                    public Long apply(InstanceStat t) {
+                        AgentInstanceMap map = maps.get(t.getAgentId());
+                        return map.getInstanceId();
+                    }
+                }));
     }
 
     @Override

@@ -1,9 +1,9 @@
 package com.baidu.oped.apm.mvc.vo;
 
 /**
- * Created by mason on 8/25/15.
+ * Created by mason on 9/22/15.
  */
-public class Transaction {
+public class TransactionVo {
     private Long appId;
     private Long instanceId;
     private Long transactionId;

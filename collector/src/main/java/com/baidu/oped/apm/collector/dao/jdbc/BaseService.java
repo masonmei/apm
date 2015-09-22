@@ -5,8 +5,12 @@ import org.springframework.dao.DataAccessException;
 
 import com.baidu.oped.apm.common.jpa.entity.AgentInstanceMap;
 import com.baidu.oped.apm.common.jpa.entity.ApiMetaData;
+import com.baidu.oped.apm.common.jpa.entity.Application;
+import com.baidu.oped.apm.common.jpa.entity.Instance;
 import com.baidu.oped.apm.common.jpa.entity.QAgentInstanceMap;
 import com.baidu.oped.apm.common.jpa.entity.QApiMetaData;
+import com.baidu.oped.apm.common.jpa.entity.QApplication;
+import com.baidu.oped.apm.common.jpa.entity.QInstance;
 import com.baidu.oped.apm.common.jpa.entity.QSqlMetaData;
 import com.baidu.oped.apm.common.jpa.entity.QStringMetaData;
 import com.baidu.oped.apm.common.jpa.entity.QTrace;
@@ -83,22 +87,6 @@ public abstract class BaseService {
                 one = agentInstanceMapRepository.findOne(whereCondition);
             }
         }
-//        if (one.getAppId() == null || one.getInstanceId() == null) {
-//            synchronized(locker) {
-//                one = agentInstanceMapRepository.findOne(whereCondition);
-//                if (one.getAppId() == null || one.getInstanceId() == null) {
-//                    Application app = applicationRepository.saveAndFlush(new Application());
-//                    one.setAppId(app.getId());
-//
-//                    Instance entity = new Instance();
-//                    entity.setAppId(app.getId());
-//                    entity.setStartTime(startTimestamp);
-//                    Instance instance = instanceRepository.saveAndFlush(entity);
-//                    one.setInstanceId(instance.getId());
-//                    one = agentInstanceMapRepository.saveAndFlush(one);
-//                }
-//            }
-//        }
 
         return one;
     }
@@ -159,4 +147,50 @@ public abstract class BaseService {
         }
         return one;
     }
+
+    protected Application findApplication(String appName, String appType, String userId) {
+        QApplication qApplication = QApplication.application;
+        BooleanExpression appNameCondition = qApplication.appName.eq(appName);
+        BooleanExpression appTypeCondition = qApplication.appType.eq(appType);
+        BooleanExpression userIdCondition = qApplication.userId.eq(userId);
+        BooleanExpression whereCondition = appNameCondition.and(appTypeCondition).and(userIdCondition);
+        Application one = applicationRepository.findOne(whereCondition);
+        if (one == null) {
+            Application application = new Application();
+            application.setAppName(appName);
+            application.setAppType(appType);
+            application.setUserId(userId);
+            try {
+                one = applicationRepository.save(application);
+            } catch (DataAccessException exception) {
+                one = applicationRepository.findOne(whereCondition);
+            }
+        }
+        return one;
+    }
+
+    protected Instance findInstance(Long appId, String ip, Integer port, int instanceType) {
+        QInstance qInstance = QInstance.instance;
+        BooleanExpression appIdCondition = qInstance.appId.eq(appId);
+        BooleanExpression ipCondition = qInstance.ip.eq(ip);
+        BooleanExpression portCondition = qInstance.port.eq(port);
+        BooleanExpression instanceTypeCondition = qInstance.instanceType.eq(instanceType);
+        BooleanExpression whereCondition =
+                appIdCondition.and(ipCondition).and(portCondition).and(instanceTypeCondition);
+        Instance one = instanceRepository.findOne(whereCondition);
+        if (one == null) {
+            Instance instance = new Instance();
+            instance.setAppId(appId);
+            instance.setIp(ip);
+            instance.setPort(port);
+            instance.setInstanceType(instanceType);
+            try {
+                one = instanceRepository.save(instance);
+            } catch (DataAccessException exception) {
+                one = instanceRepository.findOne(whereCondition);
+            }
+        }
+        return one;
+    }
+
 }

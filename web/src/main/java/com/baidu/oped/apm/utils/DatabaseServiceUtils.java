@@ -15,87 +15,71 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import com.baidu.oped.apm.common.jpa.entity.WebTransaction;
-import com.baidu.oped.apm.common.jpa.entity.WebTransactionStatistic;
+import com.baidu.oped.apm.common.jpa.entity.ExternalService;
+import com.baidu.oped.apm.common.jpa.entity.ExternalServiceStatistic;
+import com.baidu.oped.apm.common.jpa.entity.SqlTransaction;
+import com.baidu.oped.apm.common.jpa.entity.SqlTransactionStatistic;
+import com.baidu.oped.apm.mvc.vo.DatabaseServiceVo;
+import com.baidu.oped.apm.mvc.vo.ExternalServiceVo;
 import com.baidu.oped.apm.mvc.vo.TimeRange;
-import com.baidu.oped.apm.mvc.vo.TransactionVo;
 
 /**
  * Created by mason on 9/8/15.
  */
-public abstract class WebTransactionUtils {
+public abstract class DatabaseServiceUtils {
 
-    public static List<TransactionVo> topByAvgResponseTime(Iterable<WebTransactionStatistic> statistics,
-            Iterable<WebTransaction> transactions, TimeRange timeRange, Integer limit) {
-        Map<Long, WebTransaction> rpcTransactionMap = new HashMap<>();
+    public static List<DatabaseServiceVo> topByAvgResponseTime(Iterable<SqlTransactionStatistic> statistics,
+            Iterable<SqlTransaction> transactions, TimeRange timeRange, Integer limit) {
+        Map<Long, SqlTransaction> rpcTransactionMap = new HashMap<>();
 
         StreamSupport.stream(transactions.spliterator(), false)
                 .forEach(transaction -> rpcTransactionMap.put(transaction.getId(), transaction));
 
-        Map<WebTransactionGroup, List<WebTransactionStatistic>> groups =
+        Map<WebTransactionGroup, List<SqlTransactionStatistic>> groups =
                 StreamSupport.stream(statistics.spliterator(), false)
-                        .collect(Collectors.groupingBy(new Function<WebTransactionStatistic, WebTransactionGroup>() {
+                        .collect(Collectors.groupingBy(new Function<SqlTransactionStatistic, WebTransactionGroup>() {
                             @Override
-                            public WebTransactionGroup apply(WebTransactionStatistic statistic) {
-                                Long transactionId = statistic.getTransactionId();
-                                WebTransaction webTransaction = rpcTransactionMap.get(transactionId);
+                            public WebTransactionGroup apply(SqlTransactionStatistic statistic) {
+                                Long transactionId = statistic.getSqlTransactionId();
+                                SqlTransaction webTransaction = rpcTransactionMap.get(transactionId);
                                 WebTransactionGroup group = new WebTransactionGroup();
                                 group.setAppId(webTransaction.getAppId());
-                                group.setDisplayName(webTransaction.getRpc());
+                                group.setDisplayName(webTransaction.getEndPoint());
                                 return group;
                             }
                         }));
-        List<TransactionVo> result = new ArrayList<>();
+        List<DatabaseServiceVo> result = new ArrayList<>();
         groups.forEach((group, webTransactionStatistics) -> {
 
             DoubleSummaryStatistics responseSummaryStatistics =
                     webTransactionStatistics.stream().filter(statistic -> statistic.getSumResponseTime() != null)
-                            .mapToDouble(WebTransactionStatistic::getSumResponseTime).summaryStatistics();
+                            .mapToDouble(SqlTransactionStatistic::getSumResponseTime).summaryStatistics();
             DoubleSummaryStatistics maxSummaryStatistics =
                     webTransactionStatistics.stream().filter(statistic -> statistic.getMaxResponseTime() != null)
-                            .mapToDouble(WebTransactionStatistic::getMaxResponseTime).summaryStatistics();
+                            .mapToDouble(SqlTransactionStatistic::getMaxResponseTime).summaryStatistics();
             DoubleSummaryStatistics minSummaryStatistics =
                     webTransactionStatistics.stream().filter(statistic -> statistic.getMinResponseTime() != null)
-                            .mapToDouble(WebTransactionStatistic::getMinResponseTime).summaryStatistics();
+                            .mapToDouble(SqlTransactionStatistic::getMinResponseTime).summaryStatistics();
             LongSummaryStatistics pvSummaryStatistics =
                     webTransactionStatistics.stream().filter(statistic -> statistic.getPv() != null)
-                            .mapToLong(WebTransactionStatistic::getPv).summaryStatistics();
-            DoubleSummaryStatistics errorSummaryStatistics =
-                    webTransactionStatistics.stream().filter(statistic -> statistic.getError() != null)
-                            .mapToDouble(WebTransactionStatistic::getError).summaryStatistics();
-            LongSummaryStatistics satisfiedSummaryStatistics =
-                    webTransactionStatistics.stream().filter(statistic -> statistic.getSatisfied() != null)
-                            .mapToLong(WebTransactionStatistic::getSatisfied).summaryStatistics();
-            LongSummaryStatistics toleratedSummaryStatistics =
-                    webTransactionStatistics.stream().filter(statistic -> statistic.getTolerated() != null)
-                            .mapToLong(WebTransactionStatistic::getTolerated).summaryStatistics();
-            LongSummaryStatistics frustratedSummaryStatistics =
-                    webTransactionStatistics.stream().filter(statistic -> statistic.getFrustrated() != null)
-                            .mapToLong(WebTransactionStatistic::getFrustrated).summaryStatistics();
+                            .mapToLong(SqlTransactionStatistic::getPv).summaryStatistics();
 
-            TransactionVo transaction = new TransactionVo();
+            DatabaseServiceVo transaction = new DatabaseServiceVo();
             transaction.setAppId(group.getAppId());
-            transaction.setDisplayName(group.getDisplayName());
-            // TODO: add instance id and transaction id.
+            transaction.setDestination(group.getDisplayName());
 
             transaction.setPv(pvSummaryStatistics.getSum());
             transaction.setCpm(format(
                     calculateRate(pvSummaryStatistics.getSum(), timeRange.getDuration(ChronoUnit.MINUTES))));
-            transaction
-                    .setErrorRate(format(calculateRate(errorSummaryStatistics.getSum(), pvSummaryStatistics.getSum())));
-            transaction.setFrustrated(frustratedSummaryStatistics.getSum());
-            transaction.setTolerated(toleratedSummaryStatistics.getSum());
-            transaction.setSatisfied(satisfiedSummaryStatistics.getSum());
             transaction.setMaxResponseTime(format(maxSummaryStatistics.getMax()));
             transaction.setMinResponseTime(format(minSummaryStatistics.getMin()));
             transaction.setResponseTime(
-                    format(calculateRate(responseSummaryStatistics.getSum(), pvSummaryStatistics.getSum()))
-            );
+                    format(calculateRate(responseSummaryStatistics.getSum(), pvSummaryStatistics.getSum())));
 
             result.add(transaction);
         });
 
-        return result.stream().sorted(Comparator.comparing(TransactionVo::getResponseTime)).limit(limit)
+        return result.stream().sorted(Comparator.comparing(DatabaseServiceVo::getResponseTime)).limit(limit)
                 .collect(Collectors.toList());
     }
 

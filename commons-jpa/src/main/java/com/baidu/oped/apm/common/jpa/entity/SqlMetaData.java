@@ -13,15 +13,12 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
  */
 @Entity
 @Table(name = "apm_sql_meta_data", indexes = {
-        @Index(name = "sql_meta_unique", columnList = "instance_id,start_time,sql_id", unique = true)})
+        @Index(name = "sql_meta_unique", columnList = "agent_id,sql_id", unique = true)})
 public class SqlMetaData extends AbstractPersistable<Long> implements ClearableAgentInfo {
 
     @Basic
     @Column(name = "agent_id", nullable = true, insertable = true, updatable = true)
     private Long agentId;
-
-    @Column(name = "start_time", nullable = false, insertable = true, updatable = true)
-    private long startTime;
 
     @Column(name = "sql_id", nullable = false, insertable = true, updatable = true)
     private int sqlId;
@@ -58,11 +55,4 @@ public class SqlMetaData extends AbstractPersistable<Long> implements ClearableA
         this.sql = sql;
     }
 
-    public long getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(long startTime) {
-        this.startTime = startTime;
-    }
 }

@@ -167,6 +167,15 @@ public class AutomaticService {
         return result;
     }
 
+    /**
+     * Get WebTransactions' statistic data of the given timeRanges.
+     *
+     * @param transactions webTransactions
+     * @param timeRanges   timeRanges
+     * @param period       periodInSecond
+     *
+     * @return
+     */
     public Map<TimeRange, Iterable<WebTransactionStatistic>> getWebTransactionsStatistic(
             Iterable<WebTransaction> transactions, List<TimeRange> timeRanges, Long period) {
         Assert.notNull(transactions, "Transactions must not be null while getting web transaction statistics.");
@@ -185,11 +194,11 @@ public class AutomaticService {
     }
 
     /**
-     * Get WebTransactionStatistics of the given webTransactions
+     * Get WebTransactions' statistic of the given timeRange
      *
-     * @param period          is Second
      * @param webTransactions webTransactions
      * @param timeRange       timeRange
+     * @param period          periodInSecond
      *
      * @return
      */
@@ -209,6 +218,111 @@ public class AutomaticService {
 
         BooleanExpression whereCondition = appIdCondition.and(periodCondition).and(timestampCondition);
         return webTransactionStatisticRepository.findAll(whereCondition);
+    }
+
+    /**
+     * Get ExternalServices' statistic of the given timeRange in periods
+     *
+     * @param externalServices externalServices
+     * @param timeRanges       timeRanges
+     * @param period           periodInSecond
+     *
+     * @return the externalServices' statistic
+     */
+    public Map<TimeRange, Iterable<ExternalServiceStatistic>> getExternalServiceStatistic(
+            Iterable<ExternalService> externalServices, List<TimeRange> timeRanges, Long period) {
+        Assert.notNull(externalServices, "Transactions must not be null while getting external Service statistics.");
+        Assert.notNull(timeRanges, "TimeRanges must not be null while getting external Service statistics.");
+        Assert.notNull(period, "Period must be null while getting external Service statistics.");
+        Assert.state(period % 60 == 0, "Period must be 60 or the times of 60.");
+
+        Map<TimeRange, Iterable<ExternalServiceStatistic>> result = new HashMap<>();
+        timeRanges.stream().forEach(timeRange -> {
+            Iterable<ExternalServiceStatistic> currentRangeResult =
+                    getExternalServiceStatistic(externalServices, timeRange, period);
+            result.put(timeRange, currentRangeResult);
+        });
+
+        return result;
+    }
+
+    /**
+     * Get ExternalServices' statistic of the given timeRange in period
+     *
+     * @param externalServices externalServices
+     * @param timeRange        timeRange
+     * @param period           periodInSecond
+     *
+     * @return the externalServices' statistic
+     */
+    public Iterable<ExternalServiceStatistic> getExternalServiceStatistic(Iterable<ExternalService> externalServices,
+            TimeRange timeRange, Long period) {
+        final Long periodInMillis = period * 1000;
+        List<Long> externalServiceIds =
+                StreamSupport.stream(externalServices.spliterator(), false).map(ExternalService::getId)
+                        .collect(Collectors.toList());
+        QExternalServiceStatistic qExternalServiceStatistic = QExternalServiceStatistic.externalServiceStatistic;
+        BooleanExpression externalServiceIdCondition =
+                qExternalServiceStatistic.externalServiceId.in(externalServiceIds);
+        BooleanExpression periodCondition = qExternalServiceStatistic.period.eq(periodInMillis);
+        BooleanExpression timestampCondition = qExternalServiceStatistic.timestamp
+                .between(toMillSecond(timeRange.getFrom()), toMillSecond(timeRange.getTo()));
+
+        BooleanExpression whereCondition = externalServiceIdCondition.and(periodCondition).and(timestampCondition);
+
+        return externalTransactionStatisticRepository.findAll(whereCondition);
+    }
+
+    /**
+     * Get DatabaseServices' statistic of the given timeRange in periods
+     *
+     * @param sqlTransactions sqlTransactions
+     * @param timeRanges      timeRanges
+     * @param period          periodInSecond
+     *
+     * @return the externalServices' statistic
+     */
+    public Map<TimeRange, Iterable<SqlTransactionStatistic>> getDatabaseServiceStatistic(
+            Iterable<SqlTransaction> sqlTransactions, List<TimeRange> timeRanges, Long period) {
+        Assert.notNull(sqlTransactions, "Transactions must not be null while getting Database Service statistics.");
+        Assert.notNull(timeRanges, "TimeRanges must not be null while getting external Service statistics.");
+        Assert.notNull(period, "Period must be null while getting external Service statistics.");
+        Assert.state(period % 60 == 0, "Period must be 60 or the times of 60.");
+
+        Map<TimeRange, Iterable<SqlTransactionStatistic>> result = new HashMap<>();
+        timeRanges.stream().forEach(timeRange -> {
+            Iterable<SqlTransactionStatistic> currentRangeResult =
+                    getDatabaseServiceStatistic(sqlTransactions, timeRange, period);
+            result.put(timeRange, currentRangeResult);
+        });
+
+        return result;
+    }
+
+    /**
+     * Get DatabaseServices' statistic of the given timeRange in period
+     *
+     * @param sqlTransactions sqlTransactions
+     * @param timeRange       timeRange
+     * @param period          periodInSecond
+     *
+     * @return the DatabaseServices' statistic
+     */
+    public Iterable<SqlTransactionStatistic> getDatabaseServiceStatistic(Iterable<SqlTransaction> sqlTransactions,
+            TimeRange timeRange, Long period) {
+        final Long periodInMillis = period * 1000;
+        List<Long> sqlTransactionIds =
+                StreamSupport.stream(sqlTransactions.spliterator(), false).map(SqlTransaction::getId)
+                        .collect(Collectors.toList());
+        QSqlTransactionStatistic qSqlTransactionStatistic = QSqlTransactionStatistic.sqlTransactionStatistic;
+        BooleanExpression sqlTransactionIdCondition = qSqlTransactionStatistic.sqlTransactionId.in(sqlTransactionIds);
+        BooleanExpression periodCondition = qSqlTransactionStatistic.period.eq(periodInMillis);
+        BooleanExpression timestampCondition = qSqlTransactionStatistic.timestamp
+                .between(toMillSecond(timeRange.getFrom()), toMillSecond(timeRange.getTo()));
+
+        BooleanExpression whereCondition = sqlTransactionIdCondition.and(periodCondition).and(timestampCondition);
+
+        return sqlTransactionStatisticRepository.findAll(whereCondition);
     }
 
     /**

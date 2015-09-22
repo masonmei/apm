@@ -26,14 +26,13 @@ public class ApplicationHostStatProcessorTest {
         for (int i = 0; i < 3; i++) {
             InstanceStat cpuLoad = new InstanceStat();
             cpuLoad.setJvmCpuLoad(random.nextDouble());
-            cpuLoad.setAppId(i % 3l + 1);
+            cpuLoad.setAgentId(i % 3l + 1);
             items.add(cpuLoad);
         }
     }
 
     @Test
     public void testProcess() throws Exception {
-
 
         Iterable<ApplicationStatistic> process = cpuProcessor.process(items);
         process.forEach(applicationStatistic -> System.out.println(
