@@ -6,7 +6,7 @@ spring:
     name: web
   datasource:
 #    url: jdbc:mysql://180.76.135.145:3306/apm?autoReconnect=true&useUnicode=true&characterEncoding=utf-8
-    url: jdbc:mysql://127.0.0.1:3306/apm?autoReconnect=true&useUnicode=true&characterEncoding=utf-8
+    url: jdbc:mysql://masonmxdb:3306/apm?autoReconnect=true&useUnicode=true&characterEncoding=utf-8
     username: root
     password: root
     driverClassName: com.mysql.jdbc.Driver
