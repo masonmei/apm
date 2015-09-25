@@ -9,12 +9,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.baidu.oped.apm.common.jpa.entity.CommonStatistic;
 import com.baidu.oped.apm.common.jpa.entity.TraceEvent;
+import com.baidu.oped.apm.common.util.AnnotationTranscoder;
 import com.baidu.oped.apm.statistics.collector.ApdexDecider;
 
 /**
  * Created by mason on 8/31/15.
  */
 public abstract class BaseTraceEventProcessor<T extends CommonStatistic> extends BaseProcessor<TraceEvent, T> {
+    protected final AnnotationTranscoder transcoder = new AnnotationTranscoder();
 
     @Autowired
     private ApdexDecider decider;

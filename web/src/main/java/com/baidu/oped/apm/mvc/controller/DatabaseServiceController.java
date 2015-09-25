@@ -18,11 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.baidu.oped.apm.common.jpa.entity.ServiceType;
 import com.baidu.oped.apm.common.jpa.entity.SqlTransaction;
 import com.baidu.oped.apm.common.jpa.entity.SqlTransactionStatistic;
-import com.baidu.oped.apm.common.jpa.entity.WebTransaction;
-import com.baidu.oped.apm.common.jpa.entity.WebTransactionStatistic;
 import com.baidu.oped.apm.common.utils.Constraints;
 import com.baidu.oped.apm.model.service.AutomaticService;
-import com.baidu.oped.apm.model.service.OverviewService;
 import com.baidu.oped.apm.mvc.vo.DatabaseServiceVo;
 import com.baidu.oped.apm.mvc.vo.TimeRange;
 import com.baidu.oped.apm.mvc.vo.TransactionVo;
@@ -30,7 +27,6 @@ import com.baidu.oped.apm.mvc.vo.TrendContext;
 import com.baidu.oped.apm.mvc.vo.TrendResponse;
 import com.baidu.oped.apm.utils.DatabaseServiceUtils;
 import com.baidu.oped.apm.utils.TimeUtils;
-import com.baidu.oped.apm.utils.TrendContextUtils;
 import com.baidu.oped.apm.utils.TrendUtils;
 
 /**
@@ -42,9 +38,6 @@ public class DatabaseServiceController {
 
     @Autowired
     private AutomaticService automaticService;
-
-    @Autowired
-    private OverviewService overviewService;
 
     /**
      * List Given application database service.
@@ -105,13 +98,13 @@ public class DatabaseServiceController {
 
         final TimeRange timeRange = timeRanges.get(0);
 
-        Iterable<WebTransaction> transactions = automaticService.getWebTransactionsWithAppId(appId);
+        Iterable<SqlTransaction> transactions = automaticService.getSqlTransactionsWithAppId(appId);
 
-        Iterable<WebTransactionStatistic> transactionsStatistic =
-                automaticService.getWebTransactionsStatistic(transactions, timeRange, period);
+        Iterable<SqlTransactionStatistic> transactionsStatistic =
+                automaticService.getDatabaseServiceStatistic(transactions, timeRange, period);
 
-        TrendContext<String> trendContext =
-                TrendContextUtils.topByAvgResponseTime(period, limit, timeRange, transactions, transactionsStatistic);
+        TrendContext<String> trendContext = DatabaseServiceUtils
+                .topByAvgResponseTime(period, limit, timeRange, transactions, transactionsStatistic);
 
         return TrendUtils.toTrendResponse(trendContext, metricName);
     }
@@ -132,33 +125,12 @@ public class DatabaseServiceController {
         Assert.state(period % 60 == 0, "Period must be 60 or the times of 60.");
 
         final Constraints.MetricName[] metricName = new Constraints.MetricName[] {CPM, RESPONSE_TIME, PV};
-        final ServiceType serviceType = ServiceType.WEB;
+        final ServiceType serviceType = ServiceType.DB;
         List<TimeRange> timeRanges = TimeUtils.convertToRange(time);
 
         TrendContext trendContext = automaticService.getMetricDataOfApp(appId, timeRanges, period, serviceType);
 
         return TrendUtils.toTrendResponse(trendContext, metricName);
-    }
-
-    /**
-     * Get all transactions order by response time desc.
-     *
-     * @param appId
-     * @param time
-     * @param pageCount
-     * @param pageSize
-     * @param orderby
-     *
-     * @return
-     */
-    @RequestMapping(value = {"traces"})
-    public List<TransactionVo> slowTransactions(@RequestParam(value = "appId") Long appId,
-            @RequestParam(value = "time[]") String[] time,
-            @RequestParam(value = "pageNumber", defaultValue = "1") Integer pageCount,
-            @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
-            @RequestParam(value = "orderBy", required = false) String orderby) {
-
-        return null;
     }
 
     /**
@@ -226,13 +198,13 @@ public class DatabaseServiceController {
 
         final TimeRange timeRange = timeRanges.get(0);
 
-        Iterable<WebTransaction> transactions = automaticService.getWebTransactionsWithInstanceId(instanceId);
+        Iterable<SqlTransaction> transactions = automaticService.getSqlTransactionsWithInstanceId(instanceId);
 
-        Iterable<WebTransactionStatistic> transactionsStatistic =
-                automaticService.getWebTransactionsStatistic(transactions, timeRange, period);
+        Iterable<SqlTransactionStatistic> transactionsStatistic =
+                automaticService.getDatabaseServiceStatistic(transactions, timeRange, period);
 
-        TrendContext<String> trendContext =
-                TrendContextUtils.topByAvgResponseTime(period, limit, timeRange, transactions, transactionsStatistic);
+        TrendContext<String> trendContext = DatabaseServiceUtils
+                .topByAvgResponseTime(period, limit, timeRange, transactions, transactionsStatistic);
 
         return TrendUtils.toTrendResponse(trendContext, metricName);
     }

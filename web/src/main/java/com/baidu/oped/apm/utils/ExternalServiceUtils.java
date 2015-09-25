@@ -17,32 +17,84 @@ import java.util.stream.StreamSupport;
 
 import com.baidu.oped.apm.common.jpa.entity.ExternalService;
 import com.baidu.oped.apm.common.jpa.entity.ExternalServiceStatistic;
-import com.baidu.oped.apm.common.jpa.entity.WebTransactionStatistic;
 import com.baidu.oped.apm.mvc.vo.ExternalServiceVo;
 import com.baidu.oped.apm.mvc.vo.TimeRange;
+import com.baidu.oped.apm.mvc.vo.TrendContext;
 
 /**
  * Created by mason on 9/8/15.
  */
 public abstract class ExternalServiceUtils {
+    /**
+     * Build TrendContent with external services top by average response time.
+     *
+     * @param period
+     * @param limit
+     * @param timeRange
+     * @param transactions
+     * @param transactionsStatistic
+     *
+     * @return
+     */
+    public static TrendContext<String> topByAvgResponseTime(Long period, Integer limit, TimeRange timeRange,
+            Iterable<ExternalService> transactions, Iterable<ExternalServiceStatistic> transactionsStatistic) {
 
+        TrendContext<String> trendContext = new TrendContext<>(period * 1000, timeRange);
+
+        Map<Long, ExternalService> externalServiceMap = StreamSupport.stream(transactions.spliterator(), false)
+                .collect(Collectors.toMap(ExternalService::getId, (t) -> t));
+        Map<String, List<ExternalServiceStatistic>> transactionStatisticMap =
+                StreamSupport.stream(transactionsStatistic.spliterator(), false)
+                        .collect(Collectors.groupingBy(statistic -> {
+                            Long serviceId = statistic.getExternalServiceId();
+                            ExternalService transaction = externalServiceMap.get(serviceId);
+                            return transaction.getUrl();
+                        }));
+
+        transactionStatisticMap.entrySet().stream()
+                .sorted(Comparator.comparing(new Function<Map.Entry<String, List<ExternalServiceStatistic>>, Double>() {
+                    @Override
+                    public Double apply(Map.Entry<String, List<ExternalServiceStatistic>> entry) {
+                        DoubleSummaryStatistics responseSummaryStatistics =
+                                entry.getValue().stream().filter(statistic -> statistic.getSumResponseTime() != null)
+                                        .mapToDouble(ExternalServiceStatistic::getSumResponseTime).summaryStatistics();
+                        LongSummaryStatistics pvSummaryStatistics =
+                                entry.getValue().stream().filter(statistic -> statistic.getPv() != null)
+                                        .mapToLong(ExternalServiceStatistic::getPv).summaryStatistics();
+                        return calculateRate(responseSummaryStatistics.getSum(), pvSummaryStatistics.getSum());
+                    }
+                })).limit(limit)
+                .forEach(entry -> trendContext.addStatistics(entry.getKey(), timeRange, entry.getValue()));
+        return trendContext;
+    }
+
+    /**
+     * Get the top n external Services of the given services.
+     *
+     * @param statistics
+     * @param externalServices
+     * @param timeRange
+     * @param limit
+     *
+     * @return
+     */
     public static List<ExternalServiceVo> topByAvgResponseTime(Iterable<ExternalServiceStatistic> statistics,
-            Iterable<ExternalService> transactions, TimeRange timeRange, Integer limit) {
+            Iterable<ExternalService> externalServices, TimeRange timeRange, Integer limit) {
         Map<Long, ExternalService> rpcTransactionMap = new HashMap<>();
 
-        StreamSupport.stream(transactions.spliterator(), false)
+        StreamSupport.stream(externalServices.spliterator(), false)
                 .forEach(transaction -> rpcTransactionMap.put(transaction.getId(), transaction));
 
-        Map<WebTransactionGroup, List<ExternalServiceStatistic>> groups =
+        Map<TransactionGroup, List<ExternalServiceStatistic>> groups =
                 StreamSupport.stream(statistics.spliterator(), false)
-                        .collect(Collectors.groupingBy(new Function<ExternalServiceStatistic, WebTransactionGroup>() {
+                        .collect(Collectors.groupingBy(new Function<ExternalServiceStatistic, TransactionGroup>() {
                             @Override
-                            public WebTransactionGroup apply(ExternalServiceStatistic statistic) {
+                            public TransactionGroup apply(ExternalServiceStatistic statistic) {
                                 Long transactionId = statistic.getExternalServiceId();
                                 ExternalService webTransaction = rpcTransactionMap.get(transactionId);
-                                WebTransactionGroup group = new WebTransactionGroup();
+                                TransactionGroup group = new TransactionGroup();
                                 group.setAppId(webTransaction.getAppId());
-                                group.setDisplayName(webTransaction.getDestinationId());
+                                group.setDisplayName(webTransaction.getUrl());
                                 return group;
                             }
                         }));
@@ -61,18 +113,6 @@ public abstract class ExternalServiceUtils {
             LongSummaryStatistics pvSummaryStatistics =
                     webTransactionStatistics.stream().filter(statistic -> statistic.getPv() != null)
                             .mapToLong(ExternalServiceStatistic::getPv).summaryStatistics();
-            DoubleSummaryStatistics errorSummaryStatistics =
-                    webTransactionStatistics.stream().filter(statistic -> statistic.getError() != null)
-                            .mapToDouble(ExternalServiceStatistic::getError).summaryStatistics();
-            LongSummaryStatistics satisfiedSummaryStatistics =
-                    webTransactionStatistics.stream().filter(statistic -> statistic.getSatisfied() != null)
-                            .mapToLong(ExternalServiceStatistic::getSatisfied).summaryStatistics();
-            LongSummaryStatistics toleratedSummaryStatistics =
-                    webTransactionStatistics.stream().filter(statistic -> statistic.getTolerated() != null)
-                            .mapToLong(ExternalServiceStatistic::getTolerated).summaryStatistics();
-            LongSummaryStatistics frustratedSummaryStatistics =
-                    webTransactionStatistics.stream().filter(statistic -> statistic.getFrustrated() != null)
-                            .mapToLong(ExternalServiceStatistic::getFrustrated).summaryStatistics();
 
             ExternalServiceVo transaction = new ExternalServiceVo();
             transaction.setAppId(group.getAppId());
@@ -93,7 +133,7 @@ public abstract class ExternalServiceUtils {
                 .collect(Collectors.toList());
     }
 
-    static class WebTransactionGroup {
+    static class TransactionGroup {
         private Long appId;
         private Long instanceId;
         private Long transactionId;
@@ -140,7 +180,7 @@ public abstract class ExternalServiceUtils {
                 return false;
             }
 
-            WebTransactionGroup group = (WebTransactionGroup) o;
+            TransactionGroup group = (TransactionGroup) o;
 
             if (appId != null ? !appId.equals(group.appId) : group.appId != null) {
                 return false;

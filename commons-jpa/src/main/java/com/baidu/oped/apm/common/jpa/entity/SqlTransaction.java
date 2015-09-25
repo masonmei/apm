@@ -13,7 +13,7 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
  */
 @Entity
 @Table(name = "apm_sql_transaction", indexes = {
-        @Index(name = "sql_transaction_unique", columnList = "app_id,instance_id,end_point", unique = true)})
+        @Index(name = "sql_transaction_unique", columnList = "app_id,instance_id,end_point,sql_value", unique = true)})
 public class SqlTransaction extends AbstractPersistable<Long> {
 
     @Basic
@@ -25,8 +25,12 @@ public class SqlTransaction extends AbstractPersistable<Long> {
     private Long instanceId;
 
     @Basic
-    @Column(name = "end_point", nullable = false, insertable = true, updatable = true, length = 512)
+    @Column(name = "end_point", nullable = false, insertable = true, updatable = true, length = 256)
     private String endPoint;
+
+    @Basic
+    @Column(name = "sql_value", nullable = false, insertable = true, updatable = true, length = 512)
+    private String sql;
 
     public Long getAppId() {
         return appId;
@@ -50,5 +54,13 @@ public class SqlTransaction extends AbstractPersistable<Long> {
 
     public void setEndPoint(String endPoint) {
         this.endPoint = endPoint;
+    }
+
+    public String getSql() {
+        return sql;
+    }
+
+    public void setSql(String sql) {
+        this.sql = sql;
     }
 }

@@ -10,11 +10,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Component;
 
+import com.baidu.oped.apm.common.AnnotationKey;
 import com.baidu.oped.apm.common.jpa.entity.AgentInstanceMap;
+import com.baidu.oped.apm.common.jpa.entity.Annotation;
 import com.baidu.oped.apm.common.jpa.entity.ExternalService;
 import com.baidu.oped.apm.common.jpa.entity.ExternalServiceStatistic;
+import com.baidu.oped.apm.common.jpa.entity.QAnnotation;
 import com.baidu.oped.apm.common.jpa.entity.QExternalService;
 import com.baidu.oped.apm.common.jpa.entity.TraceEvent;
+import com.baidu.oped.apm.common.jpa.repository.AnnotationRepository;
 import com.baidu.oped.apm.common.jpa.repository.ExternalTransactionRepository;
 import com.mysema.query.types.expr.BooleanExpression;
 
@@ -27,6 +31,9 @@ public class ExternalServiceProcessor extends BaseTraceEventProcessor<ExternalSe
     @Autowired
     private ExternalTransactionRepository externalTransactionRepository;
 
+    @Autowired
+    private AnnotationRepository annotationRepository;
+
     public void setExternalTransactionRepository(ExternalTransactionRepository externalTransactionRepository) {
         this.externalTransactionRepository = externalTransactionRepository;
     }
@@ -38,7 +45,9 @@ public class ExternalServiceProcessor extends BaseTraceEventProcessor<ExternalSe
         BooleanExpression appIdCondition = qExternalService.appId.eq(eventGroup.getAppId());
         BooleanExpression instanceIdCondition = qExternalService.instanceId.eq(eventGroup.getInstanceId());
         BooleanExpression destinationIdCondition = qExternalService.destinationId.eq(eventGroup.getDestinationId());
-        BooleanExpression whereCondition = appIdCondition.and(instanceIdCondition).and(destinationIdCondition);
+        BooleanExpression urlCondition = qExternalService.url.eq(eventGroup.getUrl());
+        BooleanExpression whereCondition =
+                appIdCondition.and(instanceIdCondition).and(destinationIdCondition).and(urlCondition);
 
         ExternalService one = externalTransactionRepository.findOne(whereCondition);
         if (one == null) {
@@ -46,6 +55,7 @@ public class ExternalServiceProcessor extends BaseTraceEventProcessor<ExternalSe
             webTransaction.setAppId(eventGroup.getAppId());
             webTransaction.setInstanceId(eventGroup.getInstanceId());
             webTransaction.setDestinationId(eventGroup.getDestinationId());
+            webTransaction.setUrl(eventGroup.getUrl());
 
             try {
                 one = externalTransactionRepository.save(webTransaction);
@@ -62,23 +72,40 @@ public class ExternalServiceProcessor extends BaseTraceEventProcessor<ExternalSe
     protected Map<EventGroup, List<TraceEvent>> groupEvents(Iterable<TraceEvent> items) {
         final Map<Long, AgentInstanceMap> maps = getAgentInstanceMaps(items);
         return StreamSupport.stream(items.spliterator(), false)
-                       .collect(Collectors.groupingBy(new Function<TraceEvent, ExternalServiceEventGroup>() {
-                           @Override
-                           public ExternalServiceEventGroup apply(TraceEvent t) {
-                               ExternalServiceEventGroup group = new ExternalServiceEventGroup();
-                               AgentInstanceMap map = maps.get(t.getAgentId());
-                               group.setAppId(map.getAppId());
-                               group.setInstanceId(map.getInstanceId());
-                               group.setDestinationId(t.getDestinationId());
-                               return group;
-                           }
-                       }));
+                .collect(Collectors.groupingBy(new Function<TraceEvent, ExternalServiceEventGroup>() {
+                    @Override
+                    public ExternalServiceEventGroup apply(TraceEvent t) {
+                        ExternalServiceEventGroup group = new ExternalServiceEventGroup();
+                        AgentInstanceMap map = maps.get(t.getAgentId());
+                        group.setAppId(map.getAppId());
+                        group.setInstanceId(map.getInstanceId());
+                        group.setDestinationId(t.getDestinationId());
+                        Annotation annotation = getAnnotations(t);
+                        if (annotation != null) {
+                            annotation.getByteValue();
+                            String decode = (String) transcoder.decode((byte) 0, annotation.getByteValue());
+                            group.setUrl(decode);
+                        }
+                        return group;
+                    }
+                }));
     }
 
-    class ExternalServiceEventGroup implements EventGroup{
+    private Annotation getAnnotations(TraceEvent event) {
+        QAnnotation qAnnotation = QAnnotation.annotation;
+        BooleanExpression traceEventIdCondition = qAnnotation.traceEventId.eq(event.getId());
+        int code = AnnotationKey.HTTP_URL.getCode();
+        BooleanExpression keyCondition = qAnnotation.key.eq(code);
+        BooleanExpression whereCondition = traceEventIdCondition.and(keyCondition);
+
+        return annotationRepository.findOne(whereCondition);
+    }
+
+    class ExternalServiceEventGroup implements EventGroup {
         private Long appId;
         private Long instanceId;
         private String destinationId;
+        private String url;
 
         @Override
         public Long getAppId() {
@@ -106,9 +133,16 @@ public class ExternalServiceProcessor extends BaseTraceEventProcessor<ExternalSe
             this.destinationId = destinationId;
         }
 
+        public String getUrl() {
+            return url;
+        }
+
+        public void setUrl(String url) {
+            this.url = url;
+        }
+
         @Override
         public boolean equals(Object o) {
-
             if (this == o) {
                 return true;
             }
@@ -124,7 +158,10 @@ public class ExternalServiceProcessor extends BaseTraceEventProcessor<ExternalSe
             if (instanceId != null ? !instanceId.equals(that.instanceId) : that.instanceId != null) {
                 return false;
             }
-            return !(destinationId != null ? !destinationId.equals(that.destinationId) : that.destinationId != null);
+            if (destinationId != null ? !destinationId.equals(that.destinationId) : that.destinationId != null) {
+                return false;
+            }
+            return !(url != null ? !url.equals(that.url) : that.url != null);
 
         }
 
@@ -133,6 +170,7 @@ public class ExternalServiceProcessor extends BaseTraceEventProcessor<ExternalSe
             int result = appId != null ? appId.hashCode() : 0;
             result = 31 * result + (instanceId != null ? instanceId.hashCode() : 0);
             result = 31 * result + (destinationId != null ? destinationId.hashCode() : 0);
+            result = 31 * result + (url != null ? url.hashCode() : 0);
             return result;
         }
     }

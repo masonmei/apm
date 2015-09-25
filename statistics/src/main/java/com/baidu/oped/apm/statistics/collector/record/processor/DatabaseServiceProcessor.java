@@ -10,13 +10,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Component;
 
+import com.baidu.oped.apm.common.AnnotationKey;
+import com.baidu.oped.apm.common.bo.IntStringStringValue;
 import com.baidu.oped.apm.common.jpa.entity.AgentInstanceMap;
+import com.baidu.oped.apm.common.jpa.entity.Annotation;
+import com.baidu.oped.apm.common.jpa.entity.QAnnotation;
+import com.baidu.oped.apm.common.jpa.entity.QSqlMetaData;
 import com.baidu.oped.apm.common.jpa.entity.QSqlTransaction;
+import com.baidu.oped.apm.common.jpa.entity.SqlMetaData;
 import com.baidu.oped.apm.common.jpa.entity.SqlTransaction;
 import com.baidu.oped.apm.common.jpa.entity.SqlTransactionStatistic;
 import com.baidu.oped.apm.common.jpa.entity.TraceEvent;
+import com.baidu.oped.apm.common.jpa.repository.AnnotationRepository;
+import com.baidu.oped.apm.common.jpa.repository.SqlMetaDataRepository;
 import com.baidu.oped.apm.common.jpa.repository.SqlTransactionRepository;
-import com.baidu.oped.apm.statistics.collector.ApdexDecider;
+import com.baidu.oped.apm.common.util.AnnotationTranscoder;
 import com.mysema.query.types.expr.BooleanExpression;
 
 /**
@@ -24,11 +32,26 @@ import com.mysema.query.types.expr.BooleanExpression;
  */
 @Component
 public class DatabaseServiceProcessor extends BaseTraceEventProcessor<SqlTransactionStatistic> {
+
     @Autowired
     private SqlTransactionRepository sqlTransactionRepository;
 
+    @Autowired
+    private AnnotationRepository annotationRepository;
+
+    @Autowired
+    private SqlMetaDataRepository sqlMetaDataRepository;
+
     public void setSqlTransactionRepository(SqlTransactionRepository sqlTransactionRepository) {
         this.sqlTransactionRepository = sqlTransactionRepository;
+    }
+
+    public void setAnnotationRepository(AnnotationRepository annotationRepository) {
+        this.annotationRepository = annotationRepository;
+    }
+
+    public void setSqlMetaDataRepository(SqlMetaDataRepository sqlMetaDataRepository) {
+        this.sqlMetaDataRepository = sqlMetaDataRepository;
     }
 
     @Override
@@ -38,17 +61,20 @@ public class DatabaseServiceProcessor extends BaseTraceEventProcessor<SqlTransac
         BooleanExpression appIdCondition = qWebTransaction.appId.eq(eventGroup.getAppId());
         BooleanExpression instanceIdCondition = qWebTransaction.instanceId.eq(eventGroup.getInstanceId());
         BooleanExpression destinationIdCondition = qWebTransaction.endPoint.eq(eventGroup.getEndPoint());
-        BooleanExpression whereCondition = appIdCondition.and(instanceIdCondition).and(destinationIdCondition);
+        BooleanExpression sqlCondition = qWebTransaction.sql.eq(((DatabaseServiceEventGroup) group).getSql());
+        BooleanExpression whereCondition =
+                appIdCondition.and(instanceIdCondition).and(destinationIdCondition).and(sqlCondition);
 
         SqlTransaction one = sqlTransactionRepository.findOne(whereCondition);
         if (one == null) {
-            SqlTransaction webTransaction = new SqlTransaction();
-            webTransaction.setAppId(eventGroup.getAppId());
-            webTransaction.setInstanceId(eventGroup.getInstanceId());
-            webTransaction.setEndPoint(eventGroup.getEndPoint());
+            SqlTransaction sqlTransaction = new SqlTransaction();
+            sqlTransaction.setAppId(eventGroup.getAppId());
+            sqlTransaction.setInstanceId(eventGroup.getInstanceId());
+            sqlTransaction.setEndPoint(eventGroup.getEndPoint());
+            sqlTransaction.setSql(eventGroup.getSql());
 
             try {
-                one = sqlTransactionRepository.save(webTransaction);
+                one = sqlTransactionRepository.save(sqlTransaction);
             } catch (DataAccessException exception) {
                 one = sqlTransactionRepository.findOne(whereCondition);
             }
@@ -62,23 +88,50 @@ public class DatabaseServiceProcessor extends BaseTraceEventProcessor<SqlTransac
     protected Map<EventGroup, List<TraceEvent>> groupEvents(Iterable<TraceEvent> items) {
         final Map<Long, AgentInstanceMap> maps = getAgentInstanceMaps(items);
         return StreamSupport.stream(items.spliterator(), false)
-                       .collect(Collectors.groupingBy(new Function<TraceEvent, DatabaseServiceEventGroup>() {
-                           @Override
-                           public DatabaseServiceEventGroup apply(TraceEvent t) {
-                               DatabaseServiceEventGroup group = new DatabaseServiceEventGroup();
-                               AgentInstanceMap map = maps.get(t.getAgentId());
-                               group.setAppId(map.getAppId());
-                               group.setInstanceId(map.getInstanceId());
-                               group.setEndPoint(t.getEndPoint());
-                               return group;
-                           }
-                       }));
+                .collect(Collectors.groupingBy(new Function<TraceEvent, DatabaseServiceEventGroup>() {
+                    @Override
+                    public DatabaseServiceEventGroup apply(TraceEvent t) {
+                        DatabaseServiceEventGroup group = new DatabaseServiceEventGroup();
+                        AgentInstanceMap map = maps.get(t.getAgentId());
+                        group.setAppId(map.getAppId());
+                        group.setInstanceId(map.getInstanceId());
+                        group.setEndPoint(t.getEndPoint());
+                        Annotation annotation = getAnnotations(t);
+                        if (annotation != null) {
+                            annotation.getByteValue();
+                            IntStringStringValue decode =
+                                    (IntStringStringValue) transcoder.decode((byte) 21, annotation.getByteValue());
+                            SqlMetaData sqlMetaData = getSqlMetaData(t.getAgentId(), decode.getIntValue());
+                            group.setSql(sqlMetaData.getSql());
+                        }
+                        return group;
+                    }
+                }));
     }
 
-    class DatabaseServiceEventGroup implements EventGroup{
+    private SqlMetaData getSqlMetaData(Long agentId, int sqlId) {
+        QSqlMetaData qSqlMetaData = QSqlMetaData.sqlMetaData;
+        BooleanExpression agentIdCondition = qSqlMetaData.agentId.eq(agentId);
+        BooleanExpression sqlIdCondition = qSqlMetaData.sqlId.eq(sqlId);
+        BooleanExpression whereCondition = agentIdCondition.and(sqlIdCondition);
+        return sqlMetaDataRepository.findOne(whereCondition);
+    }
+
+    private Annotation getAnnotations(TraceEvent event) {
+        QAnnotation qAnnotation = QAnnotation.annotation;
+        BooleanExpression traceEventIdCondition = qAnnotation.traceEventId.eq(event.getId());
+        int code = AnnotationKey.SQL_ID.getCode();
+        BooleanExpression keyCondition = qAnnotation.key.eq(code);
+        BooleanExpression whereCondition = traceEventIdCondition.and(keyCondition);
+
+        return annotationRepository.findOne(whereCondition);
+    }
+
+    class DatabaseServiceEventGroup implements EventGroup {
         private Long appId;
         private Long instanceId;
         private String endPoint;
+        private String sql;
 
         @Override
         public Long getAppId() {
@@ -106,6 +159,14 @@ public class DatabaseServiceProcessor extends BaseTraceEventProcessor<SqlTransac
             this.endPoint = endPoint;
         }
 
+        public String getSql() {
+            return sql;
+        }
+
+        public void setSql(String sql) {
+            this.sql = sql;
+        }
+
         @Override
         public boolean equals(Object o) {
             if (this == o) {
@@ -123,7 +184,10 @@ public class DatabaseServiceProcessor extends BaseTraceEventProcessor<SqlTransac
             if (instanceId != null ? !instanceId.equals(that.instanceId) : that.instanceId != null) {
                 return false;
             }
-            return !(endPoint != null ? !endPoint.equals(that.endPoint) : that.endPoint != null);
+            if (endPoint != null ? !endPoint.equals(that.endPoint) : that.endPoint != null) {
+                return false;
+            }
+            return !(sql != null ? !sql.equals(that.sql) : that.sql != null);
 
         }
 
@@ -132,6 +196,7 @@ public class DatabaseServiceProcessor extends BaseTraceEventProcessor<SqlTransac
             int result = appId != null ? appId.hashCode() : 0;
             result = 31 * result + (instanceId != null ? instanceId.hashCode() : 0);
             result = 31 * result + (endPoint != null ? endPoint.hashCode() : 0);
+            result = 31 * result + (sql != null ? sql.hashCode() : 0);
             return result;
         }
     }

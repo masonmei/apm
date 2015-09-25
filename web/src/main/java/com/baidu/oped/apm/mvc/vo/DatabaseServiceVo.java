@@ -6,8 +6,8 @@ package com.baidu.oped.apm.mvc.vo;
 public class DatabaseServiceVo {
     private Long appId;
     private Long instanceId;
-    private Long externalServiceId;
-    private String destination;
+    private Long sqlTransactionId;
+    private String sql;
     private Long pv;
     private Double cpm;
     private Double responseTime;
@@ -30,20 +30,20 @@ public class DatabaseServiceVo {
         this.instanceId = instanceId;
     }
 
-    public Long getExternalServiceId() {
-        return externalServiceId;
+    public Long getSqlTransactionId() {
+        return sqlTransactionId;
     }
 
-    public void setExternalServiceId(Long externalServiceId) {
-        this.externalServiceId = externalServiceId;
+    public void setSqlTransactionId(Long sqlTransactionId) {
+        this.sqlTransactionId = sqlTransactionId;
     }
 
-    public String getDestination() {
-        return destination;
+    public String getSql() {
+        return sql;
     }
 
-    public void setDestination(String destination) {
-        this.destination = destination;
+    public void setSql(String sql) {
+        this.sql = sql;
     }
 
     public Long getPv() {

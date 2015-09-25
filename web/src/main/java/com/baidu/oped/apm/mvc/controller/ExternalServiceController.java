@@ -18,8 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.baidu.oped.apm.common.jpa.entity.ExternalService;
 import com.baidu.oped.apm.common.jpa.entity.ExternalServiceStatistic;
 import com.baidu.oped.apm.common.jpa.entity.ServiceType;
-import com.baidu.oped.apm.common.jpa.entity.WebTransaction;
-import com.baidu.oped.apm.common.jpa.entity.WebTransactionStatistic;
 import com.baidu.oped.apm.common.utils.Constraints;
 import com.baidu.oped.apm.model.service.AutomaticService;
 import com.baidu.oped.apm.mvc.vo.ExternalServiceVo;
@@ -28,7 +26,6 @@ import com.baidu.oped.apm.mvc.vo.TrendContext;
 import com.baidu.oped.apm.mvc.vo.TrendResponse;
 import com.baidu.oped.apm.utils.ExternalServiceUtils;
 import com.baidu.oped.apm.utils.TimeUtils;
-import com.baidu.oped.apm.utils.TrendContextUtils;
 import com.baidu.oped.apm.utils.TrendUtils;
 
 /**
@@ -42,7 +39,7 @@ public class ExternalServiceController {
     private AutomaticService automaticService;
 
     /**
-     * List Given application transactions.
+     * List Given application external services.
      *
      * @param appId the application identification
      * @param from  time range begin
@@ -75,7 +72,7 @@ public class ExternalServiceController {
     }
 
     /**
-     * Get top n transaction response time trend data.
+     * Get top n external service response time trend data.
      *
      * @param appId  the application identification
      * @param time   time range, only one
@@ -100,19 +97,19 @@ public class ExternalServiceController {
 
         final TimeRange timeRange = timeRanges.get(0);
 
-        Iterable<WebTransaction> transactions = automaticService.getWebTransactionsWithAppId(appId);
+        Iterable<ExternalService> transactions = automaticService.getExternalServicesWithAppId(appId);
 
-        Iterable<WebTransactionStatistic> transactionsStatistic =
-                automaticService.getWebTransactionsStatistic(transactions, timeRange, period);
+        Iterable<ExternalServiceStatistic> transactionsStatistic =
+                automaticService.getExternalServiceStatistic(transactions, timeRange, period);
 
-        TrendContext<String> trendContext =
-                TrendContextUtils.topByAvgResponseTime(period, limit, timeRange, transactions, transactionsStatistic);
+        TrendContext<String> trendContext = ExternalServiceUtils
+                .topByAvgResponseTime(period, limit, timeRange, transactions, transactionsStatistic);
 
         return TrendUtils.toTrendResponse(trendContext, metricName);
     }
 
     /**
-     * Get all transaction cpm of the application.
+     * Get all external service cpm of the application.
      *
      * @param appId  the application identification
      * @param time   time range, only one
@@ -127,7 +124,7 @@ public class ExternalServiceController {
         Assert.state(period % 60 == 0, "Period must be 60 or the times of 60.");
 
         final Constraints.MetricName[] metricName = new Constraints.MetricName[] {CPM, RESPONSE_TIME, PV};
-        final ServiceType serviceType = ServiceType.WEB;
+        final ServiceType serviceType = ServiceType.EXTERNAL;
         List<TimeRange> timeRanges = TimeUtils.convertToRange(time);
 
         TrendContext trendContext = automaticService.getMetricDataOfApp(appId, timeRanges, period, serviceType);
@@ -135,10 +132,8 @@ public class ExternalServiceController {
         return TrendUtils.toTrendResponse(trendContext, metricName);
     }
 
-
-
     /**
-     * List transactions of given instance.
+     * List external service of given instance.
      *
      * @param appId      the application identification
      * @param instanceId the instance identification, need to check relation with app
@@ -173,7 +168,7 @@ public class ExternalServiceController {
     }
 
     /**
-     * Get top n transaction response time trend data of given instance.
+     * Get top n external service response time trend data of given instance.
      *
      * @param appId      the application identification
      * @param instanceId the instance identification, need to check relation with app
@@ -201,19 +196,19 @@ public class ExternalServiceController {
 
         final TimeRange timeRange = timeRanges.get(0);
 
-        Iterable<WebTransaction> transactions = automaticService.getWebTransactionsWithInstanceId(instanceId);
+        Iterable<ExternalService> transactions = automaticService.getExternalServicesWithInstanceId(instanceId);
 
-        Iterable<WebTransactionStatistic> transactionsStatistic =
-                automaticService.getWebTransactionsStatistic(transactions, timeRange, period);
+        Iterable<ExternalServiceStatistic> transactionsStatistic =
+                automaticService.getExternalServiceStatistic(transactions, timeRange, period);
 
-        TrendContext<String> trendContext =
-                TrendContextUtils.topByAvgResponseTime(period, limit, timeRange, transactions, transactionsStatistic);
+        TrendContext<String> trendContext = ExternalServiceUtils
+                .topByAvgResponseTime(period, limit, timeRange, transactions, transactionsStatistic);
 
         return TrendUtils.toTrendResponse(trendContext, metricName);
     }
 
     /**
-     * Get all transaction cpm of given instance.
+     * Get all external service cpm of given instance.
      *
      * @param appId      the application identification
      * @param instanceId the instance identification, need to check relation with app
@@ -234,7 +229,7 @@ public class ExternalServiceController {
         Assert.state(period % 60 == 0, "Period must be 60 or the times of 60.");
 
         final Constraints.MetricName[] metricName = new Constraints.MetricName[] {CPM, RESPONSE_TIME, PV};
-        final ServiceType serviceType = ServiceType.WEB;
+        final ServiceType serviceType = ServiceType.EXTERNAL;
         List<TimeRange> timeRanges = TimeUtils.convertToRange(time);
         TrendContext trendContext =
                 automaticService.getMetricDataOfInstance(instanceId, timeRanges, period, serviceType);

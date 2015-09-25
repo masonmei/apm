@@ -15,18 +15,59 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import com.baidu.oped.apm.common.jpa.entity.ExternalService;
-import com.baidu.oped.apm.common.jpa.entity.ExternalServiceStatistic;
 import com.baidu.oped.apm.common.jpa.entity.SqlTransaction;
 import com.baidu.oped.apm.common.jpa.entity.SqlTransactionStatistic;
 import com.baidu.oped.apm.mvc.vo.DatabaseServiceVo;
-import com.baidu.oped.apm.mvc.vo.ExternalServiceVo;
 import com.baidu.oped.apm.mvc.vo.TimeRange;
+import com.baidu.oped.apm.mvc.vo.TrendContext;
 
 /**
  * Created by mason on 9/8/15.
  */
 public abstract class DatabaseServiceUtils {
+
+    /**
+     * Build TrendContent with database services top by average response time.
+     *
+     * @param period
+     * @param limit
+     * @param timeRange
+     * @param transactions
+     * @param transactionsStatistic
+     *
+     * @return
+     */
+    public static TrendContext<String> topByAvgResponseTime(Long period, Integer limit, TimeRange timeRange,
+            Iterable<SqlTransaction> transactions, Iterable<SqlTransactionStatistic> transactionsStatistic) {
+
+        TrendContext<String> trendContext = new TrendContext<>(period * 1000, timeRange);
+
+        Map<Long, SqlTransaction> externalServiceMap = StreamSupport.stream(transactions.spliterator(), false)
+                .collect(Collectors.toMap(SqlTransaction::getId, (t) -> t));
+        Map<String, List<SqlTransactionStatistic>> transactionStatisticMap =
+                StreamSupport.stream(transactionsStatistic.spliterator(), false)
+                        .collect(Collectors.groupingBy(statistic -> {
+                            Long serviceId = statistic.getSqlTransactionId();
+                            SqlTransaction transaction = externalServiceMap.get(serviceId);
+                            return transaction.getSql();
+                        }));
+
+        transactionStatisticMap.entrySet().stream()
+                .sorted(Comparator.comparing(new Function<Map.Entry<String, List<SqlTransactionStatistic>>, Double>() {
+                    @Override
+                    public Double apply(Map.Entry<String, List<SqlTransactionStatistic>> entry) {
+                        DoubleSummaryStatistics responseSummaryStatistics =
+                                entry.getValue().stream().filter(statistic -> statistic.getSumResponseTime() != null)
+                                        .mapToDouble(SqlTransactionStatistic::getSumResponseTime).summaryStatistics();
+                        LongSummaryStatistics pvSummaryStatistics =
+                                entry.getValue().stream().filter(statistic -> statistic.getPv() != null)
+                                        .mapToLong(SqlTransactionStatistic::getPv).summaryStatistics();
+                        return calculateRate(responseSummaryStatistics.getSum(), pvSummaryStatistics.getSum());
+                    }
+                })).limit(limit)
+                .forEach(entry -> trendContext.addStatistics(entry.getKey(), timeRange, entry.getValue()));
+        return trendContext;
+    }
 
     public static List<DatabaseServiceVo> topByAvgResponseTime(Iterable<SqlTransactionStatistic> statistics,
             Iterable<SqlTransaction> transactions, TimeRange timeRange, Integer limit) {
@@ -35,16 +76,16 @@ public abstract class DatabaseServiceUtils {
         StreamSupport.stream(transactions.spliterator(), false)
                 .forEach(transaction -> rpcTransactionMap.put(transaction.getId(), transaction));
 
-        Map<WebTransactionGroup, List<SqlTransactionStatistic>> groups =
+        Map<TransactionGroup, List<SqlTransactionStatistic>> groups =
                 StreamSupport.stream(statistics.spliterator(), false)
-                        .collect(Collectors.groupingBy(new Function<SqlTransactionStatistic, WebTransactionGroup>() {
+                        .collect(Collectors.groupingBy(new Function<SqlTransactionStatistic, TransactionGroup>() {
                             @Override
-                            public WebTransactionGroup apply(SqlTransactionStatistic statistic) {
+                            public TransactionGroup apply(SqlTransactionStatistic statistic) {
                                 Long transactionId = statistic.getSqlTransactionId();
                                 SqlTransaction webTransaction = rpcTransactionMap.get(transactionId);
-                                WebTransactionGroup group = new WebTransactionGroup();
+                                TransactionGroup group = new TransactionGroup();
                                 group.setAppId(webTransaction.getAppId());
-                                group.setDisplayName(webTransaction.getEndPoint());
+                                group.setDisplayName(webTransaction.getSql());
                                 return group;
                             }
                         }));
@@ -66,7 +107,7 @@ public abstract class DatabaseServiceUtils {
 
             DatabaseServiceVo transaction = new DatabaseServiceVo();
             transaction.setAppId(group.getAppId());
-            transaction.setDestination(group.getDisplayName());
+            transaction.setSql(group.getDisplayName());
 
             transaction.setPv(pvSummaryStatistics.getSum());
             transaction.setCpm(format(
@@ -83,7 +124,7 @@ public abstract class DatabaseServiceUtils {
                 .collect(Collectors.toList());
     }
 
-    static class WebTransactionGroup {
+    static class TransactionGroup {
         private Long appId;
         private Long instanceId;
         private Long transactionId;
@@ -130,7 +171,7 @@ public abstract class DatabaseServiceUtils {
                 return false;
             }
 
-            WebTransactionGroup group = (WebTransactionGroup) o;
+            TransactionGroup group = (TransactionGroup) o;
 
             if (appId != null ? !appId.equals(group.appId) : group.appId != null) {
                 return false;
