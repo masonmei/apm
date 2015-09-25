@@ -379,31 +379,4 @@
         </plugins>
     </reporting>
 
-    <!--用于配置分发管理，配置相应的产品发布信息,主要用于发布，在执行mvn deploy后表示要发布的位置-->
-    <distributionManagement>
-        <repository>
-            <id>baidu_local</id>
-            <name>Baidu Local Repository</name>
-            <url>http://maven.scm.baidu.com:8081/nexus/content/repositories/Baidu_Local</url>
-        </repository>
-        <snapshotRepository>
-            <id>baidu_local_snapshot</id>
-            <name>Baidu Local Snapshot Repository</name>
-            <url>http://maven.scm.baidu.com:8081/nexus/content/repositories/Baidu_Local_Snapshots</url>
-        </snapshotRepository>
-    </distributionManagement>
-
-    <!--设定除中央仓库(repo1.maven.org/maven2/)外的其他仓库,按设定顺序进行查找-->
-    <repositories>
-        <repository>
-            <id>Nexus</id>
-            <name>Nexus Public Repository</name>
-            <url>http://maven.scm.baidu.com:8081/nexus/content/groups/public</url>
-        </repository>
-        <repository>
-            <id>Nexus snapshots</id>
-            <name>Nexus Public Repository</name>
-            <url>http://maven.scm.baidu.com:8081/nexus/content/groups/public-snapshots</url>
-        </repository>
-    </repositories>
 </project>
