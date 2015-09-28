@@ -39,6 +39,11 @@ public class WeatherController {
     @Autowired
     private WeatherRepository weatherRepository;
 
+    @RequestMapping("city/update")
+    public int update(@RequestParam("cityName") String cityName) {
+        return cityRepository.updateCityBeijing(cityName);
+    }
+
     @RequestMapping("city/sync")
     public boolean syncCity() {
         cityRepository.deleteAll();
