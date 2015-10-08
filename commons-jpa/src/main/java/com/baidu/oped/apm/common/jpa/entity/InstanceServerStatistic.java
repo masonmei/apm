@@ -17,6 +17,7 @@ import javax.persistence.Table;
                 true)})
 public class InstanceServerStatistic extends AbstractServerStatistic {
 
+    private static final long serialVersionUID = -5695051454818240712L;
     @Basic
     @Column(name = "instance_id", nullable = false, insertable = true, updatable = true)
     private Long instanceId;

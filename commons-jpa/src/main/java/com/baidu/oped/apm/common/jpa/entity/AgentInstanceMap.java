@@ -16,6 +16,7 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
         @Index(name = "agent_instance_unique", columnList = "agent_id,agent_start_time", unique = true)})
 public class AgentInstanceMap extends AbstractPersistable<Long> {
 
+    private static final long serialVersionUID = 1124238086865438716L;
     @Basic
     @Column(name = "agent_id", nullable = false, insertable = true, updatable = true)
     private String agentId;

@@ -1,7 +1,5 @@
 package com.baidu.oped.apm.common.jpa.entity;
 
-import java.io.Serializable;
-
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -15,8 +13,9 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
  */
 @Entity
 @Table(name = "apm_annotation")
-public class Annotation extends AbstractPersistable<Long> implements Serializable {
+public class Annotation extends AbstractPersistable<Long> {
 
+    private static final long serialVersionUID = 5841264847191355499L;
     @Lob
     @Column(name = "byte_value", nullable = true, insertable = true, updatable = true)
     private byte[] byteValue;

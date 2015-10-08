@@ -16,6 +16,7 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
         @Index(name = "api_meta_unique", columnList = "agent_id,api_id", unique = true)})
 public class ApiMetaData extends AbstractPersistable<Long> implements ClearableAgentInfo {
 
+    private static final long serialVersionUID = -1066319610816422700L;
     @Basic
     @Column(name = "agent_id", nullable = true, insertable = true, updatable = true)
     private Long agentId;

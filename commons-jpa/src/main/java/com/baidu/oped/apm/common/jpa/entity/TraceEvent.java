@@ -14,6 +14,7 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 @Table(name = "apm_span_event")
 public class TraceEvent extends AbstractPersistable<Long> implements ClearableAgentInfo {
 
+    private static final long serialVersionUID = -3749197360786535881L;
     @Basic
     @Column(name = "agent_id", nullable = true, insertable = true, updatable = true)
     private Long agentId;

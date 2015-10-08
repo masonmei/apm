@@ -16,6 +16,7 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
         @Index(name = "app_statistic_point_unique", columnList = "app_id,period,timestamp", unique = true)})
 public class ApplicationStatistic extends AbstractPersistable<Long> implements CommonStatistic, HostStatistic {
 
+    private static final long serialVersionUID = -1725813356022430903L;
     @Basic
     @Column(name = "app_id", nullable = false, insertable = true, updatable = true)
     private Long appId;

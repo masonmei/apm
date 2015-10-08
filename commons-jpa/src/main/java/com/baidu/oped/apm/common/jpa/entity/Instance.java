@@ -14,6 +14,7 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 @Table(name = "apm_instance")
 public class Instance extends AbstractPersistable<Long> {
 
+    private static final long serialVersionUID = 5660693988117311011L;
     @Basic
     @Column(name = "app_id", nullable = false, insertable = true, updatable = true)
     private Long appId;

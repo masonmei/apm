@@ -16,6 +16,7 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
         @Index(name = "app_unique", columnList = "app_name,app_type,user_id", unique = true)})
 public class Application extends AbstractPersistable<Long> {
 
+    private static final long serialVersionUID = -8668172571856094002L;
     @Basic
     @Column(name = "app_name", nullable = true, insertable = true, updatable = true, length = 128)
     private String appName;

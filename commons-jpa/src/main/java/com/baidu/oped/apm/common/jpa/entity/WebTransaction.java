@@ -16,6 +16,7 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
         @Index(name = "web_tran_unique", columnList = "app_id,instance_id,rpc", unique = true)})
 public class WebTransaction extends AbstractPersistable<Long> {
 
+    private static final long serialVersionUID = -4916404802471838707L;
     @Basic
     @Column(name = "app_id", nullable = false, insertable = true, updatable = true)
     private Long appId;

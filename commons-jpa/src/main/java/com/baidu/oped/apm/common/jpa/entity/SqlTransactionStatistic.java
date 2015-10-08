@@ -16,6 +16,7 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
         @Index(name = "sql_tran_statistic_point_unique", columnList = "sql_transaction_id,period,timestamp",
                unique = true)})
 public class SqlTransactionStatistic extends AbstractPersistable<Long> implements CommonStatistic {
+    private static final long serialVersionUID = 1104158201367334304L;
     @Basic
     @Column(name = "sql_transaction_id", nullable = false, insertable = true, updatable = true)
     private Long sqlTransactionId;

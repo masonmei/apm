@@ -16,6 +16,7 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
                                                  columnList = "user_id,conf_key", unique = true)})
 
 public class UserConfig extends AbstractPersistable<Long> {
+    private static final long serialVersionUID = -4406053716949676814L;
     @Basic
     @Column(name = "user_id", nullable = false, insertable = true, updatable = true)
     private String userId;

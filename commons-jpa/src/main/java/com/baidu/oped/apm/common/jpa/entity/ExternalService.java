@@ -18,6 +18,7 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
         @Index(name = "external_service_unique", columnList = "app_id,instance_id,destination_id,url", unique = true)})
 public class ExternalService extends AbstractPersistable<Long> implements Serializable {
 
+    private static final long serialVersionUID = -3720516128778661519L;
     @Basic
     @Column(name = "app_id", nullable = false, insertable = true, updatable = true)
     private Long appId;

@@ -16,6 +16,7 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
         @Index(name = "trace_instance_unique", columnList = "agent_id,span_id", unique = true)})
 public class Trace extends AbstractPersistable<Long> implements ClearableAgentInfo {
 
+    private static final long serialVersionUID = 7361021770775999516L;
     @Basic
     @Column(name = "agent_id", nullable = true, insertable = true, updatable = true)
     private Long agentId;

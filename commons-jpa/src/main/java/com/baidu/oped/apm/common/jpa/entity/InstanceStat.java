@@ -16,6 +16,7 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
         @Index(name = "instance_stat_unique", columnList = "agent_id,timestamp", unique = true)})
 public class InstanceStat extends AbstractPersistable<Long> implements ClearableAgentInfo {
 
+    private static final long serialVersionUID = 2134584337846641478L;
     @Basic
     @Column(name = "agent_id", nullable = true, insertable = true, updatable = true)
     private Long agentId;

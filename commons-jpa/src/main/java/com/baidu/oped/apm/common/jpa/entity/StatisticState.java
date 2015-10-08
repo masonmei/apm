@@ -18,6 +18,7 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
         @Index(name = "statistic_state_unique", columnList = "statistic_type,period", unique = true)})
 public class StatisticState extends AbstractPersistable<Long> {
 
+    private static final long serialVersionUID = 5030348537108812217L;
     @Basic
     @Column(name = "statistic_type", nullable = false, insertable = true, updatable = true)
     @Enumerated(EnumType.STRING)

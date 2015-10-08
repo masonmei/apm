@@ -15,6 +15,7 @@ import com.baidu.oped.apm.common.utils.NumberUtils;
 @Entity
 @Table(name = "apm_metric_data")
 public class MetricData extends AbstractPersistable<Long> implements Metric {
+    private static final long serialVersionUID = -3596909110690588963L;
     @Basic
     @Column(name = "cnt", nullable = false, insertable = true, updatable = true)
     private Long count;

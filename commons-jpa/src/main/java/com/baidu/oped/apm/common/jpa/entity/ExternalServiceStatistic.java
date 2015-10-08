@@ -16,6 +16,7 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
         @Index(name = "ext_service_statistic_point_unique", columnList = "external_service_id,period,timestamp",
                unique = true)})
 public class ExternalServiceStatistic extends AbstractPersistable<Long> implements CommonStatistic {
+    private static final long serialVersionUID = 2906087403559169127L;
     @Basic
     @Column(name = "external_service_id", nullable = false, insertable = true, updatable = true)
     private Long externalServiceId;

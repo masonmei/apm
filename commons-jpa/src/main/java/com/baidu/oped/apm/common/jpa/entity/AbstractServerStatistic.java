@@ -13,6 +13,7 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
  */
 @MappedSuperclass
 public abstract class AbstractServerStatistic extends AbstractPersistable<Long> implements ServerStatistic {
+    private static final long serialVersionUID = 309337386255833865L;
     @Basic
     @Column(name = "period", nullable = false, insertable = true, updatable = true)
     private Long period;

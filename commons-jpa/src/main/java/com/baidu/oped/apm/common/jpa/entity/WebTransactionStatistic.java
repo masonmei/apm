@@ -17,6 +17,7 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
                 true)})
 public class WebTransactionStatistic extends AbstractPersistable<Long> implements CommonStatistic {
 
+    private static final long serialVersionUID = -1629047406534085868L;
     @Basic
     @Column(name = "transaction_id", nullable = false, insertable = true, updatable = true)
     private Long transactionId;

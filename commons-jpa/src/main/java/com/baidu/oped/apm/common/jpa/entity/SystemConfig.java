@@ -14,6 +14,7 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 @Entity
 @Table(name = "apm_sys_conf", indexes = {@Index(name = "sys_conf_unique", columnList = "conf_key", unique = true)})
 public class SystemConfig extends AbstractPersistable<Long> {
+    private static final long serialVersionUID = -647322328583911424L;
     @Basic
     @Column(name = "conf_key", nullable = false, insertable = true, updatable = false)
     private String confKey;
