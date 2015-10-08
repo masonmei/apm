@@ -50,7 +50,7 @@ public abstract class NumberUtils {
 
     public static Double calculateRate(final Number number, final Number divider) {
         if(number == null){
-            return 0.0;
+            return null;
         }
 
         if(divider == null || divider.doubleValue() == 0.0){

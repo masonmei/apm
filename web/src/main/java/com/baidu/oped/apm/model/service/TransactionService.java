@@ -1,6 +1,6 @@
 package com.baidu.oped.apm.model.service;
 
-import static com.baidu.oped.apm.utils.TimeUtils.toMillSecond;
+import static com.baidu.oped.apm.utils.TimeUtils.toMillisSecond;
 
 import java.util.HashMap;
 import java.util.List;
@@ -50,7 +50,7 @@ public class TransactionService {
         Map<TimeRange, Iterable<WebTransactionStatistic>> result = new HashMap<>();
         timeRanges.stream().forEach(timeRange -> {
             BooleanExpression timestampCondition = applicationStatistic.timestamp
-                    .between(toMillSecond(timeRange.getFrom()), toMillSecond(timeRange.getTo()));
+                    .between(toMillisSecond(timeRange.getFrom()), toMillisSecond(timeRange.getTo()));
 
             BooleanExpression whereCondition = transactionIdCondition.and(periodCondition).and(timestampCondition);
             Iterable<WebTransactionStatistic> currentRangeResult =
@@ -79,7 +79,7 @@ public class TransactionService {
         Map<TimeRange, Iterable<WebTransactionStatistic>> result = new HashMap<>();
         timeRanges.stream().forEach(timeRange -> {
             BooleanExpression timestampCondition = applicationStatistic.timestamp
-                    .between(toMillSecond(timeRange.getFrom()), toMillSecond(timeRange.getTo()));
+                    .between(toMillisSecond(timeRange.getFrom()), toMillisSecond(timeRange.getTo()));
 
             BooleanExpression whereCondition = transactionIdCondition.and(periodCondition).and(timestampCondition);
             Iterable<WebTransactionStatistic> currentRangeResult =

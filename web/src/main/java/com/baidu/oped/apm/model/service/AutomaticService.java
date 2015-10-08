@@ -1,6 +1,6 @@
 package com.baidu.oped.apm.model.service;
 
-import static com.baidu.oped.apm.utils.TimeUtils.toMillSecond;
+import static com.baidu.oped.apm.utils.TimeUtils.toMillisSecond;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -214,7 +214,7 @@ public class AutomaticService {
         BooleanExpression appIdCondition = qWebTransactionStatistic.transactionId.in(webTransactionIds);
         BooleanExpression periodCondition = qWebTransactionStatistic.period.eq(periodInMillis);
         BooleanExpression timestampCondition = qWebTransactionStatistic.timestamp
-                .between(toMillSecond(timeRange.getFrom()), toMillSecond(timeRange.getTo()));
+                .between(toMillisSecond(timeRange.getFrom()), toMillisSecond(timeRange.getTo()));
 
         BooleanExpression whereCondition = appIdCondition.and(periodCondition).and(timestampCondition);
         return webTransactionStatisticRepository.findAll(whereCondition);
@@ -266,7 +266,7 @@ public class AutomaticService {
                 qExternalServiceStatistic.externalServiceId.in(externalServiceIds);
         BooleanExpression periodCondition = qExternalServiceStatistic.period.eq(periodInMillis);
         BooleanExpression timestampCondition = qExternalServiceStatistic.timestamp
-                .between(toMillSecond(timeRange.getFrom()), toMillSecond(timeRange.getTo()));
+                .between(toMillisSecond(timeRange.getFrom()), toMillisSecond(timeRange.getTo()));
 
         BooleanExpression whereCondition = externalServiceIdCondition.and(periodCondition).and(timestampCondition);
 
@@ -318,7 +318,7 @@ public class AutomaticService {
         BooleanExpression sqlTransactionIdCondition = qSqlTransactionStatistic.sqlTransactionId.in(sqlTransactionIds);
         BooleanExpression periodCondition = qSqlTransactionStatistic.period.eq(periodInMillis);
         BooleanExpression timestampCondition = qSqlTransactionStatistic.timestamp
-                .between(toMillSecond(timeRange.getFrom()), toMillSecond(timeRange.getTo()));
+                .between(toMillisSecond(timeRange.getFrom()), toMillisSecond(timeRange.getTo()));
 
         BooleanExpression whereCondition = sqlTransactionIdCondition.and(periodCondition).and(timestampCondition);
 
@@ -354,7 +354,7 @@ public class AutomaticService {
         Map<TimeRange, Iterable<WebTransactionStatistic>> result = new HashMap<>();
         timeRanges.stream().forEach(timeRange -> {
             BooleanExpression timestampCondition = qWebTransactionStatistic.timestamp
-                    .between(toMillSecond(timeRange.getFrom()), toMillSecond(timeRange.getTo()));
+                    .between(toMillisSecond(timeRange.getFrom()), toMillisSecond(timeRange.getTo()));
 
             BooleanExpression whereCondition = appIdCondition.and(periodCondition).and(timestampCondition);
             Iterable<WebTransactionStatistic> currentRangeResult =
@@ -392,7 +392,7 @@ public class AutomaticService {
         Map<TimeRange, Iterable<SqlTransactionStatistic>> result = new HashMap<>();
         timeRanges.stream().forEach(timeRange -> {
             BooleanExpression timestampCondition = qSqlTransactionStatistic.timestamp
-                    .between(toMillSecond(timeRange.getFrom()), toMillSecond(timeRange.getTo()));
+                    .between(toMillisSecond(timeRange.getFrom()), toMillisSecond(timeRange.getTo()));
 
             BooleanExpression whereCondition = appIdCondition.and(periodCondition).and(timestampCondition);
             Iterable<SqlTransactionStatistic> currentRangeResult =
@@ -432,7 +432,7 @@ public class AutomaticService {
         Map<TimeRange, Iterable<SqlTransactionStatistic>> result = new HashMap<>();
         timeRanges.stream().forEach(timeRange -> {
             BooleanExpression timestampCondition = qSqlTransactionStatistic.timestamp
-                    .between(toMillSecond(timeRange.getFrom()), toMillSecond(timeRange.getTo()));
+                    .between(toMillisSecond(timeRange.getFrom()), toMillisSecond(timeRange.getTo()));
 
             BooleanExpression whereCondition = appIdCondition.and(periodCondition).and(timestampCondition);
             Iterable<SqlTransactionStatistic> currentRangeResult =
@@ -471,7 +471,7 @@ public class AutomaticService {
         Map<TimeRange, Iterable<ExternalServiceStatistic>> result = new HashMap<>();
         timeRanges.stream().forEach(timeRange -> {
             BooleanExpression timestampCondition = qExternalServiceStatistic.timestamp
-                    .between(toMillSecond(timeRange.getFrom()), toMillSecond(timeRange.getTo()));
+                    .between(toMillisSecond(timeRange.getFrom()), toMillisSecond(timeRange.getTo()));
 
             BooleanExpression whereCondition = serviceIdsCondition.and(periodCondition).and(timestampCondition);
             Iterable<ExternalServiceStatistic> currentRangeResult =
@@ -511,7 +511,7 @@ public class AutomaticService {
         Map<TimeRange, Iterable<ExternalServiceStatistic>> result = new HashMap<>();
         timeRanges.stream().forEach(timeRange -> {
             BooleanExpression timestampCondition = qExternalServiceStatistic.timestamp
-                    .between(toMillSecond(timeRange.getFrom()), toMillSecond(timeRange.getTo()));
+                    .between(toMillisSecond(timeRange.getFrom()), toMillisSecond(timeRange.getTo()));
 
             BooleanExpression whereCondition = externalServiceIdsCondition.and(periodCondition).and(timestampCondition);
             Iterable<ExternalServiceStatistic> currentRangeResult =

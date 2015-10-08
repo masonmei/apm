@@ -1,14 +1,14 @@
 package com.baidu.oped.apm.mvc.controller;
 
-import static com.baidu.oped.apm.common.utils.Constraints.MetricName.APDEX;
-import static com.baidu.oped.apm.common.utils.Constraints.MetricName.CPM;
-import static com.baidu.oped.apm.common.utils.Constraints.MetricName.ERROR;
-import static com.baidu.oped.apm.common.utils.Constraints.MetricName.ERROR_RATE;
-import static com.baidu.oped.apm.common.utils.Constraints.MetricName.FRUSTRATED;
-import static com.baidu.oped.apm.common.utils.Constraints.MetricName.PV;
-import static com.baidu.oped.apm.common.utils.Constraints.MetricName.RESPONSE_TIME;
-import static com.baidu.oped.apm.common.utils.Constraints.MetricName.SATISFIED;
-import static com.baidu.oped.apm.common.utils.Constraints.MetricName.TOLERATED;
+import static com.baidu.oped.apm.common.utils.Constraints.StatisticMetricValue.APDEX;
+import static com.baidu.oped.apm.common.utils.Constraints.StatisticMetricValue.CPM;
+import static com.baidu.oped.apm.common.utils.Constraints.StatisticMetricValue.ERROR;
+import static com.baidu.oped.apm.common.utils.Constraints.StatisticMetricValue.ERROR_RATE;
+import static com.baidu.oped.apm.common.utils.Constraints.StatisticMetricValue.FRUSTRATED;
+import static com.baidu.oped.apm.common.utils.Constraints.StatisticMetricValue.PV;
+import static com.baidu.oped.apm.common.utils.Constraints.StatisticMetricValue.RESPONSE_TIME;
+import static com.baidu.oped.apm.common.utils.Constraints.StatisticMetricValue.SATISFIED;
+import static com.baidu.oped.apm.common.utils.Constraints.StatisticMetricValue.TOLERATED;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -26,6 +26,7 @@ import com.baidu.oped.apm.common.jpa.entity.Instance;
 import com.baidu.oped.apm.common.jpa.entity.InstanceStatistic;
 import com.baidu.oped.apm.common.jpa.entity.ServiceType;
 import com.baidu.oped.apm.common.utils.Constraints;
+import com.baidu.oped.apm.common.utils.Constraints.StatisticMetricValue;
 import com.baidu.oped.apm.model.service.AutomaticService;
 import com.baidu.oped.apm.model.service.OverviewService;
 import com.baidu.oped.apm.mvc.vo.InstanceVo;
@@ -65,7 +66,7 @@ public class OverviewController {
         Assert.notNull(period, "Period must be provided while retrieve application response time trend data.");
         Assert.state(period % 60 == 0, "Period must be 60 or the times of 60.");
 
-        final Constraints.MetricName[] metricName = new Constraints.MetricName[] {RESPONSE_TIME, PV, CPM};
+        final StatisticMetricValue[] metricName = new StatisticMetricValue[] {RESPONSE_TIME, PV, CPM};
         final ServiceType[] serviceTypes = new ServiceType[] {ServiceType.WEB, ServiceType.DB, ServiceType.EXTERNAL};
         List<TimeRange> timeRanges = TimeUtils.convertToRange(time);
         TrendContext metricDataOfApp = automaticService.getMetricDataOfApp(appId, timeRanges, period, serviceTypes);
@@ -90,8 +91,7 @@ public class OverviewController {
         Assert.notNull(period, "Period must be provided while retrieve application response time trend data.");
         Assert.state(period % 60 == 0, "Period must be 60 or the times of 60.");
 
-        final Constraints.MetricName[] metricName =
-                new Constraints.MetricName[] {APDEX, SATISFIED, TOLERATED, FRUSTRATED};
+        final StatisticMetricValue[] metricName = new StatisticMetricValue[] {APDEX, SATISFIED, TOLERATED, FRUSTRATED};
         final ServiceType[] serviceTypes = new ServiceType[] {ServiceType.WEB};
         List<TimeRange> timeRanges = TimeUtils.convertToRange(time);
         TrendContext metricDataOfApp = automaticService.getMetricDataOfApp(appId, timeRanges, period, serviceTypes);
@@ -116,7 +116,7 @@ public class OverviewController {
         Assert.notNull(period, "Period must be provided while retrieve application response time trend data.");
         Assert.state(period % 60 == 0, "Period must be 60 or the times of 60.");
 
-        final Constraints.MetricName[] metricName = new Constraints.MetricName[] {CPM, RESPONSE_TIME, PV};
+        final StatisticMetricValue[] metricName = new StatisticMetricValue[] {CPM, RESPONSE_TIME, PV};
         final ServiceType[] serviceTypes = new ServiceType[] {ServiceType.WEB, ServiceType.EXTERNAL};
         List<TimeRange> timeRanges = TimeUtils.convertToRange(time);
         TrendContext metricDataOfApp = automaticService.getMetricDataOfApp(appId, timeRanges, period, serviceTypes);
@@ -167,7 +167,7 @@ public class OverviewController {
         Assert.notNull(period, "Period must be provided while retrieve application response time trend data.");
         Assert.state(period % 60 == 0, "Period must be 60 or the times of 60.");
 
-        final Constraints.MetricName[] metricName = new Constraints.MetricName[] {ERROR_RATE, ERROR, PV};
+        final StatisticMetricValue[] metricName = new StatisticMetricValue[] {ERROR_RATE, ERROR, PV};
         final ServiceType[] serviceTypes = new ServiceType[] {ServiceType.WEB, ServiceType.DB, ServiceType.EXTERNAL};
         List<TimeRange> timeRanges = TimeUtils.convertToRange(time);
 
@@ -235,7 +235,7 @@ public class OverviewController {
         Assert.notNull(period, "Period must be provided while retrieve application response time trend data.");
         Assert.state(period % 60 == 0, "Period must be 60 or the times of 60.");
 
-        final Constraints.MetricName[] metricName = new Constraints.MetricName[] {RESPONSE_TIME, PV, CPM};
+        final StatisticMetricValue[] metricName = new StatisticMetricValue[] {RESPONSE_TIME, PV, CPM};
         final ServiceType[] serviceTypes = new ServiceType[] {ServiceType.WEB, ServiceType.DB, ServiceType.EXTERNAL};
         List<TimeRange> timeRanges = TimeUtils.convertToRange(time);
 
@@ -265,8 +265,7 @@ public class OverviewController {
         Assert.notNull(period, "Period must be provided while retrieve application response time trend data.");
         Assert.state(period % 60 == 0, "Period must be 60 or the times of 60.");
 
-        final Constraints.MetricName[] metricName =
-                new Constraints.MetricName[] {APDEX, SATISFIED, TOLERATED, FRUSTRATED};
+        final StatisticMetricValue[] metricName = new StatisticMetricValue[] {APDEX, SATISFIED, TOLERATED, FRUSTRATED};
         final ServiceType[] serviceTypes = new ServiceType[] {ServiceType.WEB};
         List<TimeRange> timeRanges = TimeUtils.convertToRange(time);
 
@@ -296,7 +295,7 @@ public class OverviewController {
         Assert.notNull(period, "Period must be provided while retrieve application response time trend data.");
         Assert.state(period % 60 == 0, "Period must be 60 or the times of 60.");
 
-        final Constraints.MetricName[] metricName = new Constraints.MetricName[] {CPM, RESPONSE_TIME, PV};
+        final StatisticMetricValue[] metricName = new StatisticMetricValue[] {CPM, RESPONSE_TIME, PV};
         final ServiceType[] serviceTypes = new ServiceType[] {ServiceType.WEB, ServiceType.EXTERNAL};
         List<TimeRange> timeRanges = TimeUtils.convertToRange(time);
 
@@ -352,7 +351,7 @@ public class OverviewController {
         Assert.notNull(period, "Period must be provided while retrieve application response time trend data.");
         Assert.state(period % 60 == 0, "Period must be 60 or the times of 60.");
 
-        final Constraints.MetricName[] metricName = new Constraints.MetricName[] {ERROR_RATE, ERROR, PV};
+        final StatisticMetricValue[] metricName = new StatisticMetricValue[] {ERROR_RATE, ERROR, PV};
         final ServiceType[] serviceTypes = new ServiceType[] {ServiceType.WEB, ServiceType.DB, ServiceType.EXTERNAL};
         List<TimeRange> timeRanges = TimeUtils.convertToRange(time);
 

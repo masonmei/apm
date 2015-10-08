@@ -24,7 +24,9 @@ import com.baidu.oped.apm.utils.QueryUtils;
 import com.baidu.oped.apm.utils.TimeUtils;
 
 /**
- * Created by mason on 8/12/15.
+ * Get the Applications and instances of the current user.
+ *
+ * @author meidongxu@baidu.com
  */
 @RestController
 @RequestMapping("applications")
@@ -36,13 +38,13 @@ public class ApplicationController {
     /**
      * 获取 app 列表
      *
-     * @param from
-     * @param to
-     * @param orderBy
-     * @param pageSize
-     * @param pageNumber
+     * @param from       timeRange begin
+     * @param to         timeRange end
+     * @param orderBy    order by which properties, can be responseTime, cpm, errorRate
+     * @param pageSize   pageInfo size
+     * @param pageNumber pageInfo currentPage.
      *
-     * @return
+     * @return the application vo objects
      */
     @RequestMapping(method = RequestMethod.GET)
     public QueryResponse<ApplicationVo> applications(
@@ -69,14 +71,14 @@ public class ApplicationController {
     /**
      * 获取app对应的instance列表
      *
-     * @param appId
-     * @param from
-     * @param to
-     * @param orderBy
-     * @param pageSize
-     * @param pageNumber
+     * @param appId      instance's appId
+     * @param from       timeRange begin
+     * @param to         timeRange end
+     * @param orderBy    order by which properties, can be responseTime, cpm, errorRate
+     * @param pageSize   pageInfo size
+     * @param pageNumber pageInfo currentPage
      *
-     * @return
+     * @return the instance vo objects
      */
     @RequestMapping(value = {"instances"}, method = RequestMethod.GET)
     public QueryResponse<InstanceVo> findApplicationInstance(@RequestParam("appId") long appId,

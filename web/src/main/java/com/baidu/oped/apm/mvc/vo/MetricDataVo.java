@@ -5,10 +5,10 @@ import java.util.List;
 /**
  * Created by mason on 8/25/15.
  */
-public class MetricData {
+public class MetricDataVo {
     private String legend;
     private String time;
-    private List<DataPoint> data;
+    private List<DataPointVo> data;
 
     public String getLegend() {
         return legend;
@@ -26,11 +26,11 @@ public class MetricData {
         this.time = time;
     }
 
-    public List<DataPoint> getData() {
+    public List<DataPointVo> getData() {
         return data;
     }
 
-    public void setData(List<DataPoint> data) {
+    public void setData(List<DataPointVo> data) {
         this.data = data;
     }
 }

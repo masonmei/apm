@@ -6,22 +6,22 @@ import java.util.List;
  * Created by mason on 8/25/15.
  */
 public class TrendResponse {
-    private List<Metric> metrics;
-    private List<MetricData> values;
+    private List<MetricVo> metrics;
+    private List<MetricDataVo> values;
 
-    public List<Metric> getMetrics() {
+    public List<MetricVo> getMetrics() {
         return metrics;
     }
 
-    public void setMetrics(List<Metric> metrics) {
+    public void setMetrics(List<MetricVo> metrics) {
         this.metrics = metrics;
     }
 
-    public List<MetricData> getValues() {
+    public List<MetricDataVo> getValues() {
         return values;
     }
 
-    public void setValues(List<MetricData> values) {
+    public void setValues(List<MetricDataVo> values) {
         this.values = values;
     }
 }

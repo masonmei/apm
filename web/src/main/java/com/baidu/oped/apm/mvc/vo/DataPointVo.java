@@ -5,14 +5,14 @@ import java.util.List;
 /**
  * Created by mason on 8/13/15.
  */
-public class DataPoint {
+public class DataPointVo {
     private long timestamp;
     private List<Double> items;
 
-    public DataPoint() {
+    public DataPointVo() {
     }
 
-    public DataPoint(long timestamp, List<Double> items) {
+    public DataPointVo(long timestamp, List<Double> items) {
         this.timestamp = timestamp;
         this.items = items;
     }

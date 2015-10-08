@@ -16,9 +16,9 @@ import com.baidu.oped.apm.common.jpa.entity.ServiceType;
 import com.baidu.oped.apm.common.jpa.entity.Statistic;
 import com.baidu.oped.apm.common.utils.ApdexUtils;
 import com.baidu.oped.apm.common.utils.Constraints;
-import com.baidu.oped.apm.mvc.vo.DataPoint;
-import com.baidu.oped.apm.mvc.vo.Metric;
-import com.baidu.oped.apm.mvc.vo.MetricData;
+import com.baidu.oped.apm.mvc.vo.DataPointVo;
+import com.baidu.oped.apm.mvc.vo.MetricVo;
+import com.baidu.oped.apm.mvc.vo.MetricDataVo;
 import com.baidu.oped.apm.mvc.vo.TimeRange;
 import com.baidu.oped.apm.mvc.vo.TrendContext;
 import com.baidu.oped.apm.mvc.vo.TrendResponse;
@@ -36,16 +36,16 @@ public abstract class TrendUtils {
      *
      * @return
      */
-    public static <T> TrendResponse toTrendResponse(TrendContext<T> context, Constraints.MetricName[] metricNames) {
+    public static <T> TrendResponse toTrendResponse(TrendContext<T> context, Constraints.StatisticMetricValue[] metricNames) {
         Assert.notNull(metricNames, "MetricNames must not be null while convert to trendResponse.");
         Assert.notNull(context, "MetricData must not be null while convert to trendResponse.");
 
         TrendResponse trendResponse = new TrendResponse();
 
-        List<Metric> metrics = buildMetrics(metricNames);
+        List<MetricVo> metrics = buildMetrics(metricNames);
         trendResponse.setMetrics(metrics);
 
-        List<MetricData> values = buildMetricData(context, metricNames);
+        List<MetricDataVo> values = buildMetricData(context, metricNames);
         trendResponse.setValues(values);
 
         return trendResponse;
@@ -60,21 +60,21 @@ public abstract class TrendUtils {
      *
      * @return
      */
-    private static <T> List<MetricData> buildMetricData(TrendContext<T> context, Constraints.MetricName[] metricNames) {
-        List<MetricData> values = new ArrayList<>();
+    private static <T> List<MetricDataVo> buildMetricData(TrendContext<T> context, Constraints.StatisticMetricValue[] metricNames) {
+        List<MetricDataVo> values = new ArrayList<>();
         for (TimeRange timeRange : context.getTimeRanges()) {
             for (T serviceType : context.getServiceTypes()) {
-                MetricData metricData = new MetricData();
+                MetricDataVo metricData = new MetricDataVo();
                 metricData.setTime(timeRange.toString());
                 metricData.setLegend(calculateLegend(serviceType));
 
-                List<DataPoint> dataPoints =
+                List<DataPointVo> dataPoints =
                         context.getStatistic(timeRange, serviceType).stream().map(applicationStatistic -> {
-                            DataPoint dataPoint = new DataPoint();
+                            DataPointVo dataPoint = new DataPointVo();
                             dataPoint.setTimestamp(applicationStatistic.getTimestamp());
                             dataPoint.setItems(readValuesFromStatistic(applicationStatistic, metricNames));
                             return dataPoint;
-                        }).sorted(Comparator.comparingLong(DataPoint::getTimestamp)).collect(Collectors.toList());
+                        }).sorted(Comparator.comparingLong(DataPointVo::getTimestamp)).collect(Collectors.toList());
                 metricData.setData(dataPoints);
 
                 values.add(metricData);
@@ -112,10 +112,10 @@ public abstract class TrendUtils {
      *
      * @return
      */
-    private static List<Metric> buildMetrics(Constraints.MetricName[] metricNames) {
-        List<Metric> metrics = new ArrayList<>();
-        for (Constraints.MetricName metricName : metricNames) {
-            Metric metric = new Metric();
+    private static List<MetricVo> buildMetrics(Constraints.StatisticMetricValue[] metricNames) {
+        List<MetricVo> metrics = new ArrayList<>();
+        for (Constraints.StatisticMetricValue metricName : metricNames) {
+            MetricVo metric = new MetricVo();
             metric.setDescription(metricName.getDescription());
             metric.setName(metricName.getFieldName());
             metric.setUnit(metricName.getUnit());
@@ -132,7 +132,7 @@ public abstract class TrendUtils {
      *
      * @return
      */
-    private static List<Double> readValuesFromStatistic(Statistic statistic, Constraints.MetricName[] names) {
+    private static List<Double> readValuesFromStatistic(Statistic statistic, Constraints.StatisticMetricValue[] names) {
         Assert.notNull(statistic, "Cannot read values from a null CommonStatistic Object.");
         Assert.notNull(names, "MetricNames must not be null for read value from CommonStatistic.");
 
@@ -149,7 +149,7 @@ public abstract class TrendUtils {
             hostStatistic = (HostStatistic) statistic;
         }
 
-        for (Constraints.MetricName name : names) {
+        for (Constraints.StatisticMetricValue name : names) {
             Double value;
             switch (name) {
                 case RESPONSE_TIME:

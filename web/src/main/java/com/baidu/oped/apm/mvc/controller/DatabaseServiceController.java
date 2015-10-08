@@ -1,8 +1,8 @@
 package com.baidu.oped.apm.mvc.controller;
 
-import static com.baidu.oped.apm.common.utils.Constraints.MetricName.CPM;
-import static com.baidu.oped.apm.common.utils.Constraints.MetricName.PV;
-import static com.baidu.oped.apm.common.utils.Constraints.MetricName.RESPONSE_TIME;
+import static com.baidu.oped.apm.common.utils.Constraints.StatisticMetricValue.CPM;
+import static com.baidu.oped.apm.common.utils.Constraints.StatisticMetricValue.PV;
+import static com.baidu.oped.apm.common.utils.Constraints.StatisticMetricValue.RESPONSE_TIME;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,6 +19,7 @@ import com.baidu.oped.apm.common.jpa.entity.ServiceType;
 import com.baidu.oped.apm.common.jpa.entity.SqlTransaction;
 import com.baidu.oped.apm.common.jpa.entity.SqlTransactionStatistic;
 import com.baidu.oped.apm.common.utils.Constraints;
+import com.baidu.oped.apm.common.utils.Constraints.StatisticMetricValue;
 import com.baidu.oped.apm.model.service.AutomaticService;
 import com.baidu.oped.apm.mvc.vo.DatabaseServiceVo;
 import com.baidu.oped.apm.mvc.vo.TimeRange;
@@ -92,7 +93,7 @@ public class DatabaseServiceController {
         Assert.state(period % 60 == 0, "Period must be 60 or the times of 60.");
         Assert.state(limit > 0, "Limit must bigger that 0.");
 
-        final Constraints.MetricName[] metricName = new Constraints.MetricName[] {RESPONSE_TIME, PV, CPM};
+        final StatisticMetricValue[] metricName = new StatisticMetricValue[] {RESPONSE_TIME, PV, CPM};
         List<TimeRange> timeRanges = TimeUtils.convertToRange(time);
         Assert.state(timeRanges.size() == 1, "Time param must be only one range.");
 
@@ -124,7 +125,7 @@ public class DatabaseServiceController {
         Assert.notNull(period, "Period must be provided while retrieve application response time trend data.");
         Assert.state(period % 60 == 0, "Period must be 60 or the times of 60.");
 
-        final Constraints.MetricName[] metricName = new Constraints.MetricName[] {CPM, RESPONSE_TIME, PV};
+        final StatisticMetricValue[] metricName = new StatisticMetricValue[] {CPM, RESPONSE_TIME, PV};
         final ServiceType serviceType = ServiceType.DB;
         List<TimeRange> timeRanges = TimeUtils.convertToRange(time);
 
@@ -192,7 +193,7 @@ public class DatabaseServiceController {
         Assert.state(period % 60 == 0, "Period must be 60 or the times of 60.");
         Assert.state(limit > 0, "Limit must bigger that 0.");
 
-        final Constraints.MetricName[] metricName = new Constraints.MetricName[] {RESPONSE_TIME, PV, CPM};
+        final StatisticMetricValue[] metricName = new StatisticMetricValue[] {RESPONSE_TIME, PV, CPM};
         List<TimeRange> timeRanges = TimeUtils.convertToRange(time);
         Assert.state(timeRanges.size() == 1, "Time param must be only one range.");
 
@@ -230,7 +231,7 @@ public class DatabaseServiceController {
         Assert.notNull(period, "Period must be provided while retrieve application response time trend data.");
         Assert.state(period % 60 == 0, "Period must be 60 or the times of 60.");
 
-        final Constraints.MetricName[] metricName = new Constraints.MetricName[] {CPM, RESPONSE_TIME, PV};
+        final StatisticMetricValue[] metricName = new StatisticMetricValue[] {CPM, RESPONSE_TIME, PV};
         final ServiceType serviceType = ServiceType.WEB;
         List<TimeRange> timeRanges = TimeUtils.convertToRange(time);
         TrendContext trendContext =

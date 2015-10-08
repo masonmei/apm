@@ -1,6 +1,6 @@
 package com.baidu.oped.apm.model.service;
 
-import static com.baidu.oped.apm.utils.TimeUtils.toMillSecond;
+import static com.baidu.oped.apm.utils.TimeUtils.toMillisSecond;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -71,7 +71,7 @@ public class ApplicationService {
 
         QApplicationStatistic appStatistic = QApplicationStatistic.applicationStatistic;
         BooleanExpression timestampCondition =
-                appStatistic.timestamp.between(toMillSecond(timeRange.getFrom()), toMillSecond(timeRange.getTo()));
+                appStatistic.timestamp.between(toMillisSecond(timeRange.getFrom()), toMillisSecond(timeRange.getTo()));
         BooleanExpression appIdCondition = appStatistic.appId.in(appIds);
         BooleanExpression periodCondition = appStatistic.period.eq(periodInMillis);
 
@@ -103,7 +103,8 @@ public class ApplicationService {
 
         QInstanceStatistic instanceStatistic = QInstanceStatistic.instanceStatistic;
         BooleanExpression timestampCondition =
-                instanceStatistic.timestamp.between(toMillSecond(timeRange.getFrom()), toMillSecond(timeRange.getTo()));
+                instanceStatistic.timestamp.between(
+                        toMillisSecond(timeRange.getFrom()), toMillisSecond(timeRange.getTo()));
         BooleanExpression instanceIdCondition = instanceStatistic.instanceId.in(instanceIds);
         BooleanExpression periodCondition = instanceStatistic.period.eq(periodInMillis);
         BooleanExpression whereCondition = instanceIdCondition.and(timestampCondition).and(periodCondition);

@@ -1,6 +1,6 @@
 package com.baidu.oped.apm.model.service;
 
-import static com.baidu.oped.apm.utils.TimeUtils.toMillSecond;
+import static com.baidu.oped.apm.utils.TimeUtils.toMillisSecond;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -61,7 +61,7 @@ public class OverviewService {
         QInstanceStatistic qInstanceStatistic = QInstanceStatistic.instanceStatistic;
         BooleanExpression instanceIdCondition = qInstanceStatistic.instanceId.in(instanceIds);
         BooleanExpression timestampCondition = qInstanceStatistic.timestamp
-                .between(toMillSecond(timeRange.getFrom()), toMillSecond(timeRange.getTo()));
+                .between(toMillisSecond(timeRange.getFrom()), toMillisSecond(timeRange.getTo()));
         BooleanExpression whereCondition = instanceIdCondition.and(timestampCondition);
         return instanceStatisticRepository.findAll(whereCondition);
     }

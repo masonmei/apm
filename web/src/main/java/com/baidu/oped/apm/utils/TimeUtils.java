@@ -61,7 +61,7 @@ public abstract class TimeUtils {
         return localDateTime.format(DateTimeFormatter.ofPattern(Constraints.TIME_PATTERN));
     }
 
-    public static long toMillSecond(LocalDateTime localDateTime) {
+    public static long toMillisSecond(LocalDateTime localDateTime) {
         Assert.notNull(localDateTime, "Cannot convert an null LocalDateTime object to long.");
         return localDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
     }

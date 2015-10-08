@@ -3,7 +3,7 @@ package com.baidu.oped.apm.mvc.vo;
 /**
  * Created by mason on 8/13/15.
  */
-public class Metric {
+public class MetricVo {
     private String name;
     private String description;
     private String unit;
