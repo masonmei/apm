@@ -4,4 +4,4 @@ spring:
     suffix: .jsp
 
 server:
-  port: 28080
+  port: 38081

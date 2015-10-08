@@ -1,3 +1,5 @@
+server:
+  port: 38080
 spring:
   jpa:
     hibernate:
@@ -8,7 +10,8 @@ spring:
       repositories:
         enabled: true
   datasource:
-    url: jdbc:mysql://masonmxdb:3306/weather?autoReconnect=true&useUnicode=true&characterEncoding=utf-8
+    url: jdbc:mysql://180.76.136.21:3306/weather?autoReconnect=true&useUnicode=true&characterEncoding=utf-8
+    # url: jdbc:mysql://masonmxdb:3306/weather?autoReconnect=true&useUnicode=true&characterEncoding=utf-8
     username: apm
     password: apm
     driverClassName: com.mysql.jdbc.Driver
