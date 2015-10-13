@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.Index;
 import javax.persistence.Table;
 
+import com.google.common.base.MoreObjects;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
 /**
@@ -253,5 +254,32 @@ public class Trace extends AbstractPersistable<Long> implements ClearableAgentIn
 
     public void setVersion(int version) {
         this.version = version;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("agentId", agentId)
+                .add("spanId", spanId)
+                .add("apiId", apiId)
+                .add("collectorAcceptTime", collectorAcceptTime)
+                .add("elapsed", elapsed)
+                .add("startTime", startTime)
+                .add("endPoint", endPoint)
+                .add("errCode", errCode)
+                .add("exceptionClass", exceptionClass)
+                .add("exceptionId", exceptionId)
+                .add("exceptionMessage", exceptionMessage)
+                .add("flag", flag)
+                .add("hasException", hasException)
+                .add("parentSpanId", parentSpanId)
+                .add("remoteAddr", remoteAddr)
+                .add("rpc", rpc)
+                .add("serviceType", serviceType)
+                .add("traceAgentId", traceAgentId)
+                .add("traceAgentStartTime", traceAgentStartTime)
+                .add("traceTransactionSequence", traceTransactionSequence)
+                .add("version", version)
+                .toString();
     }
 }

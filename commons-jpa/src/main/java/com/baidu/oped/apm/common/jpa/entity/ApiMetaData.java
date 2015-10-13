@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.Index;
 import javax.persistence.Table;
 
+import com.google.common.base.MoreObjects;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
 /**
@@ -67,4 +68,13 @@ public class ApiMetaData extends AbstractPersistable<Long> implements ClearableA
         this.lineNumber = lineNumber;
     }
 
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("agentId", agentId)
+                .add("apiId", apiId)
+                .add("apiInfo", apiInfo)
+                .add("lineNumber", lineNumber)
+                .toString();
+    }
 }

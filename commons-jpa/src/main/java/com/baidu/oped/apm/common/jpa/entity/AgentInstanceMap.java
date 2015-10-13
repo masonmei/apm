@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.Index;
 import javax.persistence.Table;
 
+import com.google.common.base.MoreObjects;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
 /**
@@ -63,5 +64,15 @@ public class AgentInstanceMap extends AbstractPersistable<Long> {
 
     public void setAppId(Long appId) {
         this.appId = appId;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("agentId", agentId)
+                .add("agentStartTime", agentStartTime)
+                .add("instanceId", instanceId)
+                .add("appId", appId)
+                .toString();
     }
 }

@@ -32,7 +32,7 @@ public abstract class TimeUtil {
 
     public static List<Long> getTimestamps(LocalDateTime from , LocalDateTime to, Long periodInMillis){
         final List<Long> timestamps = new ArrayList<>();
-        LocalDateTime periodStart = TimeUtil.getPeriodStart(from, periodInMillis, ChronoUnit.MILLIS);
+        LocalDateTime periodStart = getPeriodStart(from, periodInMillis, ChronoUnit.MILLIS);
         while(true){
             if(periodStart.isBefore(from)){
                 periodStart = periodStart.plus(periodInMillis, ChronoUnit.MILLIS);

@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.Index;
 import javax.persistence.Table;
 
+import com.google.common.base.MoreObjects;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
 /**
@@ -32,6 +33,18 @@ public class SqlTransaction extends AbstractPersistable<Long> {
     @Basic
     @Column(name = "sql_value", nullable = false, insertable = true, updatable = true, length = 512)
     private String sql;
+
+    @Basic
+    @Column(name = "database_type", nullable = false, insertable = true, updatable = true, length = 64)
+    private String databaseType;
+
+    @Basic
+    @Column(name = "table_name", nullable = false, insertable = true, updatable = true, length = 128)
+    private String tableName;
+
+    @Basic
+    @Column(name = "operation", nullable = false, insertable = true, updatable = true, length = 64)
+    private String operation;
 
     public Long getAppId() {
         return appId;
@@ -63,5 +76,42 @@ public class SqlTransaction extends AbstractPersistable<Long> {
 
     public void setSql(String sql) {
         this.sql = sql;
+    }
+
+    public String getDatabaseType() {
+        return databaseType;
+    }
+
+    public void setDatabaseType(String databaseType) {
+        this.databaseType = databaseType;
+    }
+
+    public String getTableName() {
+        return tableName;
+    }
+
+    public void setTableName(String tableName) {
+        this.tableName = tableName;
+    }
+
+    public String getOperation() {
+        return operation;
+    }
+
+    public void setOperation(String operation) {
+        this.operation = operation;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("appId", appId)
+                .add("instanceId", instanceId)
+                .add("endPoint", endPoint)
+                .add("sql", sql)
+                .add("databaseType", databaseType)
+                .add("tableName", tableName)
+                .add("operation", operation)
+                .toString();
     }
 }

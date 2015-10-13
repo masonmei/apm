@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.Index;
 import javax.persistence.Table;
 
+import com.google.common.base.MoreObjects;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
 /**
@@ -53,4 +54,12 @@ public class Application extends AbstractPersistable<Long> {
         this.userId = userId;
     }
 
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("appName", appName)
+                .add("appType", appType)
+                .add("userId", userId)
+                .toString();
+    }
 }

@@ -4,6 +4,7 @@ import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 
+import com.google.common.base.MoreObjects;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
 /**
@@ -129,5 +130,21 @@ public abstract class AbstractServerStatistic extends AbstractPersistable<Long> 
 
     public void setSystemCpuMetric(Long systemCpuMetric) {
         this.systemCpuMetric = systemCpuMetric;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("period", period)
+                .add("timestamp", timestamp)
+                .add("heapUsedMetric", heapUsedMetric)
+                .add("heapMaxMetric", heapMaxMetric)
+                .add("nonHeapUsedMetric", nonHeapUsedMetric)
+                .add("nonHeapMaxMetric", nonHeapMaxMetric)
+                .add("gcOldCountMetric", gcOldCountMetric)
+                .add("gcOldTimeMetric", gcOldTimeMetric)
+                .add("jvmCpuMetric", jvmCpuMetric)
+                .add("systemCpuMetric", systemCpuMetric)
+                .toString();
     }
 }

@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.AbstractPersistable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -35,12 +36,6 @@ public class OverviewService {
     private AutomaticService automaticService;
 
     @Autowired
-    private ApplicationRepository applicationRepository;
-
-    @Autowired
-    private InstanceRepository instanceRepository;
-
-    @Autowired
     private InstanceStatisticRepository instanceStatisticRepository;
 
     /**
@@ -48,14 +43,13 @@ public class OverviewService {
      *
      * @param instances instances
      * @param timeRange timeRange
-     *
      * @return
      */
     public Iterable<InstanceStatistic> getExistInstanceStatistics(Iterable<Instance> instances, TimeRange timeRange) {
         Assert.notNull(instances, "ApplicationId must not be null while retrieving instances of.");
         Assert.notNull(timeRange, "TimeRange must not be null while retrieving instances of.");
 
-        List<Long> instanceIds = StreamSupport.stream(instances.spliterator(), false).map(instance -> instance.getId())
+        List<Long> instanceIds = StreamSupport.stream(instances.spliterator(), false).map(AbstractPersistable::getId)
                 .collect(Collectors.toList());
 
         QInstanceStatistic qInstanceStatistic = QInstanceStatistic.instanceStatistic;
@@ -67,45 +61,17 @@ public class OverviewService {
     }
 
     /**
-     * Get the instance of the given app.
-     *
-     * @param appId the application database id
-     *
-     * @return
-     */
-    public Iterable<Instance> getApplicationInstances(Long appId) {
-        Assert.notNull(appId, "ApplicationId must not be null while retrieving instances of.");
-        QInstance qInstance = QInstance.instance;
-        BooleanExpression appIdCondition = qInstance.appId.eq(appId);
-        Iterable<Instance> instances = instanceRepository.findAll(appIdCondition);
-        return instances;
-    }
-
-    /**
-     * Get Application with id
-     *
-     * @param appId app database id
-     *
-     * @return
-     */
-    public Application getApplication(Long appId) {
-        Assert.notNull(appId, "ApplicationId must not be null while retrieving instances of.");
-        return applicationRepository.findOne(appId);
-    }
-
-    /**
      * Get top n transactions of the given app.
      *
-     * @param appId     app database id.
-     * @param timeRange time range
+     * @param appId     application id.
+     * @param timeRange timeRange
      * @param limit     limit
-     *
-     * @return
+     * @return top transactions of application
      */
-    public List<TransactionVo> getWebTransactionStatisticOfApp(Long appId, TimeRange timeRange, Integer limit) {
-        final long period = 60l;
+    public List<TransactionVo> getTopNWebTransactionOfApp(Long appId, TimeRange timeRange, Integer limit) {
+        final long period = 60L;
 
-        Iterable<WebTransaction> webTransactionsForApp = automaticService.getWebTransactionsWithAppId(appId);
+        Iterable<WebTransaction> webTransactionsForApp = automaticService.getWebTransactionsOfApp(appId);
         Iterable<WebTransactionStatistic> webTransactionStatistics =
                 automaticService.getWebTransactionsStatistic(webTransactionsForApp, timeRange, period);
         return WebTransactionUtils
@@ -115,17 +81,15 @@ public class OverviewService {
     /**
      * Get the top n transaction of the given instance id.
      *
-     * @param instanceId
-     * @param timeRange
-     * @param limit
-     *
-     * @return
+     * @param instanceId instance id
+     * @param timeRange  timeRange
+     * @param limit      limit
+     * @return top transactions of instance
      */
-    public List<TransactionVo> getWebTransactionStatisticOfInstance(Long instanceId, TimeRange timeRange,
-            Integer limit) {
-        final long period = 60l;
+    public List<TransactionVo> getTopNWebTransactionOfInstance(Long instanceId, TimeRange timeRange, Integer limit) {
+        final long period = 60L;
 
-        Iterable<WebTransaction> webTransactionsForApp = automaticService.getWebTransactionsWithInstanceId(instanceId);
+        Iterable<WebTransaction> webTransactionsForApp = automaticService.getWebTransactionsOfInstance(instanceId);
         Iterable<WebTransactionStatistic> webTransactionStatistics =
                 automaticService.getWebTransactionsStatistic(webTransactionsForApp, timeRange, period);
         return WebTransactionUtils

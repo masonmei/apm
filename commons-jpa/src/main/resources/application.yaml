@@ -20,7 +20,7 @@ spring:
 
 logging:
   path: log
-  file: statistic.log
+  file: commons-jpa.log
   level:
     org.springframework.boot: INFO
     org.springframework: INFO

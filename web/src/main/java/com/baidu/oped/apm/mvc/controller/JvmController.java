@@ -11,12 +11,14 @@ import static com.baidu.oped.apm.common.utils.Constraints.JVMMetricName.HEAP_MAX
 import static com.baidu.oped.apm.common.utils.Constraints.JVMMetricName.HEAP_USED;
 import static com.baidu.oped.apm.common.utils.Constraints.JVMMetricName.NON_HEAP_MAX;
 import static com.baidu.oped.apm.common.utils.Constraints.JVMMetricName.NON_HEAP_USED;
+import static java.lang.String.format;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import com.baidu.oped.apm.common.jpa.entity.AbstractServerStatistic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -44,7 +46,24 @@ import com.baidu.oped.apm.utils.TimeUtils;
  */
 @RestController
 @RequestMapping("resource/applications")
-public class JvmController {
+public class JvmController extends BaseController {
+
+    private static final String RETRIEVE_TREND = "retrieving %s level %s trend";
+
+    private static final String RETRIEVE_APP_HEAP_TREND = format(RETRIEVE_TREND, "application", "heap");
+    private static final String RETRIEVE_INSTANCE_HEAP_TREND = format(RETRIEVE_TREND, "instance", "heap");
+
+    private static final String RETRIEVE_APP_NON_HEAP_TREND = format(RETRIEVE_TREND, "application", "non-heap");
+    private static final String RETRIEVE_INSTANCE_NON_HEAP_TREND = format(RETRIEVE_TREND, "instance", "non-heap");
+
+    private static final String RETRIEVE_APP_GARBAGE_TREND = format(RETRIEVE_TREND, "application", "garbage");
+    private static final String RETRIEVE_INSTANCE_GARBAGE_TREND = format(RETRIEVE_TREND, "instance", "garbage");
+
+    private static final String RETRIEVE_APP_CPULOAD_TREND = format(RETRIEVE_TREND, "application", "cpuload");
+    private static final String RETRIEVE_INSTANCE_CPULOAD_TREND = format(RETRIEVE_TREND, "instance", "cpuload");
+
+    private static final CommonMetricValue[] COMMON_METRIC_VALUES = new CommonMetricValue[]{AVG, MAX, MIN};
+
 
     @Autowired
     private JvmServerStatisticService serverStatisticService;
@@ -55,59 +74,62 @@ public class JvmController {
      * @param appId
      * @param time
      * @param period
-     *
      * @return
      */
     @RequestMapping(value = {"heap"})
     public TrendResponse getHeapMemory(@RequestParam(value = "appId") Long appId,
-            @RequestParam(value = "time[]") String[] time, @RequestParam(value = "period") Long period) {
-        Assert.notNull(appId, "ApplicationId must not be null while retrieving heap trend data");
-        Assert.notEmpty(time, "Time ranges must not be null while retrieving heap trend data");
-        Assert.notNull(period, "Period must be provided while retrieving heap trend data");
-        Assert.state(period % 60 == 0, "Period must be 60 or the times of 60.");
-        Assert.state(time.length == 1, "Only One TimeRange required.");
+                                       @RequestParam(value = "time[]") String[] time,
+                                       @RequestParam(value = "period") Long period) {
+        validApplicationId(appId, RETRIEVE_APP_HEAP_TREND);
+        validSingleTimeRanges(time, RETRIEVE_APP_HEAP_TREND);
+        validPeriod(period, RETRIEVE_APP_HEAP_TREND);
 
         TimeRange timeRange = TimeUtils.convertToRange(time[0]);
 
-        CommonMetricValue[] metricValue = new CommonMetricValue[] {AVG, MAX, MIN};
-        JVMMetricName[] metricNames = new JVMMetricName[] {HEAP_USED, HEAP_MAX};
+        JVMMetricName[] metricNames = new JVMMetricName[]{HEAP_USED, HEAP_MAX};
 
         Iterable<ApplicationServerStatistic> appServerStatistics =
                 serverStatisticService.getAppServerStatistics(appId, period, timeRange);
 
         List<Long> metricDataIds = getMetricDataIds(appServerStatistics, metricNames);
 
-        ServerTrendContext context = new ServerTrendContext(timeRange, period * 1000);
+        ServerTrendContext<ApplicationServerStatistic> context = buildTrendContext(timeRange, period);
         context.setMetricNames(metricNames);
-        context.setMetricValue(metricValue);
+
         context.setMetricDatas(serverStatisticService.getMetricData(metricDataIds));
         context.setServerStatistics(appServerStatistics);
 
         return context.toResponse();
     }
 
+    public static <T extends AbstractServerStatistic> ServerTrendContext<T> buildTrendContext(
+            TimeRange timeRange, Long period) {
+        Long periodInMillis = period * 1000;
+        ServerTrendContext<T> context = new ServerTrendContext<>(timeRange, periodInMillis);
+
+        context.setMetricValue(COMMON_METRIC_VALUES);
+        return context;
+    }
+
     @RequestMapping(value = {"non-heap"})
     public TrendResponse getNonHeapMemory(@RequestParam(value = "appId") Long appId,
-            @RequestParam(value = "time[]") String[] time, @RequestParam(value = "period") Long period) {
-        Assert.notNull(appId, "ApplicationId must not be null while retrieving non-heap trend data");
-        Assert.notEmpty(time, "Time ranges must not be null while retrieving non-heap trend data");
-        Assert.notNull(period, "Period must be provided while retrieving non-heap trend data");
-        Assert.state(period % 60 == 0, "Period must be 60 or the times of 60.");
-        Assert.state(time.length == 1, "Only One TimeRange required.");
+                                          @RequestParam(value = "time[]") String[] time,
+                                          @RequestParam(value = "period") Long period) {
+        validApplicationId(appId, RETRIEVE_APP_NON_HEAP_TREND);
+        validSingleTimeRanges(time, RETRIEVE_APP_NON_HEAP_TREND);
+        validPeriod(period, RETRIEVE_APP_NON_HEAP_TREND);
 
         TimeRange timeRange = TimeUtils.convertToRange(time[0]);
 
-        CommonMetricValue[] metricValue = new CommonMetricValue[] {AVG, MAX, MIN};
-        JVMMetricName[] metricNames = new JVMMetricName[] {NON_HEAP_USED, NON_HEAP_MAX};
+        JVMMetricName[] metricNames = new JVMMetricName[]{NON_HEAP_USED, NON_HEAP_MAX};
 
         Iterable<ApplicationServerStatistic> appServerStatistics =
                 serverStatisticService.getAppServerStatistics(appId, period, timeRange);
 
         List<Long> metricDataIds = getMetricDataIds(appServerStatistics, metricNames);
 
-        ServerTrendContext context = new ServerTrendContext(timeRange, period * 1000);
+        ServerTrendContext<ApplicationServerStatistic> context = buildTrendContext(timeRange, period * 1000);
         context.setMetricNames(metricNames);
-        context.setMetricValue(metricValue);
         context.setMetricDatas(serverStatisticService.getMetricData(metricDataIds));
         context.setServerStatistics(appServerStatistics);
         return context.toResponse();
@@ -115,24 +137,23 @@ public class JvmController {
 
     @RequestMapping(value = {"garbage"})
     public TrendResponse getGarbageCollection(@RequestParam(value = "appId") Long appId,
-            @RequestParam(value = "time[]") String[] time, @RequestParam(value = "period") Long period) {
-        Assert.notNull(appId, "ApplicationId must not be null while retrieving garbage trend data");
-        Assert.notEmpty(time, "Time ranges must not be null while retrieving garbage trend data");
-        Assert.notNull(period, "Period must be provided while retrieving garbage trend data");
-        Assert.state(period % 60 == 0, "Period must be 60 or the times of 60.");
-        Assert.state(time.length == 1, "Only One TimeRange required.");
+                                              @RequestParam(value = "time[]") String[] time,
+                                              @RequestParam(value = "period") Long period) {
+        validApplicationId(appId, RETRIEVE_APP_GARBAGE_TREND);
+        validSingleTimeRanges(time, RETRIEVE_APP_GARBAGE_TREND);
+        validPeriod(period, RETRIEVE_APP_GARBAGE_TREND);
 
         TimeRange timeRange = TimeUtils.convertToRange(time[0]);
 
-        CommonMetricValue[] metricValue = new CommonMetricValue[] {AVG};
-        GarbageMetricName[] metricNames = new GarbageMetricName[] {COUNT, TIME};
+        CommonMetricValue[] metricValue = new CommonMetricValue[]{AVG};
+        GarbageMetricName[] metricNames = new GarbageMetricName[]{COUNT, TIME};
 
         Iterable<ApplicationServerStatistic> appServerStatistics =
                 serverStatisticService.getAppServerStatistics(appId, period, timeRange);
 
         List<Long> metricDataIds = getMetricDataIds(appServerStatistics, metricNames);
 
-        ServerTrendContext context = new ServerTrendContext(timeRange, period * 1000);
+        ServerTrendContext<ApplicationServerStatistic> context = buildTrendContext(timeRange, period * 1000);
         context.setMetricNames(metricNames);
         context.setMetricValue(metricValue);
         context.setMetricDatas(serverStatisticService.getMetricData(metricDataIds));
@@ -142,26 +163,22 @@ public class JvmController {
 
     @RequestMapping(value = {"cpuload"})
     public TrendResponse getCpuLoad(@RequestParam(value = "appId") Long appId,
-            @RequestParam(value = "time[]") String[] time, @RequestParam(value = "period") Long period) {
-        Assert.notNull(appId, "ApplicationId must not be null while retrieving cpuload trend data");
-        Assert.notEmpty(time, "Time ranges must not be null while retrieving cpuload trend data");
-        Assert.notNull(period, "Period must be provided while retrieving cpuload trend data");
-        Assert.state(period % 60 == 0, "Period must be 60 or the times of 60.");
-        Assert.state(time.length == 1, "Only One TimeRange required.");
+                                    @RequestParam(value = "time[]") String[] time, @RequestParam(value = "period") Long period) {
+        validApplicationId(appId, RETRIEVE_APP_CPULOAD_TREND);
+        validSingleTimeRanges(time, RETRIEVE_APP_CPULOAD_TREND);
+        validPeriod(period, RETRIEVE_APP_CPULOAD_TREND);
 
         TimeRange timeRange = TimeUtils.convertToRange(time[0]);
 
-        CommonMetricValue[] metricValue = new CommonMetricValue[] {AVG, MAX, MIN};
-        CpuLoadMetricName[] metricNames = new CpuLoadMetricName[] {JVM, SYSTEM};
+        CpuLoadMetricName[] metricNames = new CpuLoadMetricName[]{JVM, SYSTEM};
 
         Iterable<ApplicationServerStatistic> appServerStatistics =
                 serverStatisticService.getAppServerStatistics(appId, period, timeRange);
 
         List<Long> metricDataIds = getMetricDataIds(appServerStatistics, metricNames);
 
-        ServerTrendContext context = new ServerTrendContext(timeRange, period * 1000);
+        ServerTrendContext<ApplicationServerStatistic> context = buildTrendContext(timeRange, period * 1000);
         context.setMetricNames(metricNames);
-        context.setMetricValue(metricValue);
         context.setMetricDatas(serverStatisticService.getMetricData(metricDataIds));
         context.setServerStatistics(appServerStatistics);
 
@@ -170,28 +187,24 @@ public class JvmController {
 
     @RequestMapping(value = {"instance/heap"})
     public TrendResponse getInstanceHeapMemory(@RequestParam(value = "appId") Long appId,
-            @RequestParam(value = "instanceId") Long instanceId, @RequestParam(value = "time[]") String[] time,
-            @RequestParam(value = "period") Long period) {
-        Assert.notNull(appId, "ApplicationId must not be null while retrieving heap trend data");
-        Assert.notNull(instanceId, "InstanceId must not be null while retrieving cpuload trend data");
-        Assert.notEmpty(time, "Time ranges must not be null while retrieving heap trend data");
-        Assert.notNull(period, "Period must be provided while retrieving heap trend data");
-        Assert.state(period % 60 == 0, "Period must be 60 or the times of 60.");
-        Assert.state(time.length == 1, "Only One TimeRange required.");
+                                               @RequestParam(value = "instanceId") Long instanceId,
+                                               @RequestParam(value = "time[]") String[] time,
+                                               @RequestParam(value = "period") Long period) {
+        validInstanceId(appId, RETRIEVE_INSTANCE_HEAP_TREND);
+        validSingleTimeRanges(time, RETRIEVE_INSTANCE_HEAP_TREND);
+        validPeriod(period, RETRIEVE_INSTANCE_HEAP_TREND);
 
         TimeRange timeRange = TimeUtils.convertToRange(time[0]);
 
-        CommonMetricValue[] metricValue = new CommonMetricValue[] {AVG, MAX, MIN};
-        JVMMetricName[] metricNames = new JVMMetricName[] {HEAP_USED, HEAP_MAX};
+        final JVMMetricName[] metricNames = new JVMMetricName[]{HEAP_USED, HEAP_MAX};
 
         Iterable<InstanceServerStatistic> instanceServerStatistics =
                 serverStatisticService.getInstanceServerStatistics(instanceId, period, timeRange);
 
         List<Long> metricDataIds = getMetricDataIds(instanceServerStatistics, metricNames);
 
-        ServerTrendContext context = new ServerTrendContext(timeRange, period * 1000);
+        ServerTrendContext<InstanceServerStatistic> context = buildTrendContext(timeRange, period * 1000);
         context.setMetricNames(metricNames);
-        context.setMetricValue(metricValue);
         context.setMetricDatas(serverStatisticService.getMetricData(metricDataIds));
         context.setServerStatistics(instanceServerStatistics);
 
@@ -200,28 +213,23 @@ public class JvmController {
 
     @RequestMapping(value = {"instance/non-heap"})
     public TrendResponse getInstanceNonHeapMemory(@RequestParam(value = "appId") Long appId,
-            @RequestParam(value = "instanceId") Long instanceId, @RequestParam(value = "time[]") String[] time,
-            @RequestParam(value = "period") Long period) {
-        Assert.notNull(appId, "ApplicationId must not be null while retrieving non-heap trend data");
-        Assert.notNull(instanceId, "InstanceId must not be null while retrieving cpuload trend data");
-        Assert.notEmpty(time, "Time ranges must not be null while retrieving non-heap trend data");
-        Assert.notNull(period, "Period must be provided while retrieving non-heap trend data");
-        Assert.state(period % 60 == 0, "Period must be 60 or the times of 60.");
-        Assert.state(time.length == 1, "Only One TimeRange required.");
+                                                  @RequestParam(value = "instanceId") Long instanceId,
+                                                  @RequestParam(value = "time[]") String[] time,
+                                                  @RequestParam(value = "period") Long period) {
+        validInstanceId(appId, RETRIEVE_INSTANCE_NON_HEAP_TREND);
+        validSingleTimeRanges(time, RETRIEVE_INSTANCE_NON_HEAP_TREND);
+        validPeriod(period, RETRIEVE_INSTANCE_NON_HEAP_TREND);
 
         TimeRange timeRange = TimeUtils.convertToRange(time[0]);
 
-        CommonMetricValue[] metricValue = new CommonMetricValue[] {AVG, MAX, MIN};
-        JVMMetricName[] metricNames = new JVMMetricName[] {NON_HEAP_USED, NON_HEAP_MAX};
+        JVMMetricName[] metricNames = new JVMMetricName[]{NON_HEAP_USED, NON_HEAP_MAX};
 
         Iterable<InstanceServerStatistic> instanceServerStatistics =
                 serverStatisticService.getInstanceServerStatistics(instanceId, period, timeRange);
 
         List<Long> metricDataIds = getMetricDataIds(instanceServerStatistics, metricNames);
-
-        ServerTrendContext context = new ServerTrendContext(timeRange, period * 1000);
+        ServerTrendContext<InstanceServerStatistic> context = buildTrendContext(timeRange, period * 1000);
         context.setMetricNames(metricNames);
-        context.setMetricValue(metricValue);
         context.setMetricDatas(serverStatisticService.getMetricData(metricDataIds));
         context.setServerStatistics(instanceServerStatistics);
         return context.toResponse();
@@ -229,26 +237,24 @@ public class JvmController {
 
     @RequestMapping(value = {"instance/garbage"})
     public TrendResponse getInstanceGarbageCollection(@RequestParam(value = "appId") Long appId,
-            @RequestParam(value = "instanceId") Long instanceId, @RequestParam(value = "time[]") String[] time,
-            @RequestParam(value = "period") Long period) {
-        Assert.notNull(appId, "ApplicationId must not be null while retrieving garbage trend data");
-        Assert.notNull(instanceId, "InstanceId must not be null while retrieving cpuload trend data");
-        Assert.notEmpty(time, "Time ranges must not be null while retrieving garbage trend data");
-        Assert.notNull(period, "Period must be provided while retrieving garbage trend data");
-        Assert.state(period % 60 == 0, "Period must be 60 or the times of 60.");
-        Assert.state(time.length == 1, "Only One TimeRange required.");
+                                                      @RequestParam(value = "instanceId") Long instanceId,
+                                                      @RequestParam(value = "time[]") String[] time,
+                                                      @RequestParam(value = "period") Long period) {
+        validInstanceId(appId, RETRIEVE_INSTANCE_GARBAGE_TREND);
+        validSingleTimeRanges(time, RETRIEVE_INSTANCE_GARBAGE_TREND);
+        validPeriod(period, RETRIEVE_INSTANCE_GARBAGE_TREND);
 
         TimeRange timeRange = TimeUtils.convertToRange(time[0]);
 
-        CommonMetricValue[] metricValue = new CommonMetricValue[] {AVG};
-        GarbageMetricName[] metricNames = new GarbageMetricName[] {COUNT, TIME};
+        CommonMetricValue[] metricValue = new CommonMetricValue[]{AVG};
+        GarbageMetricName[] metricNames = new GarbageMetricName[]{COUNT, TIME};
 
         Iterable<InstanceServerStatistic> instanceServerStatistics =
                 serverStatisticService.getInstanceServerStatistics(instanceId, period, timeRange);
 
         List<Long> metricDataIds = getMetricDataIds(instanceServerStatistics, metricNames);
 
-        ServerTrendContext context = new ServerTrendContext(timeRange, period * 1000);
+        ServerTrendContext<InstanceServerStatistic> context = buildTrendContext(timeRange, period * 1000);
         context.setMetricNames(metricNames);
         context.setMetricValue(metricValue);
         context.setMetricDatas(serverStatisticService.getMetricData(metricDataIds));
@@ -258,28 +264,24 @@ public class JvmController {
 
     @RequestMapping(value = {"instance/cpuload"})
     public TrendResponse getInstanceCpuLoad(@RequestParam(value = "appId") Long appId,
-            @RequestParam(value = "instanceId") Long instanceId, @RequestParam(value = "time[]") String[] time,
-            @RequestParam(value = "period") Long period) {
-        Assert.notNull(appId, "ApplicationId must not be null while retrieving cpuload trend data");
-        Assert.notNull(instanceId, "InstanceId must not be null while retrieving cpuload trend data");
-        Assert.notEmpty(time, "Time ranges must not be null while retrieving cpuload trend data");
-        Assert.notNull(period, "Period must be provided while retrieving cpuload trend data");
-        Assert.state(period % 60 == 0, "Period must be 60 or the times of 60.");
-        Assert.state(time.length == 1, "Only One TimeRange required.");
+                                            @RequestParam(value = "instanceId") Long instanceId,
+                                            @RequestParam(value = "time[]") String[] time,
+                                            @RequestParam(value = "period") Long period) {
+        validInstanceId(appId, RETRIEVE_INSTANCE_CPULOAD_TREND);
+        validSingleTimeRanges(time, RETRIEVE_INSTANCE_CPULOAD_TREND);
+        validPeriod(period, RETRIEVE_INSTANCE_CPULOAD_TREND);
 
         TimeRange timeRange = TimeUtils.convertToRange(time[0]);
 
-        CommonMetricValue[] metricValue = new CommonMetricValue[] {AVG, MAX, MIN};
-        CpuLoadMetricName[] metricNames = new CpuLoadMetricName[] {JVM, SYSTEM};
+        CpuLoadMetricName[] metricNames = new CpuLoadMetricName[]{JVM, SYSTEM};
 
         Iterable<InstanceServerStatistic> instanceServerStatistics =
                 serverStatisticService.getInstanceServerStatistics(instanceId, period, timeRange);
 
         List<Long> metricDataIds = getMetricDataIds(instanceServerStatistics, metricNames);
 
-        ServerTrendContext context = new ServerTrendContext(timeRange, period * 1000);
+        ServerTrendContext<InstanceServerStatistic> context = buildTrendContext(timeRange, period * 1000);
         context.setMetricNames(metricNames);
-        context.setMetricValue(metricValue);
         context.setMetricDatas(serverStatisticService.getMetricData(metricDataIds));
         context.setServerStatistics(instanceServerStatistics);
 
@@ -287,7 +289,7 @@ public class JvmController {
     }
 
     private <T extends ServerStatistic> List<Long> getMetricDataIds(Iterable<T> serverStatistics,
-            MetricName metricName) {
+                                                                    MetricName metricName) {
         if (metricName instanceof JVMMetricName) {
             JVMMetricName jvmMetricName = (JVMMetricName) metricName;
 
@@ -355,7 +357,7 @@ public class JvmController {
     }
 
     private <T extends ServerStatistic> List<Long> getMetricDataIds(Iterable<T> serverStatistics,
-            MetricName[] metricName) {
+                                                                    MetricName[] metricName) {
         List<Long> ids = new ArrayList<>();
         for (MetricName name : metricName) {
             ids.addAll(getMetricDataIds(serverStatistics, name));

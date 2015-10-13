@@ -102,14 +102,7 @@ public abstract class QueryUtils {
 
         // appNames
         Map<Long, String> instanceIdNameMap =
-                page.getContent().stream().collect(Collectors.toMap(Instance::getId, instance -> {
-                    StringBuilder builder = new StringBuilder();
-                    builder.append(instance.getHost());
-                    if (instance.getPort() != null) {
-                        builder.append(":").append(instance.getPort());
-                    }
-                    return builder.toString();
-                }));
+                page.getContent().stream().collect(Collectors.toMap(Instance::getId, NameUtils::buildInstanceName));
 
         // Group by instanceId
         Map<Long, List<InstanceStatistic>> appMappedStatistic =

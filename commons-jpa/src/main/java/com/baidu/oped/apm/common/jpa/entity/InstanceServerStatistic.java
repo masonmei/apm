@@ -1,5 +1,7 @@
 package com.baidu.oped.apm.common.jpa.entity;
 
+import com.google.common.base.MoreObjects;
+
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -28,5 +30,13 @@ public class InstanceServerStatistic extends AbstractServerStatistic {
 
     public void setInstanceId(Long instanceId) {
         this.instanceId = instanceId;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("instanceId", instanceId)
+                .add("parent", super.toString())
+                .toString();
     }
 }

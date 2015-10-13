@@ -6,15 +6,15 @@ package com.baidu.oped.apm.common.utils;
 public abstract class ApdexUtils {
     public static Double calculateApdex(Long satisfied, Long tolerated, Long frustrated) {
         if(satisfied == null) {
-            satisfied = 0l;
+            satisfied = 0L;
         }
 
         if(tolerated == null){
-            tolerated = 0l;
+            tolerated = 0L;
         }
 
         if(frustrated == null){
-            frustrated = 0l;
+            frustrated = 0L;
         }
 
         long sat = 2 * satisfied + tolerated;

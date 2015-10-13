@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.Index;
 import javax.persistence.Table;
 
+import com.google.common.base.MoreObjects;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
 /**
@@ -51,5 +52,14 @@ public class StringMetaData extends AbstractPersistable<Long> implements Clearab
 
     public void setStringValue(String stringValue) {
         this.stringValue = stringValue;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("agentId", agentId)
+                .add("stringId", stringId)
+                .add("stringValue", stringValue)
+                .toString();
     }
 }

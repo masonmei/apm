@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.Lob;
 import javax.persistence.Table;
 
+import com.google.common.base.MoreObjects;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
 /**
@@ -75,5 +76,16 @@ public class Annotation extends AbstractPersistable<Long> {
 
     public void setTraceEventId(Long traceEventId) {
         this.traceEventId = traceEventId;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("byteValue", byteValue)
+                .add("key", key)
+                .add("valueType", valueType)
+                .add("traceId", traceId)
+                .add("traceEventId", traceEventId)
+                .toString();
     }
 }

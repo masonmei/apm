@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.Index;
 import javax.persistence.Table;
 
+import com.google.common.base.MoreObjects;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
 /**
@@ -51,5 +52,14 @@ public class WebTransaction extends AbstractPersistable<Long> {
 
     public void setRpc(String rpc) {
         this.rpc = rpc;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("appId", appId)
+                .add("instanceId", instanceId)
+                .add("rpc", rpc)
+                .toString();
     }
 }

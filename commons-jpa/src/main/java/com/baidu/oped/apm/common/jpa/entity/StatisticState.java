@@ -8,6 +8,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.Index;
 import javax.persistence.Table;
 
+import com.google.common.base.MoreObjects;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
 /**
@@ -54,5 +55,14 @@ public class StatisticState extends AbstractPersistable<Long> {
 
     public void setTimestamp(Long timestamp) {
         this.timestamp = timestamp;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("statisticType", statisticType)
+                .add("period", period)
+                .add("timestamp", timestamp)
+                .toString();
     }
 }

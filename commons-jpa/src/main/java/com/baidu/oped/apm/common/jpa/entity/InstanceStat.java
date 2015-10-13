@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.Index;
 import javax.persistence.Table;
 
+import com.google.common.base.MoreObjects;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
 /**
@@ -139,5 +140,22 @@ public class InstanceStat extends AbstractPersistable<Long> implements Clearable
 
     public void setJvmMemoryNonHeapUsed(long jvmMemoryNonHeapUsed) {
         this.jvmMemoryNonHeapUsed = jvmMemoryNonHeapUsed;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("agentId", agentId)
+                .add("timestamp", timestamp)
+                .add("jvmCpuLoad", jvmCpuLoad)
+                .add("systemCpuLoad", systemCpuLoad)
+                .add("gcType", gcType)
+                .add("jvmGcOldCount", jvmGcOldCount)
+                .add("jvmGcOldTime", jvmGcOldTime)
+                .add("jvmMemoryHeapMax", jvmMemoryHeapMax)
+                .add("jvmMemoryHeapUsed", jvmMemoryHeapUsed)
+                .add("jvmMemoryNonHeapMax", jvmMemoryNonHeapMax)
+                .add("jvmMemoryNonHeapUsed", jvmMemoryNonHeapUsed)
+                .toString();
     }
 }

@@ -5,6 +5,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+import com.google.common.base.MoreObjects;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
 import com.baidu.oped.apm.common.utils.NumberUtils;
@@ -72,5 +73,15 @@ public class MetricData extends AbstractPersistable<Long> implements Metric {
     @Override
     public void setMin(Double min) {
         this.min = min;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("count", count)
+                .add("sum", sum)
+                .add("max", max)
+                .add("min", min)
+                .toString();
     }
 }

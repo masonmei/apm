@@ -8,6 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.Index;
 import javax.persistence.Table;
 
+import com.google.common.base.MoreObjects;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
 /**
@@ -65,5 +66,15 @@ public class ExternalService extends AbstractPersistable<Long> implements Serial
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("appId", appId)
+                .add("instanceId", instanceId)
+                .add("destinationId", destinationId)
+                .add("url", url)
+                .toString();
     }
 }

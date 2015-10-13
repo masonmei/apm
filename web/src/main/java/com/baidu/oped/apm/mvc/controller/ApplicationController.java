@@ -57,7 +57,7 @@ public class ApplicationController {
             @RequestParam(value = "pageNumber", required = false, defaultValue = Constraints.PAGE_NUMBER)
             int pageNumber) {
 
-        final long period = 60l;
+        final long period = 60L;
         TimeRange timeRange = TimeUtils.createTimeRange(from, to);
         Page<Application> apps =
                 applicationService.selectApplications(Constraints.DEFAULT_USER, orderBy, pageSize, pageNumber);
@@ -90,7 +90,8 @@ public class ApplicationController {
             @RequestParam(value = "pageSize", required = false, defaultValue = Constraints.PAGE_SIZE) int pageSize,
             @RequestParam(value = "pageNumber", required = false, defaultValue = Constraints.PAGE_NUMBER)
             int pageNumber) {
-        final Long period = 60l;
+
+        final Long period = 60L;
 
         TimeRange timeRange = TimeUtils.createTimeRange(from, to);
         Page<Instance> instances = applicationService.selectInstances(appId, orderBy, pageSize, pageNumber);

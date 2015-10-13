@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.Index;
 import javax.persistence.Table;
 
+import com.google.common.base.MoreObjects;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
 /**
@@ -158,5 +159,22 @@ public class WebTransactionStatistic extends AbstractPersistable<Long> implement
 
     public void setMinResponseTime(Double minResponseTime) {
         this.minResponseTime = minResponseTime;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("transactionId", transactionId)
+                .add("period", period)
+                .add("timestamp", timestamp)
+                .add("sumResponseTime", sumResponseTime)
+                .add("pv", pv)
+                .add("error", error)
+                .add("satisfied", satisfied)
+                .add("tolerated", tolerated)
+                .add("frustrated", frustrated)
+                .add("maxResponseTime", maxResponseTime)
+                .add("minResponseTime", minResponseTime)
+                .toString();
     }
 }

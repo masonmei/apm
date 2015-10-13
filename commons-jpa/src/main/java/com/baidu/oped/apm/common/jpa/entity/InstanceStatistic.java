@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.Index;
 import javax.persistence.Table;
 
+import com.google.common.base.MoreObjects;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
 /**
@@ -171,5 +172,24 @@ public class InstanceStatistic extends AbstractPersistable<Long> implements Comm
 
     public void setMemoryUsage(Double memoryUsage) {
         this.memoryUsage = memoryUsage;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("instanceId", instanceId)
+                .add("period", period)
+                .add("timestamp", timestamp)
+                .add("sumResponseTime", sumResponseTime)
+                .add("maxResponseTime", maxResponseTime)
+                .add("minResponseTime", minResponseTime)
+                .add("pv", pv)
+                .add("error", error)
+                .add("satisfied", satisfied)
+                .add("tolerated", tolerated)
+                .add("frustrated", frustrated)
+                .add("cpuUsage", cpuUsage)
+                .add("memoryUsage", memoryUsage)
+                .toString();
     }
 }

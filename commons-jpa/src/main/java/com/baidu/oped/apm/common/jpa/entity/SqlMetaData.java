@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.Index;
 import javax.persistence.Table;
 
+import com.google.common.base.MoreObjects;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
 /**
@@ -56,4 +57,12 @@ public class SqlMetaData extends AbstractPersistable<Long> implements ClearableA
         this.sql = sql;
     }
 
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("agentId", agentId)
+                .add("sqlId", sqlId)
+                .add("sql", sql)
+                .toString();
+    }
 }

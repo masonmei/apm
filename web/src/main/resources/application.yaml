@@ -5,8 +5,8 @@ spring:
   application:
     name: web
   datasource:
-#    url: jdbc:mysql://180.76.135.145:3306/apm?autoReconnect=true&useUnicode=true&characterEncoding=utf-8
-    url: jdbc:mysql://masonmxdb:3306/apm?autoReconnect=true&useUnicode=true&characterEncoding=utf-8
+    url: jdbc:mysql://180.76.136.21:3306/apm?autoReconnect=true&useUnicode=true&characterEncoding=utf-8
+#    url: jdbc:mysql://masonmxdb:3306/apm?autoReconnect=true&useUnicode=true&characterEncoding=utf-8
     username: apm
     password: apm
     driverClassName: com.mysql.jdbc.Driver
@@ -29,20 +29,10 @@ spring:
 logging:
   path: log
   file: web-mx.log
-  conf: logback.xml
+  config: logback.xml
   level:
     org.springframework.boot: INFO
     org.springframework: INFO
     com.baidu.oped: DEBUG
 
-hbase:
-  clientHost: 127.0.0.1
-  clientPort: 2181
-  clientTcpNodelay: true
-  rpcTimeout: 10000
-  operationTimeout: 10000
-  socketReadTimeout: 20000
-  socketWriteTimeout: 60000
-  maxThreadSize: 128
-  poolQueueSize: 5120
-  prestartPool: false
+

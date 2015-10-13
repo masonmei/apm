@@ -26,8 +26,7 @@ public abstract class NumberUtils {
             return null;
         }
 
-        StringBuilder formatBuilder = new StringBuilder("#.0000");
-        DecimalFormat doubleFormat = new DecimalFormat(formatBuilder.toString());
+        DecimalFormat doubleFormat = new DecimalFormat("#.0000");
         return Double.valueOf(doubleFormat.format(original));
     }
 
@@ -36,8 +35,7 @@ public abstract class NumberUtils {
             return null;
         }
 
-        StringBuilder formatBuilder = new StringBuilder("#.0000");
-        DecimalFormat doubleFormat = new DecimalFormat(formatBuilder.toString());
+        DecimalFormat doubleFormat = new DecimalFormat("#.0000");
         return Double.valueOf(doubleFormat.format(original));
     }
 

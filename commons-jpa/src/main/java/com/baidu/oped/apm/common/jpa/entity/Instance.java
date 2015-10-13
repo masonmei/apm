@@ -5,6 +5,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+import com.google.common.base.MoreObjects;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
 /**
@@ -111,4 +112,17 @@ public class Instance extends AbstractPersistable<Long> {
         this.args = args;
     }
 
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("args", args)
+                .add("appId", appId)
+                .add("port", port)
+                .add("host", host)
+                .add("ip", ip)
+                .add("pid", pid)
+                .add("startTime", startTime)
+                .add("instanceType", instanceType)
+                .toString();
+    }
 }
