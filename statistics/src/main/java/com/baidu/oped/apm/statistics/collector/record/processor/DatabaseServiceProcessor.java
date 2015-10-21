@@ -14,6 +14,7 @@ import com.baidu.oped.apm.common.AnnotationKey;
 import com.baidu.oped.apm.common.bo.IntStringStringValue;
 import com.baidu.oped.apm.common.jpa.entity.AgentInstanceMap;
 import com.baidu.oped.apm.common.jpa.entity.Annotation;
+import com.baidu.oped.apm.common.jpa.entity.DatabaseType;
 import com.baidu.oped.apm.common.jpa.entity.QAnnotation;
 import com.baidu.oped.apm.common.jpa.entity.QSqlMetaData;
 import com.baidu.oped.apm.common.jpa.entity.QSqlTransaction;
@@ -24,7 +25,8 @@ import com.baidu.oped.apm.common.jpa.entity.TraceEvent;
 import com.baidu.oped.apm.common.jpa.repository.AnnotationRepository;
 import com.baidu.oped.apm.common.jpa.repository.SqlMetaDataRepository;
 import com.baidu.oped.apm.common.jpa.repository.SqlTransactionRepository;
-import com.baidu.oped.apm.common.util.AnnotationTranscoder;
+import com.baidu.oped.apm.statistics.utils.sql.SqlStatement;
+import com.baidu.oped.apm.statistics.utils.sql.SqlUtils;
 import com.mysema.query.types.expr.BooleanExpression;
 
 /**
@@ -72,6 +74,8 @@ public class DatabaseServiceProcessor extends BaseTraceEventProcessor<SqlTransac
             sqlTransaction.setInstanceId(eventGroup.getInstanceId());
             sqlTransaction.setEndPoint(eventGroup.getEndPoint());
             sqlTransaction.setSql(eventGroup.getSql());
+            sqlTransaction.setDatabaseType(DatabaseType.DATABASE);
+            processCategoryInfo(sqlTransaction);
 
             try {
                 one = sqlTransactionRepository.save(sqlTransaction);
@@ -82,6 +86,13 @@ public class DatabaseServiceProcessor extends BaseTraceEventProcessor<SqlTransac
         SqlTransactionStatistic webTransactionStatistic = new SqlTransactionStatistic();
         webTransactionStatistic.setSqlTransactionId(one.getId());
         return webTransactionStatistic;
+    }
+
+    private void processCategoryInfo(final SqlTransaction sqlTransaction) {
+        String sql = sqlTransaction.getSql();
+        SqlStatement parse = SqlUtils.parse(sql);
+        sqlTransaction.setStatementType(parse.getStatementType());
+        sqlTransaction.setTableName(parse.getTableNamesInString());
     }
 
     @Override

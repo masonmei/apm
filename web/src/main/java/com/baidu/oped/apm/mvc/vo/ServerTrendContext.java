@@ -123,7 +123,7 @@ public class ServerTrendContext<T extends ServerStatistic> {
                     metricDataId = serverStatistic.getNonHeapUsedMetric();
                     break;
                 case NON_HEAP_MAX:
-                    metricDataId = serverStatistic.getNonHeapUsedMetric();
+                    metricDataId = serverStatistic.getNonHeapMaxMetric();
                     break;
                 case NON_HEAP_COMMITTED:
                     throw new UnsupportedOperationException("Not supported yet!");

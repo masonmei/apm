@@ -118,8 +118,8 @@ public abstract class BaseController {
      * @param usage     the purpose of the validation
      */
     public void validPageInfo(Integer pageCount, Integer pageSize, String usage) {
-        Assert.isNull(pageCount, format("Page Count must not be null while %s", usage));
-        Assert.state(pageCount > 0, format("Page Count must be from 1 while %s", usage));
+        Assert.notNull(pageCount, format("Page Count must not be null while %s", usage));
+        Assert.state(pageCount >= 0, format("Page Count must be from 0 while %s", usage));
         Assert.notNull(pageSize, format("Page Size must not be null while %s", usage));
         Assert.state(pageSize > 0, format("Page Size must be positive while %s", usage));
     }

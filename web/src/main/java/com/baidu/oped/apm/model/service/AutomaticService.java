@@ -2,7 +2,6 @@ package com.baidu.oped.apm.model.service;
 
 import com.baidu.oped.apm.common.jpa.entity.*;
 import com.baidu.oped.apm.common.jpa.repository.*;
-import com.baidu.oped.apm.mvc.vo.CallStackContext;
 import com.baidu.oped.apm.mvc.vo.TimeRange;
 import com.baidu.oped.apm.mvc.vo.TrendContext;
 import com.baidu.oped.apm.utils.PageUtils;
@@ -14,7 +13,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -550,70 +552,70 @@ public class AutomaticService {
         return agentInstanceMapRepository.findOne(id);
     }
 
-    /**
-     * Build the call stack context of the given traceId
-     *
-     * @param traceId trace id
-     * @return Call stack context.
-     */
-    public CallStackContext getCallStackContext(Long traceId) {
-        final CallStackContext context = new CallStackContext();
-
-        // set root trace
-        Trace trace = traceRepository.findOne(traceId);
-        Assert.notNull(trace, "Invalid traceId for retrieving call stack.");
-        context.setRootTrace(trace);
-
-        // Set Application and Instance
-        AgentInstanceMap agentInstanceMap = getAgentInstanceMapWithId(trace.getAgentId());
-        context.setApplication(getApplication(agentInstanceMap.getAppId()));
-        context.setInstance(getInstance(agentInstanceMap.getInstanceId()));
-
-
-        // Set Traces
-        QTrace qTrace = QTrace.trace;
-        BooleanExpression agentIdCondition = qTrace.traceAgentId.eq(trace.getTraceAgentId());
-        BooleanExpression agentStartTimeCondition = qTrace.traceAgentStartTime.eq(trace.getTraceAgentStartTime());
-        BooleanExpression tranSeqCondition = qTrace.traceTransactionSequence.eq(trace.getTraceTransactionSequence());
-        BooleanExpression whereCondition = agentIdCondition.and(agentStartTimeCondition).and(tranSeqCondition);
-        Iterable<Trace> traces = traceRepository.findAll(whereCondition);
-        context.setTraces(traces);
-
-        // Set TraceEvents
-        QTraceEvent qTraceEvent = QTraceEvent.traceEvent;
-        agentIdCondition = qTraceEvent.traceAgentId.eq(trace.getTraceAgentId());
-        agentStartTimeCondition = qTraceEvent.traceAgentStartTime.eq(trace.getTraceAgentStartTime());
-        tranSeqCondition = qTraceEvent.traceTransactionSequence.eq(trace.getTraceTransactionSequence());
-        whereCondition = agentIdCondition.and(agentStartTimeCondition).and(tranSeqCondition);
-        Iterable<TraceEvent> traceEvents = traceEventRepository.findAll(whereCondition);
-        context.setTraceEvents(traceEvents);
-
-        // Set Annotations
-        List<Long> traceIds = StreamSupport.stream(traces.spliterator(), false)
-                .map(Trace::getId)
-                .collect(Collectors.toList());
-        List<Long> traceEventIds = StreamSupport.stream(traceEvents.spliterator(), false)
-                .map(TraceEvent::getId)
-                .collect(Collectors.toList());
-        QAnnotation qAnnotation = QAnnotation.annotation;
-        BooleanExpression traceEventIdCondition = qAnnotation.traceEventId.in(traceEventIds);
-        BooleanExpression traceIdCondition = qAnnotation.traceId.in(traceIds);
-        whereCondition = traceEventIdCondition.or(traceIdCondition);
-        Iterable<Annotation> annotations = annotationRepository.findAll(whereCondition);
-        context.setAnnotations(annotations);
-
-        // Set ApiMetaDatas
-        Set<Long> apiIds = new HashSet<>();
-        traces.forEach(trace1 -> apiIds.add(trace1.getApiId()));
-        traceEvents.forEach(traceEvent -> apiIds.add(traceEvent.getApiId()));
-        QApiMetaData qApiMetaData = QApiMetaData.apiMetaData;
-        BooleanExpression idCondition = qApiMetaData.id.in(apiIds);
-        Iterable<ApiMetaData> apiMetaDatas = apiMetaDataRepository.findAll(idCondition);
-        context.setApiMetaDatas(apiMetaDatas);
-
-        //TODO：add
-
-        return context;
-    }
+//    /**
+//     * Build the call stack context of the given traceId
+//     *
+//     * @param traceId trace id
+//     * @return Call stack context.
+//     */
+//    public CallStackContext getCallStackContext(Long traceId) {
+//        final CallStackContext context = new CallStackContext();
+//
+//        // set root trace
+//        Trace trace = traceRepository.findOne(traceId);
+//        Assert.notNull(trace, "Invalid traceId for retrieving call stack.");
+//        context.setRootTrace(trace);
+//
+//        // Set Application and Instance
+//        AgentInstanceMap agentInstanceMap = getAgentInstanceMapWithId(trace.getAgentId());
+//        context.setApplication(getApplication(agentInstanceMap.getAppId()));
+//        context.setInstance(getInstance(agentInstanceMap.getInstanceId()));
+//
+//
+//        // Set Traces
+//        QTrace qTrace = QTrace.trace;
+//        BooleanExpression agentIdCondition = qTrace.traceAgentId.eq(trace.getTraceAgentId());
+//        BooleanExpression agentStartTimeCondition = qTrace.traceAgentStartTime.eq(trace.getTraceAgentStartTime());
+//        BooleanExpression tranSeqCondition = qTrace.traceTransactionSequence.eq(trace.getTraceTransactionSequence());
+//        BooleanExpression whereCondition = agentIdCondition.and(agentStartTimeCondition).and(tranSeqCondition);
+//        Iterable<Trace> traces = traceRepository.findAll(whereCondition);
+//        context.setTraces(traces);
+//
+//        // Set TraceEvents
+//        QTraceEvent qTraceEvent = QTraceEvent.traceEvent;
+//        agentIdCondition = qTraceEvent.traceAgentId.eq(trace.getTraceAgentId());
+//        agentStartTimeCondition = qTraceEvent.traceAgentStartTime.eq(trace.getTraceAgentStartTime());
+//        tranSeqCondition = qTraceEvent.traceTransactionSequence.eq(trace.getTraceTransactionSequence());
+//        whereCondition = agentIdCondition.and(agentStartTimeCondition).and(tranSeqCondition);
+//        Iterable<TraceEvent> traceEvents = traceEventRepository.findAll(whereCondition);
+//        context.setTraceEvents(traceEvents);
+//
+//        // Set Annotations
+//        List<Long> traceIds = StreamSupport.stream(traces.spliterator(), false)
+//                .map(Trace::getId)
+//                .collect(Collectors.toList());
+//        List<Long> traceEventIds = StreamSupport.stream(traceEvents.spliterator(), false)
+//                .map(TraceEvent::getId)
+//                .collect(Collectors.toList());
+//        QAnnotation qAnnotation = QAnnotation.annotation;
+//        BooleanExpression traceEventIdCondition = qAnnotation.traceEventId.in(traceEventIds);
+//        BooleanExpression traceIdCondition = qAnnotation.traceId.in(traceIds);
+//        whereCondition = traceEventIdCondition.or(traceIdCondition);
+//        Iterable<Annotation> annotations = annotationRepository.findAll(whereCondition);
+//        context.setAnnotations(annotations);
+//
+//        // Set ApiMetaDatas
+//        Set<Long> apiIds = new HashSet<>();
+//        traces.forEach(trace1 -> apiIds.add(trace1.getApiId()));
+//        traceEvents.forEach(traceEvent -> apiIds.add(traceEvent.getApiId()));
+//        QApiMetaData qApiMetaData = QApiMetaData.apiMetaData;
+//        BooleanExpression idCondition = qApiMetaData.id.in(apiIds);
+//        Iterable<ApiMetaData> apiMetaDatas = apiMetaDataRepository.findAll(idCondition);
+//        context.setApiMetaDatas(apiMetaDatas);
+//
+//        //TODO：add
+//
+//        return context;
+//    }
 
 }

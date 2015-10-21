@@ -30,7 +30,7 @@ import com.baidu.oped.apm.utils.TimeUtils;
  */
 @RestController
 @RequestMapping("applications")
-public class ApplicationController {
+public class ApplicationController extends BaseController {
 
     @Autowired
     private ApplicationService applicationService;

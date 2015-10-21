@@ -17,7 +17,7 @@ import com.baidu.oped.apm.mvc.vo.TimeRange;
  * Created by mason on 8/27/15.
  */
 public abstract class TimeUtils {
-    private static final String TIME_RANGE_ELEMENT_SPLITER = "\\|";
+    private static final String TIME_RANGE_ELEMENT_SPLITTER = "\\|";
 
     public static List<TimeRange> convertToRange(String... stringRanges) {
         List<TimeRange> timeRanges = new ArrayList<>();
@@ -31,7 +31,7 @@ public abstract class TimeUtils {
     public static TimeRange convertToRange(String stringRange) {
         Assert.hasLength(stringRange, "Cannot convert empty string to timeRange");
 
-        String[] pair = stringRange.split(TIME_RANGE_ELEMENT_SPLITER);
+        String[] pair = stringRange.split(TIME_RANGE_ELEMENT_SPLITTER);
 
         if (pair.length != 2) {
             throw new IllegalArgumentException("invalid time range arguments");

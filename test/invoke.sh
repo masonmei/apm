@@ -4,6 +4,8 @@ while true;
 do
   wget -q http://localhost:38080/city/sync
   sleep 2
+  wget -q http://localhost:38080/city/update?cityName=Bejing123
+  sleep 2
   wget -q http://localhost:38081/index.html
   sleep 2
   wget -q http://localhost:38081/callSelf/getCurrentTimestamp.pinpoint
@@ -15,6 +17,7 @@ do
   wget -q http://localhost:38081/getCurrentTimestamp.pinpoint
   sleep 2
   rm -f sync*
+  rm -f update*
   rm -f index.*
   rm -f *.pinpoint*
 done

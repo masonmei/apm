@@ -95,7 +95,7 @@ public abstract class WebTransactionUtils {
             result.add(transaction);
         });
 
-        return result.stream().sorted(Comparator.comparing(TransactionVo::getResponseTime)).limit(limit)
+        return result.stream().sorted(Comparator.comparing(TransactionVo::getResponseTime).reversed()).limit(limit)
                 .collect(Collectors.toList());
     }
 

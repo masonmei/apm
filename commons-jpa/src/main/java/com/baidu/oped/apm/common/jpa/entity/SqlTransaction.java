@@ -3,18 +3,23 @@ package com.baidu.oped.apm.common.jpa.entity;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Index;
 import javax.persistence.Table;
 
-import com.google.common.base.MoreObjects;
 import org.springframework.data.jpa.domain.AbstractPersistable;
+
+import com.google.common.base.MoreObjects;
+import com.google.common.base.Objects;
 
 /**
  * Created by mason on 8/27/15.
  */
 @Entity
 @Table(name = "apm_sql_transaction", indexes = {
-        @Index(name = "sql_transaction_unique", columnList = "app_id,instance_id,end_point,sql_value", unique = true)})
+        @Index(name = "sql_transaction_unique", columnList = "app_id,instance_id,end_point,sql_value", unique = true),
+        @Index(name = "sql_transaction_group", columnList = "database_type,table_name,operation")})
 public class SqlTransaction extends AbstractPersistable<Long> {
 
     private static final long serialVersionUID = -1503264333172908446L;
@@ -35,16 +40,18 @@ public class SqlTransaction extends AbstractPersistable<Long> {
     private String sql;
 
     @Basic
-    @Column(name = "database_type", nullable = false, insertable = true, updatable = true, length = 64)
-    private String databaseType;
+    @Enumerated(value = EnumType.STRING)
+    @Column(name = "database_type", nullable = true, insertable = true, updatable = true, length = 64)
+    private DatabaseType databaseType;
 
     @Basic
-    @Column(name = "table_name", nullable = false, insertable = true, updatable = true, length = 128)
+    @Column(name = "table_name", nullable = true, insertable = true, updatable = true, length = 128)
     private String tableName;
 
     @Basic
-    @Column(name = "operation", nullable = false, insertable = true, updatable = true, length = 64)
-    private String operation;
+    @Column(name = "operation", nullable = true, insertable = true, updatable = true, length = 64)
+    @Enumerated(value = EnumType.STRING)
+    private StatementType statementType;
 
     public Long getAppId() {
         return appId;
@@ -78,11 +85,11 @@ public class SqlTransaction extends AbstractPersistable<Long> {
         this.sql = sql;
     }
 
-    public String getDatabaseType() {
+    public DatabaseType getDatabaseType() {
         return databaseType;
     }
 
-    public void setDatabaseType(String databaseType) {
+    public void setDatabaseType(DatabaseType databaseType) {
         this.databaseType = databaseType;
     }
 
@@ -94,12 +101,12 @@ public class SqlTransaction extends AbstractPersistable<Long> {
         this.tableName = tableName;
     }
 
-    public String getOperation() {
-        return operation;
+    public StatementType getStatementType() {
+        return statementType;
     }
 
-    public void setOperation(String operation) {
-        this.operation = operation;
+    public void setStatementType(StatementType statementType) {
+        this.statementType = statementType;
     }
 
     @Override
@@ -111,7 +118,7 @@ public class SqlTransaction extends AbstractPersistable<Long> {
                 .add("sql", sql)
                 .add("databaseType", databaseType)
                 .add("tableName", tableName)
-                .add("operation", operation)
+                .add("statementType", statementType)
                 .toString();
     }
 }

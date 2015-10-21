@@ -59,7 +59,7 @@ public abstract class TrendContextUtils {
                                         .mapToLong(WebTransactionStatistic::getPv).summaryStatistics();
                         return calculateRate(responseSummaryStatistics.getSum(), pvSummaryStatistics.getSum());
                     }
-                })).limit(limit)
+                }).reversed()).limit(limit)
                 .forEach(entry -> trendContext.addStatistics(entry.getKey(), timeRange, entry.getValue()));
         return trendContext;
     }
