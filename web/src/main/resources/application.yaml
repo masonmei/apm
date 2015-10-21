@@ -29,10 +29,7 @@ spring:
 logging:
   path: log
   file: web-mx.log
-  config: logback.xml
   level:
     org.springframework.boot: INFO
     org.springframework: INFO
     com.baidu.oped: DEBUG
-
-
