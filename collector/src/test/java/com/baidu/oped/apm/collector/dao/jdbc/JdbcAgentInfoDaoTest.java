@@ -40,7 +40,7 @@ public class JdbcAgentInfoDaoTest {
         agentInfo.setPorts("80,90");
         agentInfo.setAgentId("aaaaaaaa");
         agentInfo.setApplicationName("testApp");
-        agentInfo.setVersion("aaa");
+        agentInfo.setVmVersion("aaa");
         agentInfo.setServiceType(Short.parseShort("1"));
         agentInfo.setPid(1);
         agentInfo.setStartTimestamp(1000000000L);

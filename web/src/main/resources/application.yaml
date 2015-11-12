@@ -1,3 +1,13 @@
+management:
+  context-path: /admin
+shell:
+  ssh:
+    port: 8822
+  auth:
+    simple:
+      user:
+        name: mason
+        password: test
 server:
   port: 8888
   context-path: /api/apm
@@ -30,6 +40,6 @@ logging:
   path: log
   file: web-mx.log
   level:
-    org.springframework.boot: INFO
+    org.springframework.boot: DEBUG
     org.springframework: INFO
     com.baidu.oped: DEBUG

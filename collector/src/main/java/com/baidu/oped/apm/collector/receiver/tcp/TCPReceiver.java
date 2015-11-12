@@ -1,102 +1,120 @@
 
 package com.baidu.oped.apm.collector.receiver.tcp;
 
-import java.net.InetAddress;
-import java.net.SocketAddress;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-
-import org.apache.commons.lang3.StringUtils;
+import com.baidu.oped.apm.collector.config.MxCollectorProperties;
+import com.baidu.oped.apm.collector.config.TcpConfig;
+import com.baidu.oped.apm.collector.receiver.DispatchHandler;
+import com.baidu.oped.apm.collector.receiver.TcpDispatchHandler;
+import com.baidu.oped.apm.collector.rpc.handler.AgentEventHandler;
+import com.baidu.oped.apm.collector.rpc.handler.AgentLifeCycleHandler;
+import com.baidu.oped.apm.collector.util.PacketUtils;
+import com.baidu.oped.apm.common.util.AgentEventType;
+import com.baidu.oped.apm.common.util.AgentLifeCycleState;
+import com.baidu.oped.apm.common.util.ExecutorFactory;
+import com.baidu.oped.apm.common.util.PinpointThreadFactory;
+import com.baidu.oped.apm.rpc.PinpointSocket;
+import com.baidu.oped.apm.rpc.packet.*;
+import com.baidu.oped.apm.rpc.server.PinpointServer;
+import com.baidu.oped.apm.rpc.server.PinpointServerAcceptor;
+import com.baidu.oped.apm.rpc.server.ServerMessageListener;
+import com.baidu.oped.apm.rpc.server.handler.ServerStateChangeEventHandler;
+import com.baidu.oped.apm.rpc.util.MapUtils;
+import com.baidu.oped.apm.thrift.io.*;
+import com.baidu.oped.apm.thrift.util.SerializationUtils;
 import org.apache.thrift.TBase;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
-import com.baidu.oped.apm.collector.receiver.DispatchHandler;
-import com.baidu.oped.apm.collector.util.PacketUtils;
-import com.baidu.oped.apm.common.util.ExecutorFactory;
-import com.baidu.oped.apm.common.util.PinpointThreadFactory;
-import com.baidu.oped.apm.rpc.packet.HandshakeResponseCode;
-import com.baidu.oped.apm.rpc.packet.HandshakeResponseType;
-import com.baidu.oped.apm.rpc.packet.RequestPacket;
-import com.baidu.oped.apm.rpc.packet.SendPacket;
-import com.baidu.oped.apm.rpc.server.PinpointServerSocket;
-import com.baidu.oped.apm.rpc.server.ServerMessageListener;
-import com.baidu.oped.apm.rpc.server.SocketChannel;
-import com.baidu.oped.apm.rpc.util.MapUtils;
-import com.baidu.oped.apm.thrift.io.DeserializerFactory;
-import com.baidu.oped.apm.thrift.io.Header;
-import com.baidu.oped.apm.thrift.io.HeaderTBaseDeserializer;
-import com.baidu.oped.apm.thrift.io.HeaderTBaseDeserializerFactory;
-import com.baidu.oped.apm.thrift.io.HeaderTBaseSerializer;
-import com.baidu.oped.apm.thrift.io.HeaderTBaseSerializerFactory;
-import com.baidu.oped.apm.thrift.io.L4Packet;
-import com.baidu.oped.apm.thrift.io.SerializerFactory;
-import com.baidu.oped.apm.thrift.io.ThreadLocalHeaderTBaseDeserializerFactory;
-import com.baidu.oped.apm.thrift.io.ThreadLocalHeaderTBaseSerializerFactory;
-import com.baidu.oped.apm.thrift.util.SerializationUtils;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import javax.annotation.Resource;
+import java.net.InetAddress;
+import java.net.SocketAddress;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.*;
 
 /**
- * class TCPReceiver 
+ * class TCPReceiver
  *
  * @author meidongxu@baidu.com
  */
+@Component
 public class TCPReceiver {
 
     private final Logger logger = LoggerFactory.getLogger(TCPReceiver.class);
 
-    private final ThreadFactory THREAD_FACTORY = new PinpointThreadFactory("Pinpoint-TCP-Worker");
-    private final PinpointServerSocket pinpointServerSocket;
+    private final ThreadFactory tcpWorkerThreadFactory = new PinpointThreadFactory("Pinpoint-TCP-Worker");
     private final DispatchHandler dispatchHandler;
+    private final PinpointServerAcceptor serverAcceptor;
+
     private final String bindAddress;
     private final int port;
-    private final SerializerFactory<HeaderTBaseSerializer> serializerFactory =
-            new ThreadLocalHeaderTBaseSerializerFactory<HeaderTBaseSerializer>(new HeaderTBaseSerializerFactory(true,
-                                                                                                                       HeaderTBaseSerializerFactory.DEFAULT_UDP_STREAM_MAX_SIZE));
-    private final DeserializerFactory<HeaderTBaseDeserializer> deserializerFactory =
-            new ThreadLocalHeaderTBaseDeserializerFactory<HeaderTBaseDeserializer>(new HeaderTBaseDeserializerFactory());
-    private int threadSize = 256;
-    private int workerQueueSize = 1024 * 5;
-    private final ThreadPoolExecutor worker =
-            ExecutorFactory.newFixedThreadPool(threadSize, workerQueueSize, THREAD_FACTORY);
-//    @Value("#{(pinpoint_collector_properties['collector.l4.ip']).split(',')}")
-    private List<String> l4ipList;
+    private final List<String> l4ipList;
 
-    public TCPReceiver(DispatchHandler dispatchHandler, String bindAddress, int port, List<String> l4ipList) {
+    private final ThreadPoolExecutor worker;
+
+    private final SerializerFactory<HeaderTBaseSerializer> serializerFactory =
+            new ThreadLocalHeaderTBaseSerializerFactory<>(new HeaderTBaseSerializerFactory(true,
+                    HeaderTBaseSerializerFactory.DEFAULT_UDP_STREAM_MAX_SIZE));
+    private final DeserializerFactory<HeaderTBaseDeserializer> deserializerFactory =
+            new ThreadLocalHeaderTBaseDeserializerFactory<>(new HeaderTBaseDeserializerFactory());
+
+
+    @Autowired
+    @Qualifier(value = "agentEventWorker")
+    private ExecutorService agentEventWorker;
+
+    @Autowired
+    private AgentEventHandler agentEventHandler;
+
+    @Autowired
+    private AgentLifeCycleHandler agentLifeCycleHandler;
+
+//    @Resource(name = "channelStateChangeEventHandlers")
+    private List<ServerStateChangeEventHandler> channelStateChangeEventHandlers = Collections.emptyList();
+
+
+    @Autowired
+    public TCPReceiver(TcpConfig configuration, TcpDispatchHandler dispatchHandler) {
+        this(configuration, dispatchHandler, new PinpointServerAcceptor());
+    }
+
+    public TCPReceiver(TcpConfig configuration, DispatchHandler dispatchHandler,
+                       PinpointServerAcceptor serverAcceptor) {
+        if (configuration == null) {
+            throw new NullPointerException("collector configuration must not be null");
+        }
+
         if (dispatchHandler == null) {
             throw new NullPointerException("dispatchHandler must not be null");
         }
-        if (bindAddress == null) {
-            throw new NullPointerException("bindAddress must not be null");
-        }
-
-        this.pinpointServerSocket = new PinpointServerSocket();
 
         this.dispatchHandler = dispatchHandler;
-        this.bindAddress = bindAddress;
-        this.port = port;
-        this.l4ipList = l4ipList;
+        this.bindAddress = configuration.getListenIp();
+        this.port = configuration.getListenPort();
+        this.l4ipList = configuration.getL4IpList();
+        this.worker = ExecutorFactory.newFixedThreadPool(
+                configuration.getWorkerThread(), configuration.getWorkerQueueSize(), tcpWorkerThreadFactory);
+        this.serverAcceptor = serverAcceptor;
     }
 
-    private void setL4TcpChannel(PinpointServerSocket pinpointServerSocket) {
+    private void setL4TcpChannel(PinpointServerAcceptor serverAcceptor) {
         if (l4ipList == null) {
             return;
         }
         try {
-            List<InetAddress> inetAddressList = new ArrayList<InetAddress>();
+            List<InetAddress> inetAddressList = new ArrayList<>();
             for (String l4Ip : l4ipList) {
-                if (StringUtils.isBlank(l4Ip)) {
+                if (StringUtils.isEmpty(l4Ip)) {
                     continue;
                 }
 
@@ -107,7 +125,7 @@ public class TCPReceiver {
             }
 
             InetAddress[] inetAddressArray = new InetAddress[inetAddressList.size()];
-            pinpointServerSocket.setIgnoreAddressList(inetAddressList.toArray(inetAddressArray));
+            serverAcceptor.setIgnoreAddressList(inetAddressList.toArray(inetAddressArray));
         } catch (UnknownHostException e) {
             logger.warn("l4ipList error {}", l4ipList, e);
         }
@@ -115,20 +133,12 @@ public class TCPReceiver {
 
     @PostConstruct
     public void start() {
-        setL4TcpChannel(pinpointServerSocket);
+        this.channelStateChangeEventHandlers.forEach(serverAcceptor::addStateChangeEventHandler);
+
+        setL4TcpChannel(serverAcceptor);
         // take care when attaching message handlers as events are generated from the IO thread.
         // pass them to a separate queue and handle them in a different thread.
-        this.pinpointServerSocket.setMessageListener(new ServerMessageListener() {
-            @Override
-            public void handleSend(SendPacket sendPacket, SocketChannel channel) {
-                receive(sendPacket, channel);
-            }
-
-            @Override
-            public void handleRequest(RequestPacket requestPacket, SocketChannel channel) {
-                requestResponse(requestPacket, channel);
-            }
-
+        this.serverAcceptor.setMessageListener(new ServerMessageListener() {
             @Override
             public HandshakeResponseCode handleHandshake(Map properties) {
                 if (properties == null) {
@@ -148,12 +158,40 @@ public class TCPReceiver {
                     return HandshakeResponseType.Success.SIMPLEX_COMMUNICATION;
                 }
             }
+
+            @Override
+            public void handleSend(SendPacket sendPacket, PinpointSocket channel) {
+                receive(sendPacket, channel);
+            }
+
+            @Override
+            public void handleRequest(RequestPacket requestPacket, PinpointSocket channel) {
+                requestResponse(requestPacket, channel);
+            }
+
+            @Override
+            public void handlePing(PingPacket pingPacket, PinpointServer pinpointServer) {
+                recordPing(pingPacket, pinpointServer);
+            }
         });
-        this.pinpointServerSocket.bind(bindAddress, port);
+        this.serverAcceptor.bind(bindAddress, port);
 
     }
 
-    private void receive(SendPacket sendPacket, SocketChannel channel) {
+    private void recordPing(PingPacket pingPacket, PinpointServer pinpointServer) {
+        final int eventCounter = pingPacket.getPingId();
+        long pingTimestamp = System.currentTimeMillis();
+        try {
+            if (!(eventCounter < 0)) {
+                agentLifeCycleHandler.handleLifeCycleEvent(pinpointServer, pingTimestamp, AgentLifeCycleState.RUNNING, eventCounter);
+            }
+            agentEventHandler.handleEvent(pinpointServer, pingTimestamp, AgentEventType.AGENT_PING);
+        } catch (Exception e) {
+            logger.warn("Error handling ping event", e);
+        }
+    }
+
+    private void receive(SendPacket sendPacket, PinpointSocket channel) {
         try {
             worker.execute(new Dispatch(sendPacket.getPayload(), channel.getRemoteAddress()));
         } catch (RejectedExecutionException e) {
@@ -162,28 +200,35 @@ public class TCPReceiver {
         }
     }
 
-    private void requestResponse(RequestPacket requestPacket, SocketChannel channel) {
+    private void requestResponse(RequestPacket requestPacket, PinpointSocket pinpointSocket) {
         try {
-            worker.execute(new RequestResponseDispatch(requestPacket, channel));
+            worker.execute(new RequestResponseDispatch(requestPacket, pinpointSocket));
         } catch (RejectedExecutionException e) {
             // cause is clear - full stack trace not necessary
             logger.warn("RejectedExecutionException Caused:{}", e.getMessage());
         }
 
- }
+    }
 
     @PreDestroy
     public void stop() {
         logger.info("Pinpoint-TCP-Server stop");
-        pinpointServerSocket.close();
-        worker.shutdown();
+        serverAcceptor.close();
+        shutdownExecutor(worker);
+        shutdownExecutor(agentEventWorker);
+    }
+
+    private void shutdownExecutor(ExecutorService executor) {
+        if (executor == null) {
+            return;
+        }
+        executor.shutdown();
         try {
-            worker.awaitTermination(10, TimeUnit.SECONDS);
+            executor.awaitTermination(10, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
-
- }
+    }
 
     private class Dispatch implements Runnable {
         private final byte[] bytes;
@@ -201,11 +246,11 @@ public class TCPReceiver {
         public void run() {
             try {
                 TBase<?, ?> tBase = SerializationUtils.deserialize(bytes, deserializerFactory);
-                dispatchHandler.dispatchSendMessage(tBase, bytes, Header.HEADER_SIZE, bytes.length);
+                dispatchHandler.dispatchSendMessage(tBase);
             } catch (TException e) {
                 if (logger.isWarnEnabled()) {
                     logger.warn("packet serialize error. SendSocketAddress:{} Cause:{}", remoteAddress, e.getMessage(),
-                                       e);
+                            e);
                 }
                 if (logger.isDebugEnabled()) {
                     logger.debug("packet dump hex:{}", PacketUtils.dumpByteArray(bytes));
@@ -221,25 +266,25 @@ public class TCPReceiver {
             }
         }
 
- }
+    }
 
     private class RequestResponseDispatch implements Runnable {
         private final RequestPacket requestPacket;
-        private final SocketChannel socketChannel;
+        private final PinpointSocket pinpointSocket;
 
-        private RequestResponseDispatch(RequestPacket requestPacket, SocketChannel socketChannel) {
+        private RequestResponseDispatch(RequestPacket requestPacket, PinpointSocket pinpointSocket) {
             if (requestPacket == null) {
                 throw new NullPointerException("requestPacket");
             }
             this.requestPacket = requestPacket;
-            this.socketChannel = socketChannel;
+            this.pinpointSocket = pinpointSocket;
         }
 
         @Override
         public void run() {
 
             byte[] bytes = requestPacket.getPayload();
-            SocketAddress remoteAddress = socketChannel.getRemoteAddress();
+            SocketAddress remoteAddress = pinpointSocket.getRemoteAddress();
             try {
                 TBase<?, ?> tBase = SerializationUtils.deserialize(bytes, deserializerFactory);
                 if (tBase instanceof L4Packet) {
@@ -249,15 +294,15 @@ public class TCPReceiver {
                     }
                     return;
                 }
-                TBase result = dispatchHandler.dispatchRequestMessage(tBase, bytes, Header.HEADER_SIZE, bytes.length);
+                TBase result = dispatchHandler.dispatchRequestMessage(tBase);
                 if (result != null) {
                     byte[] resultBytes = SerializationUtils.serialize(result, serializerFactory);
-                    socketChannel.sendResponseMessage(requestPacket, resultBytes);
+                    pinpointSocket.response(requestPacket, resultBytes);
                 }
             } catch (TException e) {
                 if (logger.isWarnEnabled()) {
                     logger.warn("packet serialize error. SendSocketAddress:{} Cause:{}", remoteAddress, e.getMessage(),
-                                       e);
+                            e);
                 }
                 if (logger.isDebugEnabled()) {
                     logger.debug("packet dump hex:{}", PacketUtils.dumpByteArray(bytes));

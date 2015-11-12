@@ -17,12 +17,10 @@ import org.springframework.stereotype.Component;
  * @author meidongxu@baidu.com
  */
 @Component
-@Qualifier("udpDispatchHandler")
 public class UdpDispatchHandler extends AbstractDispatchHandler {
 
-    @Autowired()
+    @Autowired
     private AgentStatHandler agentStatHandler;
-
 
     public UdpDispatchHandler() {
         this.logger = LoggerFactory.getLogger(this.getClass());

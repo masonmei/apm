@@ -2,5 +2,4 @@
 <configuration>
     <include resource="org/springframework/boot/logging/logback/base.xml" />
     <logger name="com.baidu.oped.apm" level="INFO" />
-
 </configuration>

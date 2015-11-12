@@ -24,7 +24,7 @@ public class AgentStatHandler implements Handler {
     @Autowired
     private AgentStatDao agentStatDao;
 
-    public void handle(TBase<?, ?> tbase, byte[] packet, int offset, int length) {
+    public void handle(TBase<?, ?> tbase) {
         // FIXME (2014.08) Legacy - TAgentStats should not be sent over the wire.
         if (tbase instanceof TAgentStat) {
             final TAgentStat agentStat = (TAgentStat)tbase;

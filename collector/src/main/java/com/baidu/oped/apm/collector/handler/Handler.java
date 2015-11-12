@@ -10,6 +10,6 @@ import org.apache.thrift.TBase;
  */
 public interface Handler {
 
-    void handle(TBase<?, ?> tbase, byte[] packet, int offset, int length);
+    void handle(TBase<?, ?> tbase);
     
 }

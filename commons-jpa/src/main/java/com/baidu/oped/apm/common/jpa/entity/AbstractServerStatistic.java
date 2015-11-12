@@ -20,7 +20,7 @@ public abstract class AbstractServerStatistic extends AbstractPersistable<Long> 
     private Long period;
 
     @Basic
-    @Column(name = "timestamp", nullable = false, insertable = true, updatable = true)
+    @Column(name = "`timestamp`", nullable = false, insertable = true, updatable = true)
     private Long timestamp;
 
     @Basic

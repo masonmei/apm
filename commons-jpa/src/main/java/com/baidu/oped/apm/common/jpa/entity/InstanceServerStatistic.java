@@ -15,7 +15,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "apm_instance_server_statistic", indexes = {
-        @Index(name = "app_instance_statistic_point_unique", columnList = "instance_id,period,timestamp", unique =
+        @Index(name = "app_instance_statistic_point_unique", columnList = "instance_id,period,`timestamp`", unique =
                 true)})
 public class InstanceServerStatistic extends AbstractServerStatistic {
 

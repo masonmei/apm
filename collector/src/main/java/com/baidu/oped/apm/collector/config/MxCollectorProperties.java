@@ -1,30 +1,18 @@
 package com.baidu.oped.apm.collector.config;
 
-import java.util.List;
-
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * Created by mason on 8/5/15.
  */
-@Configuration
 @ConfigurationProperties(prefix = "collector")
 public class MxCollectorProperties {
     private long flushPeriod;
-    private String tcpListenIp;
-    private int tcpListenPort;
-    private String udpSpanListenIp;
-    private int udpSpanListenPort;
-    private int udpSpanSocketReceiveBufferSize;
-    private int udpSpanWorkerThread;
-    private int udpSpanWorkerQueueSize;
-    private String udpStatListenIp;
-    private int udpStatListenPort;
-    private int udpStatSocketReceiveBufferSize;
-    private int udpStatWorkerThread;
-    private int udpStatWorkerQueueSize;
-    private List<String> l4ip;
+    private int agentEventWorkerThread;
+    private int agentEventWorkerQueueSize;
+    private TcpConfig tcpConfig;
+    private StatConfig statConfig;
+    private SpanConfig spanConfig;
 
     public long getFlushPeriod() {
         return flushPeriod;
@@ -34,107 +22,45 @@ public class MxCollectorProperties {
         this.flushPeriod = flushPeriod;
     }
 
-    public String getTcpListenIp() {
-        return tcpListenIp;
+    public int getAgentEventWorkerThread() {
+        return agentEventWorkerThread;
     }
 
-    public void setTcpListenIp(String tcpListenIp) {
-        this.tcpListenIp = tcpListenIp;
+    public void setAgentEventWorkerThread(int agentEventWorkerThread) {
+        this.agentEventWorkerThread = agentEventWorkerThread;
     }
 
-    public int getTcpListenPort() {
-        return tcpListenPort;
+    public int getAgentEventWorkerQueueSize() {
+        return agentEventWorkerQueueSize;
     }
 
-    public void setTcpListenPort(int tcpListenPort) {
-        this.tcpListenPort = tcpListenPort;
+    public void setAgentEventWorkerQueueSize(int agentEventWorkerQueueSize) {
+        this.agentEventWorkerQueueSize = agentEventWorkerQueueSize;
     }
 
-    public String getUdpSpanListenIp() {
-        return udpSpanListenIp;
+    public TcpConfig getTcpConfig() {
+        return tcpConfig;
     }
 
-    public void setUdpSpanListenIp(String udpSpanListenIp) {
-        this.udpSpanListenIp = udpSpanListenIp;
+
+    public void setTcpConfig(TcpConfig tcpConfig) {
+        this.tcpConfig = tcpConfig;
     }
 
-    public int getUdpSpanListenPort() {
-        return udpSpanListenPort;
+    public StatConfig getStatConfig() {
+        return statConfig;
     }
 
-    public void setUdpSpanListenPort(int udpSpanListenPort) {
-        this.udpSpanListenPort = udpSpanListenPort;
+    public void setStatConfig(StatConfig statConfig) {
+        this.statConfig = statConfig;
     }
 
-    public int getUdpSpanSocketReceiveBufferSize() {
-        return udpSpanSocketReceiveBufferSize;
+    public SpanConfig getSpanConfig() {
+        return spanConfig;
     }
 
-    public void setUdpSpanSocketReceiveBufferSize(int udpSpanSocketReceiveBufferSize) {
-        this.udpSpanSocketReceiveBufferSize = udpSpanSocketReceiveBufferSize;
+    public void setSpanConfig(SpanConfig spanConfig) {
+        this.spanConfig = spanConfig;
     }
 
-    public int getUdpSpanWorkerThread() {
-        return udpSpanWorkerThread;
-    }
-
-    public void setUdpSpanWorkerThread(int udpSpanWorkerThread) {
-        this.udpSpanWorkerThread = udpSpanWorkerThread;
-    }
-
-    public int getUdpSpanWorkerQueueSize() {
-        return udpSpanWorkerQueueSize;
-    }
-
-    public void setUdpSpanWorkerQueueSize(int udpSpanWorkerQueueSize) {
-        this.udpSpanWorkerQueueSize = udpSpanWorkerQueueSize;
-    }
-
-    public String getUdpStatListenIp() {
-        return udpStatListenIp;
-    }
-
-    public void setUdpStatListenIp(String udpStatListenIp) {
-        this.udpStatListenIp = udpStatListenIp;
-    }
-
-    public int getUdpStatListenPort() {
-        return udpStatListenPort;
-    }
-
-    public void setUdpStatListenPort(int udpStatListenPort) {
-        this.udpStatListenPort = udpStatListenPort;
-    }
-
-    public int getUdpStatSocketReceiveBufferSize() {
-        return udpStatSocketReceiveBufferSize;
-    }
-
-    public void setUdpStatSocketReceiveBufferSize(int udpStatSocketReceiveBufferSize) {
-        this.udpStatSocketReceiveBufferSize = udpStatSocketReceiveBufferSize;
-    }
-
-    public int getUdpStatWorkerThread() {
-        return udpStatWorkerThread;
-    }
-
-    public void setUdpStatWorkerThread(int udpStatWorkerThread) {
-        this.udpStatWorkerThread = udpStatWorkerThread;
-    }
-
-    public int getUdpStatWorkerQueueSize() {
-        return udpStatWorkerQueueSize;
-    }
-
-    public void setUdpStatWorkerQueueSize(int udpStatWorkerQueueSize) {
-        this.udpStatWorkerQueueSize = udpStatWorkerQueueSize;
-    }
-
-    public List<String> getL4ip() {
-        return l4ip;
-    }
-
-    public void setL4ip(List<String> l4ip) {
-        this.l4ip = l4ip;
-    }
 }

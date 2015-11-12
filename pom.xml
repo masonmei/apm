@@ -4,7 +4,7 @@
 
     <groupId>com.baidu.oped.apm</groupId>
     <artifactId>apm</artifactId>
-    <version>1.1.1</version>
+    <version>1.2.0-SNAPSHOT</version>
     <name>apm</name>
     <packaging>pom</packaging>
 
@@ -25,7 +25,6 @@
     <properties>
         <encoding>UTF-8</encoding>
         <jdk.version>1.8</jdk.version>
-        <slf4j.version>1.7.12</slf4j.version>
         <metrics.version>3.0.1</metrics.version>
         <jetty.version>9.2.13.v20150730</jetty.version>
         <codehaus.jackson.version>1.9.13</codehaus.jackson.version>
@@ -49,7 +48,7 @@
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
+            <artifactId>mockito-core</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -77,21 +76,6 @@
                 <artifactId>commons-jpa</artifactId>
                 <version>${project.version}</version>
             </dependency>
-            <dependency>
-                <groupId>com.baidu.oped.apm</groupId>
-                <artifactId>collector</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.baidu.oped.apm</groupId>
-                <artifactId>web</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <!--<dependency>-->
-                <!--<groupId>org.springframework</groupId>-->
-                <!--<artifactId>spring-instrument</artifactId>-->
-                <!--<version>${spring.version}</version>-->
-            <!--</dependency>-->
 
             <!-- serving performance metrics -->
             <dependency>
@@ -111,59 +95,20 @@
             </dependency>
 
             <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-                <version>${slf4j.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>jcl-over-slf4j</artifactId>
-                <version>${slf4j.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-log4j12</artifactId>
-                <version>${slf4j.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>log4j</groupId>
-                <artifactId>log4j</artifactId>
-                <version>1.2.17</version>
-            </dependency>
-
-            <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty</artifactId>
-                <version>3.6.6.Final</version>
+                <version>3.10.5.Final</version>
             </dependency>
-            <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-lang3</artifactId>
-                <version>3.3.2</version>
-            </dependency>
-            <dependency>
-                <groupId>commons-lang</groupId>
-                <artifactId>commons-lang</artifactId>
-                <version>2.6</version>
-            </dependency>
-
-
-            <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>4.12</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hamcrest</groupId>
-                <artifactId>hamcrest-library</artifactId>
-                <version>1.3</version>
-            </dependency>
-            <dependency>
-                <groupId>org.mockito</groupId>
-                <artifactId>mockito-all</artifactId>
-                <version>1.10.19</version>
-            </dependency>
+            <!--<dependency>-->
+                <!--<groupId>org.apache.commons</groupId>-->
+                <!--<artifactId>commons-lang3</artifactId>-->
+                <!--<version>3.3.2</version>-->
+            <!--</dependency>-->
+            <!--<dependency>-->
+                <!--<groupId>commons-lang</groupId>-->
+                <!--<artifactId>commons-lang</artifactId>-->
+                <!--<version>2.6</version>-->
+            <!--</dependency>-->
 
             <dependency>
                 <groupId>org.apache.thrift</groupId>
@@ -332,12 +277,10 @@
                     <xmlOutput>true</xmlOutput>
                     <xmlOutputDirectory>${project.build.directory}/findbugs</xmlOutputDirectory>
                 </configuration>
-                <version>2.5.5</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-pmd-plugin</artifactId>
-                <version>3.0.1</version>
                 <configuration>
                     <linkXRef>true</linkXRef>
                     <sourceEncoding>${encoding}</sourceEncoding>
@@ -358,7 +301,6 @@
             <plugin>
                 <groupId>com.atlassian.maven.plugins</groupId>
                 <artifactId>maven-clover2-plugin</artifactId>
-                <version>3.1.6</version>
                 <configuration>
                     <includesTestSourceRoots>true</includesTestSourceRoots>
                     <licenseLocation>clover.license</licenseLocation>

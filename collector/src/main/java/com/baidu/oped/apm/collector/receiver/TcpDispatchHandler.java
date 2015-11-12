@@ -21,27 +21,23 @@ import org.springframework.stereotype.Component;
  * @author meidongxu@baidu.com
  */
 @Component
-@Qualifier("tcpDispatchHandler")
 public class TcpDispatchHandler extends AbstractDispatchHandler {
 
-    @Autowired()
+    @Autowired
     private AgentInfoHandler agentInfoHandler;
 
-    @Autowired()
+    @Autowired
     private SqlMetaDataHandler sqlMetaDataHandler;
 
-    @Autowired()
+    @Autowired
     private ApiMetaDataHandler apiMetaDataHandler;
 
-    @Autowired()
+    @Autowired
     private StringMetaDataHandler stringMetaDataHandler;
-
-
 
     public TcpDispatchHandler() {
         this.logger = LoggerFactory.getLogger(this.getClass());
     }
-
 
     @Override
     RequestResponseHandler getRequestResponseHandler(TBase<?, ?> tBase) {

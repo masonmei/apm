@@ -153,7 +153,7 @@ public class JvmController extends BaseController {
 
         List<Long> metricDataIds = getMetricDataIds(appServerStatistics, metricNames);
 
-        ServerTrendContext<ApplicationServerStatistic> context = buildTrendContext(timeRange, period * 1000);
+        ServerTrendContext<ApplicationServerStatistic> context = buildTrendContext(timeRange, period);
         context.setMetricNames(metricNames);
         context.setMetricValue(metricValue);
         context.setMetricDatas(serverStatisticService.getMetricData(metricDataIds));
@@ -177,7 +177,7 @@ public class JvmController extends BaseController {
 
         List<Long> metricDataIds = getMetricDataIds(appServerStatistics, metricNames);
 
-        ServerTrendContext<ApplicationServerStatistic> context = buildTrendContext(timeRange, period * 1000);
+        ServerTrendContext<ApplicationServerStatistic> context = buildTrendContext(timeRange, period);
         context.setMetricNames(metricNames);
         context.setMetricDatas(serverStatisticService.getMetricData(metricDataIds));
         context.setServerStatistics(appServerStatistics);

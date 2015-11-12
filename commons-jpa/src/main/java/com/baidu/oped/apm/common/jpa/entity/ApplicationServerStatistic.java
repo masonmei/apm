@@ -15,7 +15,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "apm_application_server_statistic", indexes = {
-        @Index(name = "app_server_statistic_point_unique", columnList = "app_id,period,timestamp", unique = true)})
+        @Index(name = "app_server_statistic_point_unique", columnList = "app_id,period,`timestamp`", unique = true)})
 public class ApplicationServerStatistic extends AbstractServerStatistic {
     private static final long serialVersionUID = -6888969876356148718L;
     @Basic

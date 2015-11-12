@@ -18,13 +18,10 @@ import org.springframework.stereotype.Component;
  * @author meidongxu@baidu.com
  */
 @Component
-@Qualifier("udpSpanDispatchHandler")
 public class UdpSpanDispatchHandler extends AbstractDispatchHandler {
-
 
     @Autowired()
     private SpanHandler spanDataHandler;
-
 
     @Autowired()
     private SpanChunkHandler spanChunkHandler;
