@@ -1,19 +1,11 @@
 package com.baidu.oped.apm.statistics.collector.record.reader;
 
-import static com.baidu.oped.apm.common.ServiceType.HTTP_CLIENT;
-import static com.baidu.oped.apm.common.ServiceType.HTTP_CLIENT_INTERNAL;
-import static com.baidu.oped.apm.common.ServiceType.JDK_HTTPURLCONNECTOR;
-import static com.baidu.oped.apm.common.ServiceType.NIMM_CLIENT;
-import static com.baidu.oped.apm.common.ServiceType.NPC_CLIENT;
-import static com.baidu.oped.apm.common.ServiceType.NPC_CLIENT_INTERNAL;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
-import com.baidu.oped.apm.common.ServiceType;
+import java.util.Arrays;
+import java.util.List;
+
 
 /**
  * Created by mason on 9/4/15.
@@ -21,20 +13,11 @@ import com.baidu.oped.apm.common.ServiceType;
 @Component
 public class ExternalServiceItemReader extends TraceEventItemReader {
 
-    private static final ServiceType[] SERVICE_TYPE_EXTERNAL =
-            new ServiceType[] {
-                  HTTP_CLIENT,
-                  HTTP_CLIENT_INTERNAL,
-                  JDK_HTTPURLCONNECTOR,
-                  NPC_CLIENT,
-                  NPC_CLIENT_INTERNAL,
-                  NIMM_CLIENT
-            };
+    private static final List<Integer> SERVICE_TYPE_EXTERNAL =
+            Arrays.asList(9050, 9051, 9052, 9053, 9054, 9055, 9058, 9059);
 
     @Override
     protected List<Integer> serviceTypes() {
-        return Arrays.stream(SERVICE_TYPE_EXTERNAL)
-                       .map(serviceType -> (int) serviceType.getCode())
-                       .collect(Collectors.toList());
+        return SERVICE_TYPE_EXTERNAL;
     }
 }

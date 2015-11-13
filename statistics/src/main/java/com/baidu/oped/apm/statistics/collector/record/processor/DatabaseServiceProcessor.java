@@ -6,11 +6,11 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import com.baidu.oped.apm.common.trace.AnnotationKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Component;
 
-import com.baidu.oped.apm.common.AnnotationKey;
 import com.baidu.oped.apm.common.bo.IntStringStringValue;
 import com.baidu.oped.apm.common.jpa.entity.AgentInstanceMap;
 import com.baidu.oped.apm.common.jpa.entity.Annotation;
