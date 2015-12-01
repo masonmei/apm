@@ -30,7 +30,7 @@
 
         <dependency>
             <groupId>com.baidu.oped.apm</groupId>
-            <artifactId>pinpoint-commons</artifactId>
+            <artifactId>apm-commons</artifactId>
         </dependency>
         <dependency>
             <groupId>com.baidu.oped.apm</groupId>
@@ -38,11 +38,11 @@
         </dependency>
         <dependency>
             <groupId>com.baidu.oped.apm</groupId>
-            <artifactId>pinpoint-rpc</artifactId>
+            <artifactId>apm-rpc</artifactId>
         </dependency>
         <dependency>
             <groupId>com.baidu.oped.apm</groupId>
-            <artifactId>pinpoint-thrift</artifactId>
+            <artifactId>apm-thrift</artifactId>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>

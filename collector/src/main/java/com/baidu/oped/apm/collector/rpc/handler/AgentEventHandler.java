@@ -23,7 +23,7 @@ import com.baidu.oped.apm.common.bo.AgentEventBo;
 import com.baidu.oped.apm.common.util.AgentEventMessageSerializer;
 import com.baidu.oped.apm.common.util.AgentEventType;
 import com.baidu.oped.apm.common.util.AgentEventTypeCategory;
-import com.baidu.oped.apm.rpc.server.PinpointServer;
+import com.baidu.oped.apm.rpc.server.ApmServer;
 import com.baidu.oped.apm.rpc.util.MapUtils;
 import com.baidu.oped.apm.thrift.io.CommandHeaderTBaseDeserializerFactory;
 import com.baidu.oped.apm.thrift.io.DeserializerFactory;
@@ -63,11 +63,11 @@ public class AgentEventHandler {
     @Autowired
     private CommandHeaderTBaseDeserializerFactory commandDeserializerFactory;
 
-    public void handleEvent(PinpointServer pinpointServer, long eventTimestamp, AgentEventType eventType) {
+    public void handleEvent(ApmServer pinpointServer, long eventTimestamp, AgentEventType eventType) {
         handleEvent(pinpointServer, eventTimestamp, eventType, null);
     }
 
-    public void handleEvent(PinpointServer pinpointServer, long eventTimestamp, AgentEventType eventType,
+    public void handleEvent(ApmServer pinpointServer, long eventTimestamp, AgentEventType eventType,
             Object eventMessage) {
         if (pinpointServer == null) {
             throw new NullPointerException("pinpointServer may not be null");

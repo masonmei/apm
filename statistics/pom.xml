@@ -60,7 +60,7 @@
 
         <dependency>
             <groupId>com.baidu.oped.apm</groupId>
-            <artifactId>pinpoint-commons</artifactId>
+            <artifactId>apm-commons</artifactId>
         </dependency>
 
         <dependency>

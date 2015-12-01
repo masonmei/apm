@@ -77,9 +77,9 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                     <jvmArguments>
-                        <!-- -javaagent:${project.basedir}/../../agent/java-agent/agent/target/pinpoint-agent/pinpoint-bootstrap-1.1.1.jar-->
-                        -javaagent:/Users/mason/Workspaces/github/pinpoint/agent/target/pinpoint-agent-1.2.0-SNAPSHOT/pinpoint-bootstrap-1.2.0-SNAPSHOT.jar
-                        -Dpinpoint.agentId=${pom.build.finalName} -Dpinpoint.applicationName=weather
+                        -javaagent:${project.basedir}/../../agent/java/agent/target/apm-agent-1.2.0-SNAPSHOT/apm-bootstrap-1.2.0-SNAPSHOT.jar
+                        <!-- -javaagent:/Users/mason/Workspaces/github/pinpoint/agent/target/pinpoint-agent-1.2.0-SNAPSHOT/pinpoint-bootstrap-1.2.0-SNAPSHOT.jar-->
+                        -Dapm.agentId=${pom.build.finalName} -Dapm.applicationName=weather
                     </jvmArguments>
                 </configuration>
             </plugin>

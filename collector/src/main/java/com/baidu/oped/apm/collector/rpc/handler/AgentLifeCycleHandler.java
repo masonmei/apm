@@ -4,7 +4,7 @@ import com.baidu.oped.apm.collector.dao.AgentLifeCycleDao;
 import com.baidu.oped.apm.common.bo.AgentLifeCycleBo;
 import com.baidu.oped.apm.common.util.AgentLifeCycleState;
 import com.baidu.oped.apm.common.util.BytesUtils;
-import com.baidu.oped.apm.rpc.server.PinpointServer;
+import com.baidu.oped.apm.rpc.server.ApmServer;
 import com.baidu.oped.apm.rpc.util.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +37,7 @@ public class AgentLifeCycleHandler {
     @Autowired
     private AgentLifeCycleDao agentLifeCycleDao;
 
-    public void handleLifeCycleEvent(PinpointServer pinpointServer, long eventTimestamp,
+    public void handleLifeCycleEvent(ApmServer pinpointServer, long eventTimestamp,
                                      AgentLifeCycleState agentLifeCycleState, int eventCounter) {
         if (pinpointServer == null) {
             throw new NullPointerException("pinpointServer may not be null");

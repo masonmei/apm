@@ -1,7 +1,6 @@
 
 package com.baidu.oped.apm.collector.receiver.tcp;
 
-import com.baidu.oped.apm.collector.config.MxCollectorProperties;
 import com.baidu.oped.apm.collector.config.TcpConfig;
 import com.baidu.oped.apm.collector.receiver.DispatchHandler;
 import com.baidu.oped.apm.collector.receiver.TcpDispatchHandler;
@@ -10,12 +9,13 @@ import com.baidu.oped.apm.collector.rpc.handler.AgentLifeCycleHandler;
 import com.baidu.oped.apm.collector.util.PacketUtils;
 import com.baidu.oped.apm.common.util.AgentEventType;
 import com.baidu.oped.apm.common.util.AgentLifeCycleState;
+import com.baidu.oped.apm.common.util.ApmThreadFactory;
 import com.baidu.oped.apm.common.util.ExecutorFactory;
-import com.baidu.oped.apm.common.util.PinpointThreadFactory;
-import com.baidu.oped.apm.rpc.PinpointSocket;
+
+import com.baidu.oped.apm.rpc.ApmSocket;
 import com.baidu.oped.apm.rpc.packet.*;
-import com.baidu.oped.apm.rpc.server.PinpointServer;
-import com.baidu.oped.apm.rpc.server.PinpointServerAcceptor;
+import com.baidu.oped.apm.rpc.server.ApmServer;
+import com.baidu.oped.apm.rpc.server.ApmServerAcceptor;
 import com.baidu.oped.apm.rpc.server.ServerMessageListener;
 import com.baidu.oped.apm.rpc.server.handler.ServerStateChangeEventHandler;
 import com.baidu.oped.apm.rpc.util.MapUtils;
@@ -32,7 +32,6 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.annotation.Resource;
 import java.net.InetAddress;
 import java.net.SocketAddress;
 import java.net.UnknownHostException;
@@ -52,9 +51,9 @@ public class TCPReceiver {
 
     private final Logger logger = LoggerFactory.getLogger(TCPReceiver.class);
 
-    private final ThreadFactory tcpWorkerThreadFactory = new PinpointThreadFactory("Pinpoint-TCP-Worker");
+    private final ThreadFactory tcpWorkerThreadFactory = new ApmThreadFactory("Apm-TCP-Worker");
     private final DispatchHandler dispatchHandler;
-    private final PinpointServerAcceptor serverAcceptor;
+    private final ApmServerAcceptor serverAcceptor;
 
     private final String bindAddress;
     private final int port;
@@ -85,11 +84,11 @@ public class TCPReceiver {
 
     @Autowired
     public TCPReceiver(TcpConfig configuration, TcpDispatchHandler dispatchHandler) {
-        this(configuration, dispatchHandler, new PinpointServerAcceptor());
+        this(configuration, dispatchHandler, new ApmServerAcceptor());
     }
 
     public TCPReceiver(TcpConfig configuration, DispatchHandler dispatchHandler,
-                       PinpointServerAcceptor serverAcceptor) {
+                       ApmServerAcceptor serverAcceptor) {
         if (configuration == null) {
             throw new NullPointerException("collector configuration must not be null");
         }
@@ -107,7 +106,7 @@ public class TCPReceiver {
         this.serverAcceptor = serverAcceptor;
     }
 
-    private void setL4TcpChannel(PinpointServerAcceptor serverAcceptor) {
+    private void setL4TcpChannel(ApmServerAcceptor serverAcceptor) {
         if (l4ipList == null) {
             return;
         }
@@ -160,17 +159,17 @@ public class TCPReceiver {
             }
 
             @Override
-            public void handleSend(SendPacket sendPacket, PinpointSocket channel) {
+            public void handleSend(SendPacket sendPacket, ApmSocket channel) {
                 receive(sendPacket, channel);
             }
 
             @Override
-            public void handleRequest(RequestPacket requestPacket, PinpointSocket channel) {
+            public void handleRequest(RequestPacket requestPacket, ApmSocket channel) {
                 requestResponse(requestPacket, channel);
             }
 
             @Override
-            public void handlePing(PingPacket pingPacket, PinpointServer pinpointServer) {
+            public void handlePing(PingPacket pingPacket, ApmServer pinpointServer) {
                 recordPing(pingPacket, pinpointServer);
             }
         });
@@ -178,20 +177,20 @@ public class TCPReceiver {
 
     }
 
-    private void recordPing(PingPacket pingPacket, PinpointServer pinpointServer) {
+    private void recordPing(PingPacket pingPacket, ApmServer apmServer) {
         final int eventCounter = pingPacket.getPingId();
         long pingTimestamp = System.currentTimeMillis();
         try {
             if (!(eventCounter < 0)) {
-                agentLifeCycleHandler.handleLifeCycleEvent(pinpointServer, pingTimestamp, AgentLifeCycleState.RUNNING, eventCounter);
+                agentLifeCycleHandler.handleLifeCycleEvent(apmServer, pingTimestamp, AgentLifeCycleState.RUNNING, eventCounter);
             }
-            agentEventHandler.handleEvent(pinpointServer, pingTimestamp, AgentEventType.AGENT_PING);
+            agentEventHandler.handleEvent(apmServer, pingTimestamp, AgentEventType.AGENT_PING);
         } catch (Exception e) {
             logger.warn("Error handling ping event", e);
         }
     }
 
-    private void receive(SendPacket sendPacket, PinpointSocket channel) {
+    private void receive(SendPacket sendPacket, ApmSocket channel) {
         try {
             worker.execute(new Dispatch(sendPacket.getPayload(), channel.getRemoteAddress()));
         } catch (RejectedExecutionException e) {
@@ -200,7 +199,7 @@ public class TCPReceiver {
         }
     }
 
-    private void requestResponse(RequestPacket requestPacket, PinpointSocket pinpointSocket) {
+    private void requestResponse(RequestPacket requestPacket, ApmSocket pinpointSocket) {
         try {
             worker.execute(new RequestResponseDispatch(requestPacket, pinpointSocket));
         } catch (RejectedExecutionException e) {
@@ -212,7 +211,7 @@ public class TCPReceiver {
 
     @PreDestroy
     public void stop() {
-        logger.info("Pinpoint-TCP-Server stop");
+        logger.info("Apm-TCP-Server stop");
         serverAcceptor.close();
         shutdownExecutor(worker);
         shutdownExecutor(agentEventWorker);
@@ -270,9 +269,9 @@ public class TCPReceiver {
 
     private class RequestResponseDispatch implements Runnable {
         private final RequestPacket requestPacket;
-        private final PinpointSocket pinpointSocket;
+        private final ApmSocket pinpointSocket;
 
-        private RequestResponseDispatch(RequestPacket requestPacket, PinpointSocket pinpointSocket) {
+        private RequestResponseDispatch(RequestPacket requestPacket, ApmSocket pinpointSocket) {
             if (requestPacket == null) {
                 throw new NullPointerException("requestPacket");
             }

@@ -5,7 +5,7 @@ import com.baidu.oped.apm.collector.config.UdpServerConfig;
 import com.baidu.oped.apm.collector.receiver.DataReceiver;
 import com.baidu.oped.apm.collector.util.*;
 import com.baidu.oped.apm.common.util.ExecutorFactory;
-import com.baidu.oped.apm.common.util.PinpointThreadFactory;
+import com.baidu.oped.apm.common.util.ApmThreadFactory;
 import com.baidu.oped.apm.rpc.util.CpuUtils;
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
@@ -101,7 +101,7 @@ public abstract class AbstractUDPReceiver implements DataReceiver {
 
         this.timer = metricRegistry.timer(receiverName + "-timer");
         this.rejectedCounter = metricRegistry.counter(receiverName + "-rejected");
-        this.io = (ThreadPoolExecutor) Executors.newCachedThreadPool(new PinpointThreadFactory(receiverName + "-Io", true));
+        this.io = (ThreadPoolExecutor) Executors.newCachedThreadPool(new ApmThreadFactory(receiverName + "-Io", true));
     }
 
 

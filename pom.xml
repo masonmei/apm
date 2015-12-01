@@ -57,17 +57,17 @@
         <dependencies>
             <dependency>
                 <groupId>com.baidu.oped.apm</groupId>
-                <artifactId>pinpoint-commons</artifactId>
+                <artifactId>apm-commons</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.baidu.oped.apm</groupId>
-                <artifactId>pinpoint-rpc</artifactId>
+                <artifactId>apm-rpc</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.baidu.oped.apm</groupId>
-                <artifactId>pinpoint-thrift</artifactId>
+                <artifactId>apm-thrift</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -245,7 +245,7 @@
                 <version>1.4</version>
                 <executions>
                     <execution>
-                        <id>enforce-pinpoint-build-requirements</id>
+                        <id>enforce-apm-build-requirements</id>
                         <phase>validate</phase>
                         <goals>
                             <goal>enforce</goal>
