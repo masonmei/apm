@@ -1,6 +1,3 @@
-[submodule "agent/java-agent"]
-	path = agent/java-agent
-	url = https://github.com/masonmei/java-agent
 [submodule "agent/java"]
 	path = agent/java
 	url = https://github.com/masonmei/java-agent.git
