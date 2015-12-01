@@ -77,7 +77,7 @@
                 <configuration>
                     <jvmArguments>
                         <!-- -javaagent:${project.basedir}/../../agent/java-agent/agent/target/pinpoint-agent/pinpoint-bootstrap-1.1.1.jar-->
-                         -javaagent:/Users/mason/Workspaces/github/pinpoint/agent/target/pinpoint-agent-1.2.0-SNAPSHOT/pinpoint-bootstrap-1.2.0-SNAPSHOT.jar
+                        -javaagent:/Users/mason/Workspaces/github/pinpoint/agent/target/pinpoint-agent-1.2.0-SNAPSHOT/pinpoint-bootstrap-1.2.0-SNAPSHOT.jar
                         -Dpinpoint.agentId=${pom.build.finalName} -Dpinpoint.applicationName=TESTAPP
                     </jvmArguments>
                 </configuration>
